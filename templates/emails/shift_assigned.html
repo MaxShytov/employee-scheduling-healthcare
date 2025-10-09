@@ -1,0 +1,49 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_title %}New Shift Assigned - MedShift Scheduler{% endblock %}
+
+{% block email_content %}
+<h2 style="color: #333; margin-top: 0; font-size: 24px; font-weight: 600;">
+    📅 New Shift Assigned
+</h2>
+
+<p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
+    Hi {{ shift.employee.get_short_name }},
+</p>
+
+<p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
+    You have been assigned to a new shift:
+</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 8px; padding: 25px; border-left: 4px solid #667eea;">
+    <tr>
+        <td>
+            <p style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: 600;">
+                Shift Details
+            </p>
+            <p style="margin: 5px 0; color: #555; font-size: 15px;">
+                <strong>📍 Location:</strong> {{ shift.location.name }}<br>
+                <strong>👤 Position:</strong> {{ shift.position.name }}<br>
+                <strong>📆 Date:</strong> {{ shift.start_datetime|date:"l, F j, Y" }}<br>
+                <strong>⏰ Time:</strong> {{ shift.start_datetime|date:"g:i A" }} - {{ shift.end_datetime|date:"g:i A" }}<br>
+                <strong>☕ Break:</strong> {{ shift.break_duration }} minutes
+            </p>
+        </td>
+    </tr>
+</table>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+    <tr>
+        <td align="center">
+            <a href="{{ protocol }}://{{ domain }}/schedules/my-schedule/" 
+               style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 15px 40px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
+                View My Schedule
+            </a>
+        </td>
+    </tr>
+</table>
+
+<p style="color: #777; font-size: 14px; line-height: 1.6; margin: 30px 0 0 0;">
+    If you have any conflicts or questions about this shift, please contact your manager as soon as possible.
+</p>
+{% endblock %}

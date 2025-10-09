@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     
     # Local apps
     'apps.core',
+    'apps.accounts',
+    'apps.dashboard',
 ]
 
 MIDDLEWARE = [
@@ -129,4 +131,32 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Swiss compliance settings
-SWISS_CANTON = env('SWISS_CANTON', default='BE')
+SWISS_CANTON = env('SWISS_CANTON', default='GE')
+
+
+# Custom User Model
+AUTH_USER_MODEL = 'accounts.User'
+
+# Authentication settings
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+# Password validation (already exists, but ensure it's there)
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]

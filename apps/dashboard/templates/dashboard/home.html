@@ -1,0 +1,186 @@
+{% extends "layouts/dashboard_layout.html" %}
+{% load static %}
+
+{% block title %}Dashboard - MedShift Scheduler{% endblock %}
+
+{% block dashboard_content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h3 mb-0">
+            <span class="material-icons align-middle me-2" style="font-size: 32px;">dashboard</span>
+            Welcome back, {{ user.get_short_name }}!
+        </h1>
+        <p class="text-muted">Here's what's happening with your workforce today</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Total Employees</p>
+                        <h3 class="mb-0">0</h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded">
+                        <span class="material-icons text-primary" style="font-size: 32px;">people</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Today's Shifts</p>
+                        <h3 class="mb-0">0</h3>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded">
+                        <span class="material-icons text-success" style="font-size: 32px;">event_available</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Active Now</p>
+                        <h3 class="mb-0">0</h3>
+                    </div>
+                    <div class="bg-info bg-opacity-10 p-3 rounded">
+                        <span class="material-icons text-info" style="font-size: 32px;">access_time</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Certifications</p>
+                        <h3 class="mb-0">0</h3>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded">
+                        <span class="material-icons text-warning" style="font-size: 32px;">badge</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Welcome Card -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-5 text-center">
+                <span class="material-icons text-primary mb-3" style="font-size: 80px;">rocket_launch</span>
+                <h2 class="mb-3">Welcome to MedShift Scheduler!</h2>
+                <p class="text-muted mb-4">
+                    Your employee scheduling and workforce management system is being set up.<br>
+                    We're building the following modules:
+                </p>
+                
+                <div class="row g-3 text-start">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <span class="material-icons text-success me-2">check_circle</span>
+                            <div>
+                                <strong>Authentication</strong>
+                                <p class="text-muted mb-0 small">Login, Signup, Password Reset ✓</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <span class="material-icons text-secondary me-2">radio_button_unchecked</span>
+                            <div>
+                                <strong>Employee Management</strong>
+                                <p class="text-muted mb-0 small">Coming next...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <span class="material-icons text-secondary me-2">radio_button_unchecked</span>
+                            <div>
+                                <strong>Schedule Management</strong>
+                                <p class="text-muted mb-0 small">Coming soon...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <span class="material-icons text-secondary me-2">radio_button_unchecked</span>
+                            <div>
+                                <strong>Time Clock</strong>
+                                <p class="text-muted mb-0 small">Coming soon...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <span class="material-icons align-middle me-2">info</span>
+                    System Info
+                </h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <small class="text-muted">Version:</small>
+                        <strong class="float-end">1.0.0 (MVP)</strong>
+                    </li>
+                    <li class="mb-2">
+                        <small class="text-muted">Phase:</small>
+                        <strong class="float-end">Phase 1</strong>
+                    </li>
+                    <li class="mb-2">
+                        <small class="text-muted">Environment:</small>
+                        <strong class="float-end">Development</strong>
+                    </li>
+                    <li>
+                        <small class="text-muted">Database:</small>
+                        <strong class="float-end">PostgreSQL</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <span class="material-icons align-middle me-2">support</span>
+                    Quick Links
+                </h5>
+                <div class="d-grid gap-2">
+                    <a href="/admin/" class="btn btn-outline-primary btn-sm" target="_blank">
+                        <span class="material-icons align-middle me-2" style="font-size: 18px;">admin_panel_settings</span>
+                        Admin Panel
+                    </a>
+                    <a href="https://github.com/yourusername/medshift-scheduler" class="btn btn-outline-secondary btn-sm" target="_blank">
+                        <span class="material-icons align-middle me-2" style="font-size: 18px;">code</span>
+                        Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

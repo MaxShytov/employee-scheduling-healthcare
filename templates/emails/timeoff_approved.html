@@ -1,0 +1,43 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_title %}Time Off Request Approved - MedShift Scheduler{% endblock %}
+
+{% block email_content %}
+<h2 style="color: #10b981; margin-top: 0; font-size: 24px; font-weight: 600;">
+    ✅ Time Off Request Approved
+</h2>
+
+<p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
+    Hi {{ request.employee.get_short_name }},
+</p>
+
+<p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
+    Great news! Your time off request has been approved.
+</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0; background-color: rgba(16, 185, 129, 0.1); border-radius: 8px; padding: 25px; border-left: 4px solid #10b981;">
+    <tr>
+        <td>
+            <p style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: 600;">
+                Time Off Details
+            </p>
+            <p style="margin: 5px 0; color: #555; font-size: 15px;">
+                <strong>Type:</strong> {{ request.get_time_off_type_display }}<br>
+                <strong>From:</strong> {{ request.start_date|date:"F j, Y" }}<br>
+                <strong>To:</strong> {{ request.end_date|date:"F j, Y" }}<br>
+                <strong>Days:</strong> {{ request.days_requested }}
+            </p>
+            {% if request.notes %}
+            <p style="margin: 15px 0 0 0; color: #777; font-size: 14px;">
+                <strong>Manager's Note:</strong><br>
+                {{ request.notes }}
+            </p>
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
+    Enjoy your time off! 🌴
+</p>
+{% endblock %}

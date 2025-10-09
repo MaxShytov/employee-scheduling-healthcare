@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block content %}
+<div class="d-flex" id="wrapper">
+    <!-- Sidebar -->
+    <div class="bg-white border-end" id="sidebar-wrapper" style="width: 250px;">
+        <div class="sidebar-heading border-bottom p-3">
+            <div class="d-flex align-items-center">
+                <span class="material-icons text-primary me-2" style="font-size: 32px;">local_hospital</span>
+                <span class="fw-bold">MedShift</span>
+            </div>
+        </div>
+        <div class="list-group list-group-flush">
+            <a href="{% url 'dashboard:home' %}" class="list-group-item list-group-item-action active">
+                <span class="material-icons align-middle me-2" style="font-size: 20px;">dashboard</span>
+                Dashboard
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">
+                <span class="material-icons align-middle me-2" style="font-size: 20px;">people</span>
+                Employees
+                <span class="badge bg-secondary float-end">Soon</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">
+                <span class="material-icons align-middle me-2" style="font-size: 20px;">calendar_month</span>
+                Schedule
+                <span class="badge bg-secondary float-end">Soon</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">
+                <span class="material-icons align-middle me-2" style="font-size: 20px;">access_time</span>
+                Time Clock
+                <span class="badge bg-secondary float-end">Soon</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">
+                <span class="material-icons align-middle me-2" style="font-size: 20px;">badge</span>
+                Certifications
+                <span class="badge bg-secondary float-end">Soon</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper" class="flex-fill">
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+            <div class="container-fluid">
+                <button class="btn btn-link" id="sidebarToggle">
+                    <span class="material-icons">menu</span>
+                </button>
+
+                <div class="ms-auto d-flex align-items-center">
+                    <!-- Notifications -->
+                    <div class="dropdown me-3">
+                        <button class="btn btn-link position-relative" type="button" data-bs-toggle="dropdown">
+                            <span class="material-icons">notifications</span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                0
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li class="dropdown-header">No notifications</li>
+                        </ul>
+                    </div>
+
+                    <!-- User Menu -->
+                    <div class="dropdown">
+                        <button class="btn btn-link d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                            {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" 
+                                     class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-primary text-white me-2 d-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px; font-weight: bold;">
+                                    {{ user.initials }}
+                                </div>
+                            {% endif %}
+                            <div class="text-start">
+                                <div class="fw-semibold" style="font-size: 14px;">{{ user.get_full_name }}</div>
+                                <div class="text-muted" style="font-size: 12px;">{{ user.email }}</div>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <span class="material-icons align-middle me-2" style="font-size: 18px;">person</span>
+                                    Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <span class="material-icons align-middle me-2" style="font-size: 18px;">settings</span>
+                                    Settings
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                                    <span class="material-icons align-middle me-2" style="font-size: 18px;">logout</span>
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container-fluid p-4">
+            {% include 'includes/messages.html' %}
+            {% block dashboard_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+<style>
+#wrapper {
+    min-height: 100vh;
+}
+
+#sidebar-wrapper {
+    transition: margin 0.25s ease-out;
+}
+
+#page-content-wrapper {
+    background-color: #f8f9fa;
+}
+
+.list-group-item {
+    border: none;
+    padding: 12px 20px;
+    transition: all 0.2s;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.list-group-item.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    margin: 4px 12px;
+    padding: 12px 16px;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: -250px;
+    }
+    
+    #sidebar-wrapper.show {
+        margin-left: 0;
+    }
+}
+</style>
+
+<script>
+document.getElementById('sidebarToggle').addEventListener('click', function() {
+    document.getElementById('sidebar-wrapper').classList.toggle('show');
+});
+</script>
+{% endblock %}
