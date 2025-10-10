@@ -13,6 +13,7 @@ urlpatterns = [
     path('accounts/', include('apps.accounts.urls')), 
     path('dashboard/', include('apps.dashboard.urls')),
     path('employees/', include('apps.employees.urls')),
+    path('help/', include('apps.core.urls')),
     path('', RedirectView.as_view(url='/accounts/login/', permanent=False)),
     
 ]

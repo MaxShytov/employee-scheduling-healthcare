@@ -127,6 +127,22 @@ medshift-scheduler/
 │   ├── timeoff/             # Leave requests
 │   ├── notifications/       # Notification system
 │   └── core/                # Shared utilities
+│   ├── templates/core/
+│   │   └── help.html                      # Страница Help в приложении
+│   ├── views.py                           # View для Help
+│   └── urls.py                            # URL для Help
+├── docs/
+│   ├── README.md                          # Общая информация о документации
+│   ├── convert_to_pdf.sh                  # Скрипт конвертации в PDF
+│   └── user-manual/
+│       ├── USER_MANUAL.md                 # Полное руководство (60+ страниц)
+│       ├── QUICK_START.md                 # Быстрый старт (5 минут)
+│       ├── SCREENSHOT_LIST.md             # Список нужных скриншотов (45+)
+│       ├── images/                        # Дополнительные изображения
+│       └── screenshots/                   # Папка для скриншотов
+│           ├── 01_login_page.png
+│           ├── 02_login_form_highlighted.png
+│           └── ... (45+ files)
 ├── config/                   # Django settings
 │   ├── settings/
 │   │   ├── base.py
@@ -136,6 +152,9 @@ medshift-scheduler/
 │   ├── wsgi.py
 │   └── asgi.py
 ├── static/                   # Static files (CSS, JS, images)
+│   ├── docs/                           # Готовые PDF файлы
+│   ├── USER_MANUAL.pdf
+│   └── QUICK_START.pdf
 ├── templates/                # HTML templates
 ├── media/                    # User uploads
 ├── requirements/             # Python dependencies
