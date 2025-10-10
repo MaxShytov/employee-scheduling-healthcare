@@ -7,10 +7,9 @@ __pycache__/
 *.so
 
 # Django user uploads
-/media/
-/staticfiles/
 *.sqlite3
-!media/.gitkeep
+/media/*          # игнорировать всё внутри папки
+!/media/.gitkeep  # кроме файла-якоря
 
 # Distribution / packaging
 .Python

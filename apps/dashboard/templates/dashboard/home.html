@@ -22,7 +22,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted mb-1">Total Employees</p>
-                        <h3 class="mb-0">0</h3>
+                        <h3 class="mb-0">{{ total_employees }}</h3>
                     </div>
                     <div class="bg-primary bg-opacity-10 p-3 rounded">
                         <span class="material-icons text-primary" style="font-size: 32px;">people</span>
@@ -38,7 +38,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted mb-1">Today's Shifts</p>
-                        <h3 class="mb-0">0</h3>
+                        <h3 class="mb-0">{{ today_shifts }}</h3>
                     </div>
                     <div class="bg-success bg-opacity-10 p-3 rounded">
                         <span class="material-icons text-success" style="font-size: 32px;">event_available</span>
@@ -54,7 +54,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted mb-1">Active Now</p>
-                        <h3 class="mb-0">0</h3>
+                        <h3 class="mb-0">{{ active_now }}</h3>
                     </div>
                     <div class="bg-info bg-opacity-10 p-3 rounded">
                         <span class="material-icons text-info" style="font-size: 32px;">access_time</span>
@@ -70,7 +70,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted mb-1">Certifications</p>
-                        <h3 class="mb-0">0</h3>
+                        <h3 class="mb-0">{{ total_certifications }}</h3>
                     </div>
                     <div class="bg-warning bg-opacity-10 p-3 rounded">
                         <span class="material-icons text-warning" style="font-size: 32px;">badge</span>
@@ -105,10 +105,10 @@
                     </div>
                     <div class="col-md-6">
                         <div class="d-flex align-items-start">
-                            <span class="material-icons text-secondary me-2">radio_button_unchecked</span>
+                            <span class="material-icons text-success me-2">check_circle</span>
                             <div>
                                 <strong>Employee Management</strong>
-                                <p class="text-muted mb-0 small">Coming next...</p>
+                                <p class="text-muted mb-0 small">CRUD, Departments, Positions ✓</p>
                             </div>
                         </div>
                     </div>
@@ -174,9 +174,9 @@
                         <span class="material-icons align-middle me-2" style="font-size: 18px;">admin_panel_settings</span>
                         Admin Panel
                     </a>
-                    <a href="https://github.com/yourusername/medshift-scheduler" class="btn btn-outline-secondary btn-sm" target="_blank">
-                        <span class="material-icons align-middle me-2" style="font-size: 18px;">code</span>
-                        Documentation
+                    <a href="{% url 'employees:employee_list' %}" class="btn btn-outline-secondary btn-sm">
+                        <span class="material-icons align-middle me-2" style="font-size: 18px;">people</span>
+                        Manage Employees
                     </a>
                 </div>
             </div>

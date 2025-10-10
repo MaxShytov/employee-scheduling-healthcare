@@ -14,14 +14,21 @@
             </div>
         </div>
         <div class="list-group list-group-flush">
-            <a href="{% url 'dashboard:home' %}" class="list-group-item list-group-item-action active">
+            <a href="{% url 'dashboard:home' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
                 <span class="material-icons align-middle me-2" style="font-size: 20px;">dashboard</span>
                 Dashboard
             </a>
-            <a href="#" class="list-group-item list-group-item-action">
+            <a href="{% url 'employees:employee_list' %}" class="list-group-item list-group-item-action {% if 'employees' in request.path %}active{% endif %}">
                 <span class="material-icons align-middle me-2" style="font-size: 20px;">people</span>
                 Employees
-                <span class="badge bg-secondary float-end">Soon</span>
+            </a>
+            <a href="{% url 'employees:department_list' %}" class="list-group-item list-group-item-action">
+                <span class="material-icons align-middle me-2" style="font-size: 20px;">apartment</span>
+                Departments
+            </a>
+            <a href="{% url 'employees:position_list' %}" class="list-group-item list-group-item-action">
+                <span class="material-icons align-middle me-2" style="font-size: 20px;">work</span>
+                Positions
             </a>
             <a href="#" class="list-group-item list-group-item-action">
                 <span class="material-icons align-middle me-2" style="font-size: 20px;">calendar_month</span>

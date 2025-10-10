@@ -1,0 +1,274 @@
+{% extends "layouts/dashboard_layout.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}{{ page_title }} - MedShift Scheduler{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% url 'employees:employee_list' %}" class="btn btn-outline-secondary me-3">
+                <span class="material-icons align-middle" style="font-size: 18px;">arrow_back</span>
+            </a>
+            <div>
+                <h1 class="h3 mb-0">{{ page_title }}</h1>
+                <p class="text-muted mb-0">Fill in the employee information below</p>
+            </div>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- User Information Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <span class="material-icons align-middle me-2">person</span>
+                        Personal Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Profile Picture -->
+                        <div class="col-12">
+                            <label for="{{ user_form.profile_picture.id_for_label }}" class="form-label">
+                                Profile Picture
+                            </label>
+                            {% if object.user.profile_picture %}
+                            <div class="mb-2">
+                                <img src="{{ object.user.profile_picture.url }}" 
+                                    class="rounded-circle" 
+                                    style="width: 80px; height: 80px; object-fit: cover;"
+                                    alt="Current photo">
+                                <p class="text-muted small mt-1">Current photo</p>
+                            </div>
+                            {% endif %}
+                            {% render_field user_form.profile_picture class="form-control" %}
+                            <small class="form-text text-muted">
+                                Upload JPG, PNG or GIF (max 5MB)
+                            </small>
+                            {% if user_form.profile_picture.errors %}
+                                <div class="invalid-feedback d-block">{{ user_form.profile_picture.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ user_form.first_name.id_for_label }}" class="form-label">
+                                First Name <span class="text-danger">*</span>
+                            </label>
+                            {% render_field user_form.first_name class="form-control" %}
+                            {% if user_form.first_name.errors %}
+                                <div class="invalid-feedback d-block">{{ user_form.first_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ user_form.last_name.id_for_label }}" class="form-label">
+                                Last Name <span class="text-danger">*</span>
+                            </label>
+                            {% render_field user_form.last_name class="form-control" %}
+                            {% if user_form.last_name.errors %}
+                                <div class="invalid-feedback d-block">{{ user_form.last_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ user_form.email.id_for_label }}" class="form-label">
+                                Email Address <span class="text-danger">*</span>
+                            </label>
+                            {% render_field user_form.email class="form-control" %}
+                            {% if user_form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ user_form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ user_form.phone.id_for_label }}" class="form-label">
+                                Phone Number
+                            </label>
+                            {% render_field user_form.phone class="form-control" %}
+                            {% if user_form.phone.errors %}
+                                <div class="invalid-feedback d-block">{{ user_form.phone.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ user_form.date_of_birth.id_for_label }}" class="form-label">
+                                Date of Birth
+                            </label>
+                            {% render_field user_form.date_of_birth class="form-control" %}
+                            {% if user_form.date_of_birth.errors %}
+                                <div class="invalid-feedback d-block">{{ user_form.date_of_birth.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ user_form.country.id_for_label }}" class="form-label">
+                                Country
+                            </label>
+                            {% render_field user_form.country class="form-select" %}
+                            {% if user_form.country.errors %}
+                                <div class="invalid-feedback d-block">{{ user_form.country.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Employment Information Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <span class="material-icons align-middle me-2">work</span>
+                        Employment Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.employee_id.id_for_label }}" class="form-label">
+                                Employee ID <span class="text-danger">*</span>
+                            </label>
+                            {% render_field form.employee_id class="form-control" %}
+                            {% if form.employee_id.errors %}
+                                <div class="invalid-feedback d-block">{{ form.employee_id.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.employment_type.id_for_label }}" class="form-label">
+                                Employment Type <span class="text-danger">*</span>
+                            </label>
+                            {% render_field form.employment_type class="form-select" %}
+                            {% if form.employment_type.errors %}
+                                <div class="invalid-feedback d-block">{{ form.employment_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.department.id_for_label }}" class="form-label">
+                                Department <span class="text-danger">*</span>
+                            </label>
+                            {% render_field form.department class="form-select" %}
+                            {% if form.department.errors %}
+                                <div class="invalid-feedback d-block">{{ form.department.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.position.id_for_label }}" class="form-label">
+                                Position <span class="text-danger">*</span>
+                            </label>
+                            {% render_field form.position class="form-select" %}
+                            {% if form.position.errors %}
+                                <div class="invalid-feedback d-block">{{ form.position.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.hire_date.id_for_label }}" class="form-label">
+                                Hire Date <span class="text-danger">*</span>
+                            </label>
+                            {% render_field form.hire_date class="form-control" %}
+                            {% if form.hire_date.errors %}
+                                <div class="invalid-feedback d-block">{{ form.hire_date.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.termination_date.id_for_label }}" class="form-label">
+                                Termination Date
+                            </label>
+                            {% render_field form.termination_date class="form-control" %}
+                            {% if form.termination_date.errors %}
+                                <div class="invalid-feedback d-block">{{ form.termination_date.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.hourly_rate.id_for_label }}" class="form-label">
+                                Hourly Rate (CHF) <span class="text-danger">*</span>
+                            </label>
+                            {% render_field form.hourly_rate class="form-control" %}
+                            {% if form.hourly_rate.errors %}
+                                <div class="invalid-feedback d-block">{{ form.hourly_rate.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.weekly_hours.id_for_label }}" class="form-label">
+                                Weekly Hours <span class="text-danger">*</span>
+                            </label>
+                            {% render_field form.weekly_hours class="form-control" %}
+                            {% if form.weekly_hours.errors %}
+                                <div class="invalid-feedback d-block">{{ form.weekly_hours.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                {% render_field form.is_active class="form-check-input" %}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Active Employee
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Emergency Contact Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <span class="material-icons align-middle me-2">emergency</span>
+                        Emergency Contact
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.emergency_contact_name.id_for_label }}" class="form-label">
+                                Contact Name
+                            </label>
+                            {% render_field form.emergency_contact_name class="form-control" %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.emergency_contact_phone.id_for_label }}" class="form-label">
+                                Contact Phone
+                            </label>
+                            {% render_field form.emergency_contact_phone class="form-control" %}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.emergency_contact_relationship.id_for_label }}" class="form-label">
+                                Relationship
+                            </label>
+                            {% render_field form.emergency_contact_relationship class="form-control" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notes Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <span class="material-icons align-middle me-2">notes</span>
+                        Additional Notes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">
+                        Internal Notes
+                    </label>
+                    {% render_field form.notes class="form-control" %}
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="d-flex justify-content-end gap-2 mb-4">
+                <a href="{% url 'employees:employee_list' %}" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <span class="material-icons align-middle me-2" style="font-size: 18px;">save</span>
+                    {{ form_action }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

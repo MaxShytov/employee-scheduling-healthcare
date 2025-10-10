@@ -1,0 +1,83 @@
+{% extends "layouts/dashboard_layout.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} - MedShift Scheduler{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">
+            <span class="material-icons align-middle me-2" style="font-size: 32px;">apartment</span>
+            Departments
+        </h1>
+        <p class="text-muted">Manage hospital departments and units</p>
+    </div>
+    <a href="{% url 'employees:department_create' %}" class="btn btn-primary">
+        <span class="material-icons align-middle me-2" style="font-size: 18px;">add</span>
+        Add Department
+    </a>
+</div>
+
+<div class="row g-4">
+    {% for department in departments %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="badge bg-primary mb-2">{{ department.code }}</span>
+                        <h5 class="card-title mb-0">{{ department.name }}</h5>
+                    </div>
+                    {% if department.is_active %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+                
+                <p class="text-muted small mb-3">{{ department.description|default:"No description" }}</p>
+                
+                <div class="d-flex align-items-center mb-2">
+                    <span class="material-icons text-muted me-2" style="font-size: 20px;">people</span>
+                    <strong>{{ department.employee_count }}</strong>
+                    <span class="text-muted ms-1">employees</span>
+                </div>
+                
+                {% if department.manager %}
+                <div class="d-flex align-items-center mb-3">
+                    <span class="material-icons text-muted me-2" style="font-size: 20px;">person</span>
+                    <span class="text-muted">Manager:</span>
+                    <strong class="ms-1">{{ department.manager.get_full_name }}</strong>
+                </div>
+                {% endif %}
+                
+                <div class="btn-group w-100">
+                    <a href="{% url 'employees:department_update' department.pk %}" class="btn btn-outline-primary btn-sm">
+                        <span class="material-icons align-middle" style="font-size: 16px;">edit</span>
+                        Edit
+                    </a>
+                    <a href="{% url 'employees:department_delete' department.pk %}" class="btn btn-outline-danger btn-sm">
+                        <span class="material-icons align-middle" style="font-size: 16px;">delete</span>
+                        Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <span class="material-icons text-muted mb-3" style="font-size: 64px;">apartment</span>
+                <h5 class="text-muted">No departments yet</h5>
+                <p class="text-muted">Create your first department to organize your workforce</p>
+                <a href="{% url 'employees:department_create' %}" class="btn btn-primary">
+                    <span class="material-icons align-middle me-2" style="font-size: 18px;">add</span>
+                    Add First Department
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
