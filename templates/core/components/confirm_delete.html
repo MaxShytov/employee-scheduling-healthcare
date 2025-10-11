@@ -1,0 +1,45 @@
+{% load i18n %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center p-5">
+                <span class="material-icons text-danger mb-3" style="font-size: 64px;">
+                    {{ icon|default:"warning" }}
+                </span>
+                <h3 class="mb-3">{{ title }}</h3>
+                <p class="text-muted mb-4">
+                    {{ message|safe }}
+                </p>
+                
+                {% if blocking_message %}
+                <div class="alert alert-danger text-start">
+                    <strong>{% trans "Warning" %}:</strong> {{ blocking_message|safe }}
+                </div>
+                <a href="{{ cancel_url }}" class="btn btn-primary">
+                    <span class="material-icons align-middle me-2" style="font-size: 18px;">arrow_back</span>
+                    {{ back_text|default:"Go Back" }}
+                </a>
+                {% else %}
+                    {% if warning_message %}
+                    <div class="alert alert-warning text-start">
+                        <strong>{% trans "Warning" %}:</strong> {{ warning_message|safe }}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <a href="{{ cancel_url }}" class="btn btn-outline-secondary me-2">
+                            <span class="material-icons align-middle me-2" style="font-size: 18px;">arrow_back</span>
+                            {% trans "Cancel" %}
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <span class="material-icons align-middle me-2" style="font-size: 18px;">delete</span>
+                            {{ confirm_text|default:"Delete" }}
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

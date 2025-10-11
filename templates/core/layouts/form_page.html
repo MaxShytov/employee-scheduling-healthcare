@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load ui_components %}
+
+{% block content %}
+<div class="container py-4">
+    
+    <!-- Breadcrumbs -->
+    {% block breadcrumbs %}
+    {% if breadcrumb_items %}
+        {% breadcrumbs breadcrumb_items %}
+    {% endif %}
+    {% endblock %}
+    
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="h3">{% block form_title %}{% endblock %}</h1>
+        <p class="text-muted">{% block form_subtitle %}{% endblock %}</p>
+    </div>
+    
+    <!-- Form -->
+    <div class="row">
+        <div class="{% block form_width %}col-lg-8{% endblock %}">
+            <form method="post" {% block form_attrs %}{% if has_file_upload %}enctype="multipart/form-data"{% endif %}{% endblock %} novalidate>
+                {% csrf_token %}
+                
+                <!-- Non-field errors -->
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-dismissible fade show">
+                    {{ form.non_field_errors }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+                
+                <!-- Form sections -->
+                {% block form_content %}
+                <!-- Override this block to add form fields -->
+                {% endblock %}
+                
+                <!-- Actions -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    {% block form_actions %}
+                    <a href="{% block cancel_url %}{{ cancel_url }}{% endblock %}" class="btn btn-outline-secondary">
+                        {% icon 'close' size=18 %} {% trans "Cancel" %}
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        {% icon 'save' size=18 %} {% block submit_text %}{% trans "Save" %}{% endblock %}
+                    </button>
+                    {% endblock %}
+                </div>
+            </form>
+        </div>
+        
+        <!-- Sidebar (optional) -->
+        {% block form_sidebar %}{% endblock %}
+    </div>
+    
+</div>
+{% endblock %}

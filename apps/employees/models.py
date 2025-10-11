@@ -63,6 +63,32 @@ class Department(TimeStampedModel):
     def employee_count(self):
         """Return number of employees in this department."""
         return self.employees.filter(is_active=True).count()
+    
+    def get_card_items(self):
+        """Returns list of items for info_card component"""
+        items = [
+            {
+                'icon': 'people',
+                'value': self.employees.filter(is_active=True).count(),
+                'label': 'employees'
+            }
+        ]
+        
+        if self.manager:
+            items.append({
+                'icon': 'person',
+                'label': f'Manager: {self.manager.get_full_name()}'
+            })
+        
+        return items
+
+    def get_edit_url(self):
+        from django.urls import reverse
+        return reverse('employees:department_update', kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        from django.urls import reverse
+        return reverse('employees:department_delete', kwargs={'pk': self.pk})
 
 
 class Position(TimeStampedModel):

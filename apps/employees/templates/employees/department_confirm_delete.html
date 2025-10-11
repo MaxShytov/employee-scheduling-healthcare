@@ -1,44 +1,16 @@
 {% extends "layouts/dashboard_layout.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Delete Department - MedShift Scheduler{% endblock %}
+{% block title %}{% trans "Delete Department" %} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center p-5">
-                <span class="material-icons text-danger mb-3" style="font-size: 64px;">warning</span>
-                <h3 class="mb-3">Delete Department?</h3>
-                <p class="text-muted mb-4">
-                    Are you sure you want to delete <strong>{{ object.name }}</strong>?<br>
-                    This action cannot be undone.
-                </p>
-                
-                {% if emp_count > 0 %}
-                <div class="alert alert-danger text-start">
-                    <strong>Warning:</strong> This department has <strong>{{ emp_count }}</strong> active employee(s).
-                    You cannot delete a department with active employees. Please reassign them first.
-                </div>
-                <a href="{% url 'employees:department_list' %}" class="btn btn-primary">
-                    <span class="material-icons align-middle me-2" style="font-size: 18px;">arrow_back</span>
-                    Back to Departments
-                </a>
-                {% else %}
-                <form method="post" class="d-inline">
-                    {% csrf_token %}
-                    <a href="{% url 'employees:department_list' %}" class="btn btn-outline-secondary me-2">
-                        <span class="material-icons align-middle me-2" style="font-size: 18px;">arrow_back</span>
-                        Cancel
-                    </a>
-                    <button type="submit" class="btn btn-danger">
-                        <span class="material-icons align-middle me-2" style="font-size: 18px;">delete</span>
-                        Delete Department
-                    </button>
-                </form>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
+{# Breadcrumbs #}
+{% include "core/components/breadcrumbs.html" with items=breadcrumb_items %}
+
+{% if emp_count > 0 %}
+    {% include "core/components/confirm_delete.html" with title="Delete Department?" message=message_html blocking_message=blocking_html cancel_url=list_url back_text="Back to Departments" %}
+{% else %}
+    {% include "core/components/confirm_delete.html" with title="Delete Department?" message=message_html cancel_url=list_url confirm_text="Delete Department" %}
+{% endif %}
 {% endblock %}

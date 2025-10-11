@@ -1,0 +1,38 @@
+{% load i18n %}
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                {% if columns %}
+                <thead class="table-light">
+                    <tr>
+                        {% for column in columns %}
+                        <th{% if column.width %} width="{{ column.width }}"{% endif %}{% if column.class %} class="{{ column.class }}"{% endif %}>
+                            {{ column.title }}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                {% endif %}
+                <tbody>
+                    {% if rows %}
+                        {% for row in rows %}
+                            {% include "core/components/table_row.html" with row=row %}
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="{{ columns|length|default:8 }}" class="text-center py-4">
+                                {% if empty_state %}
+                                    {% include "core/components/empty_state.html" with icon=empty_state.icon title=empty_state.title message=empty_state.message button_text=empty_state.button_text button_url=empty_state.button_url %}
+                                {% else %}
+                                    <p class="text-muted">{% trans "No data available" %}</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

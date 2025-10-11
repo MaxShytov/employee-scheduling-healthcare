@@ -1,0 +1,76 @@
+{% load i18n %}
+{% load widget_tweaks %}
+
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body">
+        <form method="get" id="filterForm" class="needs-validation">
+            <div class="row g-3 align-items-end">
+                {% if show_search %}
+                <div class="col-md-4">
+                    {% if form.search %}
+                        <label class="form-label small text-muted mb-1">{{ form.search.label }}</label>
+                        {{ form.search|add_class:"form-control" }}
+                    {% else %}
+                        <label class="form-label small text-muted mb-1">Search</label>
+                        <input type="text" 
+                               name="search" 
+                               class="form-control" 
+                               placeholder="{{ search_placeholder|default:'Search...' }}"
+                               value="{{ request.GET.search }}">
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                {% if show_department_filter and form.department %}
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">{{ form.department.label }}</label>
+                    {{ form.department|add_class:"form-select" }}
+                </div>
+                {% endif %}
+                
+                {% if show_position_filter and form.position %}
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">{{ form.position.label }}</label>
+                    {{ form.position|add_class:"form-select" }}
+                </div>
+                {% endif %}
+                
+                {% if show_status_filter and form.status %}
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">{{ form.status.label }}</label>
+                    {{ form.status|add_class:"form-select" }}
+                </div>
+                {% endif %}
+                
+                {% if show_employment_type_filter and form.employment_type %}
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">{{ form.employment_type.label }}</label>
+                    {{ form.employment_type|add_class:"form-select" }}
+                </div>
+                {% endif %}
+                
+                <div class="col-auto ms-auto">
+                    <div class="btn-group" role="group">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="material-icons align-middle me-1" style="font-size: 18px;">filter_list</span>
+                            {% trans "Apply" %}
+                        </button>
+                        <a href="{{ request.path }}" class="btn btn-outline-secondary">
+                            <span class="material-icons align-middle me-1" style="font-size: 18px;">clear</span>
+                            {% trans "Clear" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-label.small {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+</style>

@@ -140,7 +140,7 @@ class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
         fields = (
-            'employee_id', 'department', 'position',
+            'employee_id', 'department', 'position', 'location',  # ← Добавьте location
             'employment_type', 'hire_date', 'termination_date',
             'hourly_rate', 'weekly_hours',
             'emergency_contact_name', 'emergency_contact_phone',
@@ -156,6 +156,9 @@ class EmployeeForm(forms.ModelForm):
                 'class': 'form-select'
             }),
             'position': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'location': forms.Select(attrs={  # ← Добавьте widget для location
                 'class': 'form-select'
             }),
             'employment_type': forms.Select(attrs={
@@ -213,6 +216,87 @@ class EmployeeForm(forms.ModelForm):
         
         return cleaned_data
 
+# apps/employees/forms.py - Simplified version
+
+from django import forms
+from django.utils.translation import gettext_lazy as _
+from .models import Department, Position
+
+
+class EmployeeFilterForm(forms.Form):
+    """
+    Filter form for employee list with Material Design styling.
+    Simplified version without certifications.
+    """
+    
+    EMPLOYMENT_TYPE_CHOICES = [
+        ('', _('All Types')),
+        ('full_time', _('Full-time')),
+        ('part_time', _('Part-time')),
+        ('contractor', _('Contractor')),
+        ('intern', _('Intern')),
+    ]
+    
+    STATUS_CHOICES = [
+        ('', _('All Status')),
+        ('active', _('Active')),
+        ('inactive', _('Inactive')),
+    ]
+    
+    search = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Search by name, ID, or email...'),
+            'autocomplete': 'off',
+        }),
+        label=_('Search')
+    )
+    
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.filter(is_active=True),
+        required=False,
+        empty_label=_('All Departments'),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+        }),
+        label=_('Department')
+    )
+    
+    position = forms.ModelChoiceField(
+        queryset=Position.objects.filter(is_active=True),
+        required=False,
+        empty_label=_('All Positions'),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+        }),
+        label=_('Position')
+    )
+    
+    employment_type = forms.ChoiceField(
+        choices=EMPLOYMENT_TYPE_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+        }),
+        label=_('Employment Type')
+    )
+    
+    status = forms.ChoiceField(
+        choices=STATUS_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+        }),
+        label=_('Status')
+    )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add Material Design classes
+        for field_name, field in self.fields.items():
+            if field_name != 'search':
+                field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' form-select-sm'
 
 class EmployeeDocumentForm(forms.ModelForm):
     """Form for employee documents."""

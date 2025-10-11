@@ -1,0 +1,50 @@
+<span class="badge badge-{{ status|lower }} d-inline-flex align-items-center">
+    {% if status == 'active' %}
+        <i class="material-icons me-1" style="font-size: 16px;">check_circle</i>
+        {% trans "Active" %}
+    {% elif status == 'inactive' %}
+        <i class="material-icons me-1" style="font-size: 16px;">cancel</i>
+        {% trans "Inactive" %}
+    {% elif status == 'pending' %}
+        <i class="material-icons me-1" style="font-size: 16px;">schedule</i>
+        {% trans "Pending" %}
+    {% elif status == 'expired' %}
+        <i class="material-icons me-1" style="font-size: 16px;">error</i>
+        {% trans "Expired" %}
+    {% elif status == 'expiring_soon' %}
+        <i class="material-icons me-1" style="font-size: 16px;">warning</i>
+        {% trans "Expiring Soon" %}
+    {% else %}
+        {{ status|title }}
+    {% endif %}
+</span>
+{% endif %}
+
+<style>
+.badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+.badge-active { 
+    background-color: #e8f5e9; 
+    color: #2e7d32; 
+}
+.badge-inactive { 
+    background-color: #ffebee; 
+    color: #c62828; 
+}
+.badge-pending { 
+    background-color: #fff3e0; 
+    color: #ef6c00; 
+}
+.badge-expired { 
+    background-color: #ffebee; 
+    color: #d32f2f; 
+}
+.badge-expiring_soon { 
+    background-color: #fff8e1; 
+    color: #f57c00; 
+}
+</style>

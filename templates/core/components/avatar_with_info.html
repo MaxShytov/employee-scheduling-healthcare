@@ -1,0 +1,27 @@
+{% load i18n %}
+
+<div class="d-flex align-items-center">
+    <div class="avatar me-2">
+        {% if avatar_url %}
+            <img src="{{ avatar_url }}" 
+                 alt="{{ name }}" 
+                 class="rounded-circle"
+                 style="width: 40px; height: 40px; object-fit: cover;">
+        {% else %}
+            <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center"
+                 style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 500; font-size: 14px;">
+                {% if name %}
+                    {{ name|slice:":1"|upper }}{% if name|wordcount > 1 %}{{ name|slice:"1:"|truncatewords:1|slice:"-1"|slice:":1"|upper }}{% endif %}
+                {% else %}
+                    ?
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    <div>
+        <div class="fw-medium">{{ name }}</div>
+        {% if subtitle %}
+            <small class="text-muted">{{ subtitle }}</small>
+        {% endif %}
+    </div>
+</div>

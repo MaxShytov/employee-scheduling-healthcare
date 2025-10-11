@@ -1,0 +1,126 @@
+{% extends "layouts/dashboard_layout.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block dashboard_content %}
+{# Breadcrumbs #}
+{% if breadcrumb_items %}
+    {% include "core/components/breadcrumbs.html" with items=breadcrumb_items %}
+{% endif %}
+
+{# Page Header #}
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <div class="d-flex align-items-center">
+                {% if page_icon %}
+                <span class="material-icons me-2" style="font-size: 32px; color: var(--bs-primary);">
+                    {% block page_icon %}{% endblock %}
+                </span>
+                {% endif %}
+                <div>
+                    <h1 class="h3 mb-0">{% block page_title %}{% endblock %}</h1>
+                    {% block page_subtitle %}{% endblock page_subtitle %}
+                </div>
+            </div>
+        </div>
+        <div class="col-auto">
+            {% block page_actions %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+{# Statistics Cards #}
+{% block stats_cards %}{% endblock %}
+
+{# Filters Section #}
+{% block filters %}{% endblock %}
+
+{# Main Content Card #}
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        {% block list_content %}{% endblock %}
+        
+        {# Pagination #}
+        {% if is_paginated %}
+        <div class="card-footer bg-white border-top">
+            {% include "core/components/pagination.html" %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# Modals #}
+{% block modals %}{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        border-bottom: 1px solid rgba(0,0,0,.125);
+        padding-bottom: 1rem;
+    }
+    
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: var(--bs-gray-600);
+        border-bottom: 2px solid var(--bs-gray-200);
+    }
+    
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .table tbody tr:hover {
+        background-color: var(--bs-gray-50);
+    }
+    
+    .bulk-actions-bar {
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .dropdown-menu {
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .dropdown-item {
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .dropdown-item:hover {
+        background-color: var(--bs-primary);
+        color: white;
+    }
+    
+    .dropdown-item:hover .material-icons {
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .table {
+            font-size: 0.875rem;
+        }
+        
+        .btn-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{% block list_extra_js %}{% endblock %}
+{% endblock %}

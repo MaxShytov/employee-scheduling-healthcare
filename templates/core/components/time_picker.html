@@ -1,0 +1,38 @@
+{% load i18n %}
+<div class="row g-2">
+    <div class="col">
+        <div class="mdc-text-field mdc-text-field--outlined w-100">
+            <input type="time" 
+                   class="mdc-text-field__input" 
+                   name="{{ name }}_start"
+                   value="{{ start_value }}"
+                   required="{{ required|default:'false' }}">
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label class="mdc-floating-label">{% trans "Start Time" %}</label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-auto d-flex align-items-center">
+        <i class="material-icons text-muted">arrow_forward</i>
+    </div>
+    <div class="col">
+        <div class="mdc-text-field mdc-text-field--outlined w-100">
+            <input type="time" 
+                   class="mdc-text-field__input" 
+                   name="{{ name }}_end"
+                   value="{{ end_value }}"
+                   required="{{ required|default:'false' }}">
+            <div class="mdc-notched-outline">
+                <div class="mdc-notched-outline__leading"></div>
+                <div class="mdc-notched-outline__notch">
+                    <label class="mdc-floating-label">{% trans "End Time" %}</label>
+                </div>
+                <div class="mdc-notched-outline__trailing"></div>
+            </div>
+        </div>
+    </div>
+</div>

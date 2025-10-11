@@ -1,0 +1,51 @@
+{% load static %}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body text-center">
+        {% if employee.user.profile_picture %}
+            <img src="{{ employee.user.profile_picture.url }}" 
+                 class="rounded-circle mb-3" 
+                 style="width: 120px; height: 120px; object-fit: cover;"
+                 alt="{{ employee.full_name }}">
+        {% else %}
+            <div class="rounded-circle bg-primary text-white mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                 style="width: 120px; height: 120px; font-size: 48px; font-weight: bold;">
+                {{ employee.user.initials }}
+            </div>
+        {% endif %}
+        
+        <h5 class="mb-1">{{ employee.full_name }}</h5>
+        <p class="text-muted mb-3">{{ employee.position.title }}</p>
+        
+        {% if employee.is_active %}
+            <span class="badge bg-success mb-3">Active Employee</span>
+        {% else %}
+            <span class="badge bg-danger mb-3">Inactive</span>
+        {% endif %}
+        
+        <hr>
+        
+        <div class="text-start">
+            <div class="d-flex align-items-center mb-2">
+                <span class="material-icons text-muted me-2" style="font-size: 20px;">badge</span>
+                <strong class="me-2">ID:</strong>
+                <span>{{ employee.employee_id }}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+                <span class="material-icons text-muted me-2" style="font-size: 20px;">email</span>
+                <strong class="me-2">Email:</strong>
+                <span>{{ employee.email }}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+                <span class="material-icons text-muted me-2" style="font-size: 20px;">phone</span>
+                <strong class="me-2">Phone:</strong>
+                <span>{{ employee.phone|default:"—" }}</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="material-icons text-muted me-2" style="font-size: 20px;">apartment</span>
+                <strong class="me-2">Dept:</strong>
+                <span>{{ employee.department.name }}</span>
+            </div>
+        </div>
+    </div>
+</div>

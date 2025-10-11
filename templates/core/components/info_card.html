@@ -1,0 +1,64 @@
+{% load i18n %}
+
+<div class="card border-0 shadow-sm h-100">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                {% if badge_text %}
+                <span class="badge {{ badge_class|default:'bg-primary' }} mb-2">{{ badge_text }}</span>
+                {% endif %}
+                <h5 class="card-title mb-0">
+                    {% if detail_url %}
+                    <a href="{{ detail_url }}" class="text-decoration-none text-dark">{{ title }}</a>
+                    {% else %}
+                    {{ title }}
+                    {% endif %}
+                </h5>
+            </div>
+            {% if status_text %}
+            <span class="badge {{ status_class|default:'bg-success' }}">{{ status_text }}</span>
+            {% endif %}
+        </div>
+        
+        {% if description %}
+        <p class="text-muted small mb-3">{{ description|default:"No description" }}</p>
+        {% endif %}
+        
+        {% if card_items %}
+        {% for item in card_items %}
+        <div class="d-flex align-items-center mb-2">
+            {% if item.icon %}
+            <span class="material-icons text-muted me-2" style="font-size: 20px;">{{ item.icon }}</span>
+            {% endif %}
+            {% if item.value %}
+            <strong>{{ item.value }}</strong>
+            {% endif %}
+            {% if item.label %}
+            <span class="text-muted {% if item.value %}ms-1{% endif %}">{{ item.label }}</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+        
+        <div class="btn-group w-100 mt-3">
+            {% if detail_url %}
+            <a href="{{ detail_url }}" class="btn btn-outline-secondary btn-sm">
+                <span class="material-icons align-middle" style="font-size: 16px;">visibility</span>
+                {% trans "View" %}
+            </a>
+            {% endif %}
+            {% if edit_url %}
+            <a href="{{ edit_url }}" class="btn btn-outline-primary btn-sm">
+                <span class="material-icons align-middle" style="font-size: 16px;">edit</span>
+                {% trans "Edit" %}
+            </a>
+            {% endif %}
+            {% if delete_url %}
+            <a href="{{ delete_url }}" class="btn btn-outline-danger btn-sm">
+                <span class="material-icons align-middle" style="font-size: 16px;">delete</span>
+                {% trans "Delete" %}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

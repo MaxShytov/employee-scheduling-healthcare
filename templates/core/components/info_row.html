@@ -1,0 +1,9 @@
+<div class="{% if col_class %}{{ col_class }}{% else %}col-md-6{% endif %}">
+    <label class="text-muted small">{{ label }}</label>
+    <p class="mb-0">
+        {% if badge_text %}
+        <span class="badge {{ badge_class|default:'bg-secondary' }}">{{ badge_text }}</span>
+        {% endif %}
+        <strong>{{ value|default:"—" }}</strong>
+    </p>
+</div>

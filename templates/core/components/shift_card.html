@@ -1,0 +1,36 @@
+<div class="shift-card mdc-card mdc-card--outlined mb-2" data-shift-id="{{ shift.id }}">
+    <div class="mdc-card__content p-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <h6 class="mb-1">{{ shift.position.name }}</h6>
+                <div class="text-muted small">
+                    <i class="material-icons" style="font-size: 16px;">schedule</i>
+                    {{ shift.start_time|time:"g:i A" }} - {{ shift.end_time|time:"g:i A" }}
+                </div>
+            </div>
+            {% include 'components/display/status_badge.html' with status=shift.status %}
+        </div>
+        
+        {% if shift.employee %}
+        <div class="mt-2">
+            {% include 'components/display/avatar_with_info.html' with
+                name=shift.employee.get_full_name
+                subtitle=shift.employee.position.name
+                avatar_url=shift.employee.profile_picture.url
+                initials=shift.employee.get_initials
+            %}
+        </div>
+        {% else %}
+        <div class="mt-2 p-2 bg-light rounded text-center">
+            <small class="text-muted">{% trans "Unassigned" %}</small>
+        </div>
+        {% endif %}
+        
+        {% if shift.notes %}
+        <div class="mt-2 small text-muted">
+            <i class="material-icons" style="font-size: 14px;">note</i>
+            {{ shift.notes|truncatewords:10 }}
+        </div>
+        {% endif %}
+    </div>
+</div>

@@ -1,10 +1,14 @@
 {% extends "layouts/dashboard_layout.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}{{ employee.full_name }} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-<!-- Header -->
+{# Breadcrumbs #}
+{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
+
+{# Header #}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div class="d-flex align-items-center">
         <a href="{% url 'employees:employee_list' %}" class="btn btn-outline-secondary me-3">
@@ -18,212 +22,112 @@
     <div>
         <a href="{% url 'employees:employee_update' employee.pk %}" class="btn btn-primary">
             <span class="material-icons align-middle me-2" style="font-size: 18px;">edit</span>
-            Edit
+            {% trans "Edit" %}
         </a>
         <a href="{% url 'employees:employee_delete' employee.pk %}" class="btn btn-outline-danger">
             <span class="material-icons align-middle me-2" style="font-size: 18px;">delete</span>
-            Delete
+            {% trans "Delete" %}
         </a>
     </div>
 </div>
 
-<!-- Profile Card -->
+{# Profile and Tabs #}
 <div class="row mb-4">
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center">
-                {% if employee.user.profile_picture %}
-                    <img src="{{ employee.user.profile_picture.url }}" 
-                         class="rounded-circle mb-3" 
-                         style="width: 120px; height: 120px; object-fit: cover;"
-                         alt="{{ employee.full_name }}">
-                {% else %}
-                    <div class="rounded-circle bg-primary text-white mb-3 mx-auto d-flex align-items-center justify-content-center" 
-                         style="width: 120px; height: 120px; font-size: 48px; font-weight: bold;">
-                        {{ employee.user.initials }}
-                    </div>
-                {% endif %}
-                
-                <h5 class="mb-1">{{ employee.full_name }}</h5>
-                <p class="text-muted mb-3">{{ employee.position.title }}</p>
-                
-                {% if employee.is_active %}
-                    <span class="badge bg-success mb-3">Active Employee</span>
-                {% else %}
-                    <span class="badge bg-danger mb-3">Inactive</span>
-                {% endif %}
-                
-                <hr>
-                
-                <div class="text-start">
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="material-icons text-muted me-2" style="font-size: 20px;">badge</span>
-                        <strong class="me-2">ID:</strong>
-                        <span>{{ employee.employee_id }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="material-icons text-muted me-2" style="font-size: 20px;">email</span>
-                        <strong class="me-2">Email:</strong>
-                        <span>{{ employee.email }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="material-icons text-muted me-2" style="font-size: 20px;">phone</span>
-                        <strong class="me-2">Phone:</strong>
-                        <span>{{ employee.phone|default:"—" }}</span>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <span class="material-icons text-muted me-2" style="font-size: 20px;">apartment</span>
-                        <strong class="me-2">Dept:</strong>
-                        <span>{{ employee.department.name }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include "core/components/profile_card.html" with employee=employee %}
     </div>
     
     <div class="col-md-8">
-        <!-- Tabs -->
+        {# Tabs Navigation #}
         <ul class="nav nav-tabs mb-3" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link {% if active_tab == 'personal' %}active{% endif %}" 
                    href="?tab=personal" role="tab">
                     <span class="material-icons align-middle me-2" style="font-size: 18px;">person</span>
-                    Personal Info
+                    {% trans "Personal Info" %}
                 </a>
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link {% if active_tab == 'work' %}active{% endif %}" 
                    href="?tab=work" role="tab">
                     <span class="material-icons align-middle me-2" style="font-size: 18px;">work</span>
-                    Work Info
+                    {% trans "Work Info" %}
                 </a>
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link {% if active_tab == 'documents' %}active{% endif %}" 
                    href="?tab=documents" role="tab">
                     <span class="material-icons align-middle me-2" style="font-size: 18px;">description</span>
-                    Documents
+                    {% trans "Documents" %}
                     <span class="badge bg-primary ms-1">{{ documents.count }}</span>
                 </a>
             </li>
         </ul>
         
-        <!-- Tab Content -->
+        {# Tab Content #}
         <div class="tab-content">
-            <!-- Personal Info Tab -->
+            {# Personal Info Tab #}
             {% if active_tab == 'personal' %}
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
                         <span class="material-icons align-middle me-2">person</span>
-                        Personal Information
+                        {% trans "Personal Information" %}
                     </h5>
                     
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="text-muted small">First Name</label>
-                            <p class="mb-0"><strong>{{ employee.user.first_name }}</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Last Name</label>
-                            <p class="mb-0"><strong>{{ employee.user.last_name }}</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Email Address</label>
-                            <p class="mb-0"><strong>{{ employee.user.email }}</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Phone Number</label>
-                            <p class="mb-0"><strong>{{ employee.user.phone|default:"—" }}</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Date of Birth</label>
-                            <p class="mb-0"><strong>{{ employee.user.date_of_birth|date:"F j, Y"|default:"—" }}</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Country</label>
-                            <p class="mb-0"><strong>{{ employee.user.country.name }}</strong></p>
-                        </div>
+                        {% include "core/components/info_row.html" with label="First Name" value=employee.user.first_name %}
+                        {% include "core/components/info_row.html" with label="Last Name" value=employee.user.last_name %}
+                        {% include "core/components/info_row.html" with label="Email Address" value=employee.user.email %}
+                        {% include "core/components/info_row.html" with label="Phone Number" value=employee.user.phone %}
+                        {% include "core/components/info_row.html" with label="Date of Birth" value=employee.user.date_of_birth|date:"F j, Y" %}
+                        {% include "core/components/info_row.html" with label="Country" value=employee.user.country.name %}
                     </div>
                     
                     <hr class="my-4">
                     
                     <h5 class="card-title mb-3">
                         <span class="material-icons align-middle me-2">emergency</span>
-                        Emergency Contact
+                        {% trans "Emergency Contact" %}
                     </h5>
                     
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="text-muted small">Contact Name</label>
-                            <p class="mb-0"><strong>{{ employee.emergency_contact_name|default:"—" }}</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Contact Phone</label>
-                            <p class="mb-0"><strong>{{ employee.emergency_contact_phone|default:"—" }}</strong></p>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="text-muted small">Relationship</label>
-                            <p class="mb-0"><strong>{{ employee.emergency_contact_relationship|default:"—" }}</strong></p>
-                        </div>
+                        {% include "core/components/info_row.html" with label="Contact Name" value=employee.emergency_contact_name %}
+                        {% include "core/components/info_row.html" with label="Contact Phone" value=employee.emergency_contact_phone %}
+                        {% include "core/components/info_row.html" with label="Relationship" value=employee.emergency_contact_relationship col_class="col-12" %}
                     </div>
                 </div>
             </div>
             {% endif %}
             
-            <!-- Work Info Tab -->
+            {# Work Info Tab #}
             {% if active_tab == 'work' %}
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
                         <span class="material-icons align-middle me-2">work</span>
-                        Employment Information
+                        {% trans "Employment Information" %}
                     </h5>
                     
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="text-muted small">Employee ID</label>
-                            <p class="mb-0"><strong>{{ employee.employee_id }}</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Employment Type</label>
-                            <p class="mb-0"><strong>{{ employee.get_employment_type_display }}</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Department</label>
-                            <p class="mb-0">
-                                <span class="badge bg-secondary">{{ employee.department.code }}</span>
-                                <strong>{{ employee.department.name }}</strong>
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Position</label>
-                            <p class="mb-0">
-                                <span class="badge bg-info">{{ employee.position.code }}</span>
-                                <strong>{{ employee.position.title }}</strong>
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Hire Date</label>
-                            <p class="mb-0"><strong>{{ employee.hire_date|date:"F j, Y" }}</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Years of Service</label>
-                            <p class="mb-0"><strong>{{ employee.years_of_service }} years</strong></p>
-                        </div>
+                        {% include "core/components/info_row.html" with label="Employee ID" value=employee.employee_id %}
+                        {% include "core/components/info_row.html" with label="Employment Type" value=employee.get_employment_type_display %}
+                        {% include "core/components/info_row.html" with label="Department" value=employee.department.name badge_text=employee.department.code badge_class="bg-secondary" %}
+                        {% include "core/components/info_row.html" with label="Position" value=employee.position.title badge_text=employee.position.code badge_class="bg-info" %}
+                        {% include "core/components/info_row.html" with label="Hire Date" value=employee.hire_date|date:"F j, Y" %}
+                        {% include "core/components/info_row.html" with label="Years of Service" value=employee.years_of_service|add:" years" %}
+                        
                         {% if employee.termination_date %}
-                        <div class="col-md-6">
-                            <label class="text-muted small">Termination Date</label>
-                            <p class="mb-0"><strong>{{ employee.termination_date|date:"F j, Y" }}</strong></p>
-                        </div>
+                        {% include "core/components/info_row.html" with label="Termination Date" value=employee.termination_date|date:"F j, Y" %}
                         {% endif %}
+                        
                         <div class="col-md-6">
-                            <label class="text-muted small">Status</label>
+                            <label class="text-muted small">{% trans "Status" %}</label>
                             <p class="mb-0">
                                 {% if employee.is_active %}
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="badge bg-success">{% trans "Active" %}</span>
                                 {% else %}
-                                    <span class="badge bg-danger">Inactive</span>
+                                    <span class="badge bg-danger">{% trans "Inactive" %}</span>
                                 {% endif %}
                             </p>
                         </div>
@@ -233,18 +137,15 @@
                     
                     <h5 class="card-title mb-3">
                         <span class="material-icons align-middle me-2">payments</span>
-                        Compensation
+                        {% trans "Compensation" %}
                     </h5>
                     
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="text-muted small">Hourly Rate</label>
+                            <label class="text-muted small">{% trans "Hourly Rate" %}</label>
                             <p class="mb-0"><strong class="text-success">CHF {{ employee.hourly_rate }}</strong></p>
                         </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Weekly Hours</label>
-                            <p class="mb-0"><strong>{{ employee.weekly_hours }} hours</strong></p>
-                        </div>
+                        {% include "core/components/info_row.html" with label="Weekly Hours" value=employee.weekly_hours|add:" hours" %}
                     </div>
                     
                     {% if employee.notes %}
@@ -252,7 +153,7 @@
                     
                     <h5 class="card-title mb-3">
                         <span class="material-icons align-middle me-2">notes</span>
-                        Notes
+                        {% trans "Notes" %}
                     </h5>
                     
                     <p class="text-muted">{{ employee.notes }}</p>
@@ -261,18 +162,18 @@
             </div>
             {% endif %}
             
-            <!-- Documents Tab -->
+            {# Documents Tab #}
             {% if active_tab == 'documents' %}
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">
                             <span class="material-icons align-middle me-2">description</span>
-                            Documents
+                            {% trans "Documents" %}
                         </h5>
                         <a href="{% url 'employees:document_upload' employee.pk %}" class="btn btn-sm btn-primary">
                             <span class="material-icons align-middle me-1" style="font-size: 16px;">upload_file</span>
-                            Upload Document
+                            {% trans "Upload Document" %}
                         </a>
                     </div>
                     
@@ -281,12 +182,12 @@
                         <table class="table table-hover">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Type</th>
-                                    <th>Title</th>
-                                    <th>Issue Date</th>
-                                    <th>Expiry Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <th>{% trans "Type" %}</th>
+                                    <th>{% trans "Title" %}</th>
+                                    <th>{% trans "Issue Date" %}</th>
+                                    <th>{% trans "Expiry Date" %}</th>
+                                    <th>{% trans "Status" %}</th>
+                                    <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -301,14 +202,14 @@
                                     <td>
                                         {% if doc.expiry_date %}
                                             {% if doc.is_expired %}
-                                                <span class="badge bg-danger">Expired</span>
+                                                <span class="badge bg-danger">{% trans "Expired" %}</span>
                                             {% elif doc.days_until_expiry <= 30 %}
-                                                <span class="badge bg-warning">Expires in {{ doc.days_until_expiry }} days</span>
+                                                <span class="badge bg-warning">{% trans "Expires in" %} {{ doc.days_until_expiry }} {% trans "days" %}</span>
                                             {% else %}
-                                                <span class="badge bg-success">Valid</span>
+                                                <span class="badge bg-success">{% trans "Valid" %}</span>
                                             {% endif %}
                                         {% else %}
-                                            <span class="badge bg-light text-dark">No Expiry</span>
+                                            <span class="badge bg-light text-dark">{% trans "No Expiry" %}</span>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -316,12 +217,12 @@
                                             <a href="{{ doc.file.url }}" 
                                                class="btn btn-outline-primary" 
                                                target="_blank"
-                                               title="Download">
+                                               title="{% trans 'Download' %}">
                                                 <span class="material-icons" style="font-size: 16px;">download</span>
                                             </a>
                                             <a href="{% url 'employees:document_delete' employee.pk doc.pk %}" 
                                                class="btn btn-outline-danger" 
-                                               title="Delete">
+                                               title="{% trans 'Delete' %}">
                                                 <span class="material-icons" style="font-size: 16px;">delete</span>
                                             </a>
                                         </div>
@@ -332,15 +233,7 @@
                         </table>
                     </div>
                     {% else %}
-                    <div class="text-center py-5">
-                        <span class="material-icons text-muted mb-3" style="font-size: 64px;">description</span>
-                        <h6 class="text-muted">No documents uploaded</h6>
-                        <p class="text-muted">Upload certificates, contracts, or other documents</p>
-                        <a href="{% url 'employees:document_upload' employee.pk %}" class="btn btn-primary">
-                            <span class="material-icons align-middle me-2" style="font-size: 18px;">upload_file</span>
-                            Upload First Document
-                        </a>
-                    </div>
+                    {% include "core/components/empty_state.html" with icon="description" title="No documents uploaded" message="Upload certificates, contracts, or other documents" action_url=upload_url action_text="Upload First Document" action_icon="upload_file" %}
                     {% endif %}
                 </div>
             </div>

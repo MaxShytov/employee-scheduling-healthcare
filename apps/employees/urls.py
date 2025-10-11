@@ -15,6 +15,9 @@ urlpatterns = [
     path('<int:pk>/edit/', views.EmployeeUpdateView.as_view(), name='employee_update'),
     path('<int:pk>/delete/', views.EmployeeDeleteView.as_view(), name='employee_delete'),
     
+    # Bulk actions (заглушка на данный момент). TODO: Implement bulk actions.
+    path('bulk-action/', views.employee_bulk_action, name='bulk_action'),
+    
     # Document URLs
     path('<int:pk>/documents/upload/', views.employee_document_upload, name='document_upload'),
     path('<int:pk>/documents/<int:doc_pk>/delete/', views.employee_document_delete, name='document_delete'),

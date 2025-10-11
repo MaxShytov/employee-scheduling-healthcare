@@ -1,0 +1,20 @@
+{% load i18n %}
+<div class="certification-status d-flex align-items-center">
+    {% if all_valid %}
+        <i class="material-icons text-success me-2">verified</i>
+        <span class="text-success fw-medium">{% trans "All Certifications Valid" %}</span>
+    {% elif expired_count > 0 %}
+        <i class="material-icons text-danger me-2">error</i>
+        <span class="text-danger fw-medium">
+            {{ expired_count }} {% trans "Expired" %}
+        </span>
+    {% elif expiring_soon_count > 0 %}
+        <i class="material-icons text-warning me-2">warning</i>
+        <span class="text-warning fw-medium">
+            {{ expiring_soon_count }} {% trans "Expiring Soon" %}
+        </span>
+    {% else %}
+        <i class="material-icons text-muted me-2">help_outline</i>
+        <span class="text-muted">{% trans "No Certifications" %}</span>
+    {% endif %}
+</div>

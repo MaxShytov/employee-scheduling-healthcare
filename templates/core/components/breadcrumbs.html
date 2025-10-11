@@ -1,0 +1,25 @@
+{% if breadcrumb_items %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        {% for item in breadcrumb_items %}
+            {% if forloop.last and not item.url %}
+                {# Последний элемент без URL - делаем его активным #}
+                <li class="breadcrumb-item active" aria-current="page">
+                    {{ item.name }}
+                </li>
+            {% else %}
+                <li class="breadcrumb-item">
+                    <a href="{{ item.url }}" class="text-decoration-none">
+                        {% if forloop.first and not item.name %}
+                            {# Первый элемент - домашняя страница #}
+                            <span class="material-icons align-middle" style="font-size: 18px;">home</span>
+                        {% else %}
+                            {{ item.name }}
+                        {% endif %}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+</nav>
+{% endif %}

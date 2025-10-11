@@ -1,0 +1,53 @@
+{% load i18n %}
+
+<tr{% if row.id %} data-id="{{ row.id }}"{% endif %}{% if row.class %} class="{{ row.class }}"{% endif %}>
+    {% for cell in row.cells %}
+    <td{% if cell.class %} class="{{ cell.class }}"{% endif %}>
+        {% if cell.type == "text" %}
+            {{ cell.value }}
+        {% elif cell.type == "strong" %}
+            <strong>{{ cell.value }}</strong>
+        {% elif cell.type == "avatar" %}
+            {% if cell.avatar_url %}
+                {% include "core/components/avatar_with_info.html" with name=cell.name subtitle=cell.subtitle avatar_url=cell.avatar_url %}
+            {% else %}
+                {% include "core/components/avatar_with_info.html" with name=cell.name subtitle=cell.subtitle %}
+            {% endif %}
+        {% elif cell.type == "badge" %}
+            <span class="badge bg-{{ cell.color|default:'secondary' }}">{{ cell.text }}</span>
+            {% if cell.subtitle %}<br><small>{{ cell.subtitle }}</small>{% endif %}
+        {% elif cell.type == "badges" %}
+            {% for badge in cell.badges %}
+                <span class="badge bg-{{ badge.color|default:'secondary' }}">{{ badge.text }}</span>
+            {% endfor %}
+            {% if cell.text %}{{ cell.text }}{% endif %}
+        {% elif cell.type == "status" %}
+            {% if cell.value %}
+                <span class="badge bg-success">{{ cell.true_text|default:"Active" }}</span>
+            {% else %}
+                <span class="badge bg-danger">{{ cell.false_text|default:"Inactive" }}</span>
+            {% endif %}
+        {% elif cell.type == "currency" %}
+            <strong>{{ cell.currency|default:"CHF" }} {{ cell.value|floatformat:2 }}</strong>
+        {% elif cell.type == "actions" %}
+            <div class="btn-group btn-group-sm">
+                {% for action in cell.actions %}
+                    {% if action.type == "link" %}
+                        <a href="{{ action.url }}" class="btn btn-outline-{{ action.color|default:'primary' }}" title="{{ action.title }}">
+                            <span class="material-icons" style="font-size: 16px;">{{ action.icon }}</span>
+                        </a>
+                    {% elif action.type == "button" %}
+                        <button type="button" class="btn btn-outline-{{ action.color|default:'primary' }}" title="{{ action.title }}" onclick="{{ action.onclick }}">
+                            <span class="material-icons" style="font-size: 16px;">{{ action.icon }}</span>
+                        </button>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% elif cell.type == "html" %}
+            {{ cell.value|safe }}
+        {% else %}
+            {{ cell.value|default:"-" }}
+        {% endif %}
+    </td>
+    {% endfor %}
+</tr>

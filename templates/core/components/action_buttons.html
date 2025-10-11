@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<div class="d-flex justify-content-end gap-2">
+    {% if extra_buttons %}
+        {% for button in extra_buttons %}
+        <a href="{{ button.url }}" class="btn {{ button.class|default:'btn-outline-secondary' }}">
+            {% if button.icon %}
+            <span class="material-icons align-middle me-2" style="font-size: 18px;">{{ button.icon }}</span>
+            {% endif %}
+            {{ button.text }}
+        </a>
+        {% endfor %}
+    {% endif %}
+    
+    <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
+        {{ cancel_text|default:"Cancel" }}
+    </a>
+    
+    <button type="submit" class="btn btn-primary">
+        <span class="material-icons align-middle me-2" style="font-size: 18px;">{{ submit_icon|default:"save" }}</span>
+        {{ submit_text|default:"Save" }}
+    </button>
+</div>

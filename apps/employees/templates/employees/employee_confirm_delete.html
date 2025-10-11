@@ -1,43 +1,12 @@
 {% extends "layouts/dashboard_layout.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Delete Employee - MedShift Scheduler{% endblock %}
+{% block title %}{% trans "Delete Employee" %} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center p-5">
-                <span class="material-icons text-danger mb-3" style="font-size: 64px;">warning</span>
-                <h3 class="mb-3">Delete Employee?</h3>
-                <p class="text-muted mb-4">
-                    Are you sure you want to delete <strong>{{ object.full_name }}</strong>?<br>
-                    This action cannot be undone.
-                </p>
-                
-                <div class="alert alert-warning text-start">
-                    <strong>Warning:</strong> This will permanently delete:
-                    <ul class="mb-0 mt-2">
-                        <li>Employee profile and employment history</li>
-                        <li>Associated user account</li>
-                        <li>All uploaded documents</li>
-                        <li>Time clock records (if any)</li>
-                    </ul>
-                </div>
-                
-                <form method="post" class="d-inline">
-                    {% csrf_token %}
-                    <a href="{% url 'employees:employee_detail' object.pk %}" class="btn btn-outline-secondary me-2">
-                        <span class="material-icons align-middle me-2" style="font-size: 18px;">arrow_back</span>
-                        Cancel
-                    </a>
-                    <button type="submit" class="btn btn-danger">
-                        <span class="material-icons align-middle me-2" style="font-size: 18px;">delete</span>
-                        Delete Employee
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+{# Breadcrumbs #}
+{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
+
+{% include "core/components/confirm_delete.html" with title="Delete Employee?" message=message_html warning_message=warning_html cancel_url=cancel_url confirm_text="Delete Employee" %}
 {% endblock %}
