@@ -17,9 +17,9 @@ from django.views.generic import (
 )
 
 from apps.accounts.models import User
-from .models import Department, Position, Employee, EmployeeDocument
+from .models import Department, Location, Position, Employee, EmployeeDocument
 from .forms import (
-    DepartmentForm, PositionForm,
+    DepartmentForm, LocationForm, LocationSearchForm, PositionForm,
     EmployeeUserForm, EmployeeForm, EmployeeDocumentForm,
     EmployeeSearchForm
 )
@@ -402,3 +402,155 @@ def employee_document_delete(request, pk, doc_pk):
         'employee': employee,
         'page_title': _('Delete Document')
     })
+    
+# ============================================
+# Location Views (Class-Based)
+# ============================================
+
+class LocationListView(LoginRequiredMixin, ListView):
+    """List all locations with search and filters."""
+    
+    model = Location
+    template_name = 'employees/location_list.html'
+    context_object_name = 'locations'
+    paginate_by = 20  # ← Встроенная пагинация как у Employee
+    
+    def get_queryset(self):
+        # Use emp_count instead of employee_count to avoid conflict with property
+        queryset = Location.objects.annotate(
+            emp_count=Count('employees', filter=Q(employees__is_active=True))
+        ).all()
+        
+        # Get filter parameters
+        search = self.request.GET.get('search', '')
+        country = self.request.GET.get('country', '')
+        is_active = self.request.GET.get('is_active', '')
+        
+        # Apply search
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) |
+                Q(city__icontains=search) |
+                Q(address__icontains=search)
+            )
+        
+        # Apply filters
+        if country:
+            queryset = queryset.filter(country=country)
+        
+        if is_active == 'true':
+            queryset = queryset.filter(is_active=True)
+        elif is_active == 'false':
+            queryset = queryset.filter(is_active=False)
+        
+        return queryset.order_by('name')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_form'] = LocationSearchForm(self.request.GET)
+        context['total_locations'] = Location.objects.filter(is_active=True).count()
+        context['page_title'] = _('Locations')
+        return context
+
+
+class LocationDetailView(LoginRequiredMixin, DetailView):
+    """View location details."""
+    
+    model = Location
+    template_name = 'employees/location_detail.html'
+    context_object_name = 'location'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get employees at this location
+        context['employees'] = self.object.employees.filter(
+            is_active=True
+        ).select_related('user')
+        
+        # Get recent shifts at this location (if schedules app exists)
+        try:
+            from apps.schedules.models import Shift
+            context['recent_shifts'] = Shift.objects.filter(
+                location=self.object
+            ).select_related('employee__user', 'position').order_by('-start_datetime')[:10]
+        except ImportError:
+            context['recent_shifts'] = None
+        
+        context['page_title'] = self.object.name
+        return context
+
+
+class LocationCreateView(LoginRequiredMixin, CreateView):
+    """Create new location."""
+    
+    model = Location
+    form_class = LocationForm
+    template_name = 'employees/location_form.html'
+    
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            _('Location "{}" has been created successfully.').format(form.instance.name)
+        )
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('employees:location_detail', kwargs={'pk': self.object.pk})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('Create New Location')
+        context['form_action'] = _('Create Location')
+        return context
+
+
+class LocationUpdateView(LoginRequiredMixin, UpdateView):
+    """Update existing location."""
+    
+    model = Location
+    form_class = LocationForm
+    template_name = 'employees/location_form.html'
+    
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            _('Location "{}" has been updated successfully.').format(form.instance.name)
+        )
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('employees:location_detail', kwargs={'pk': self.object.pk})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _(f'Edit {self.object.name}')
+        context['form_action'] = _('Update Location')
+        return context
+
+
+class LocationDeleteView(LoginRequiredMixin, DeleteView):
+    """Delete (deactivate) location."""
+    
+    model = Location
+    template_name = 'employees/location_confirm_delete.html'
+    success_url = reverse_lazy('employees:location_list')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['employee_count'] = self.object.employee_count
+        context['page_title'] = _(f'Delete {self.object.name}')
+        return context
+    
+    def delete(self, request, *args, **kwargs):
+        location = self.get_object()
+        
+        # Soft delete - just deactivate
+        location.is_active = False
+        location.save()
+        
+        messages.success(
+            request,
+            _('Location "{}" has been deactivated.').format(location.name)
+        )
+        return HttpResponseRedirect(self.success_url)

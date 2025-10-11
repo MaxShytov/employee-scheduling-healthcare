@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from django.urls import reverse
 
-from .models import Department, Position, Employee, EmployeeDocument
+from .models import Department, Position, Employee, EmployeeDocument, Location
 
 
 @admin.register(Department)
@@ -294,3 +294,71 @@ class EmployeeDocumentAdmin(admin.ModelAdmin):
         if not change:  # Only on creation
             obj.uploaded_by = request.user
         super().save_model(request, obj, form, change)
+        
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = [
+        'name',
+        'city',
+        'country',
+        'employee_count_display',
+        'manager',
+        'labor_budget',
+        'status_badge',
+    ]
+    
+    list_filter = [
+        'is_active',
+        'country',
+        'city',
+    ]
+    
+    search_fields = [
+        'name',
+        'city',
+        'address',
+        'postal_code',
+    ]
+    
+    fieldsets = (
+        (_('Basic Information'), {
+            'fields': ('name', 'is_active')
+        }),
+        (_('Address'), {
+            'fields': ('address', 'city', 'postal_code', 'country')
+        }),
+        (_('Contact'), {
+            'fields': ('phone', 'email')
+        }),
+        (_('Management'), {
+            'fields': ('manager', 'labor_budget')
+        }),
+        (_('Geolocation (Optional)'), {
+            'fields': ('latitude', 'longitude'),
+            'classes': ('collapse',),
+            'description': _('GPS coordinates for geolocation tracking (optional)')
+        }),
+        (_('Additional'), {
+            'fields': ('notes',)
+        }),
+    )
+    
+    def employee_count_display(self, obj):
+        count = obj.employee_count
+        return format_html(
+            '<span style="font-weight: bold; color: #007bff;">{}</span>',
+            count
+        )
+    employee_count_display.short_description = _('Employees')
+    
+    def status_badge(self, obj):
+        if obj.is_active:
+            return format_html(
+                '<span style="background-color: #28a745; color: white; padding: 3px 10px; '
+                'border-radius: 3px; font-size: 11px;">Active</span>'
+            )
+        return format_html(
+            '<span style="background-color: #dc3545; color: white; padding: 3px 10px; '
+            'border-radius: 3px; font-size: 11px;">Inactive</span>'
+        )
+    status_badge.short_description = _('Status')

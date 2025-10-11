@@ -3,13 +3,14 @@ Employee management models.
 """
 
 from django.db import models
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django_countries.fields import CountryField
 from decimal import Decimal
 
 from apps.core.models import TimeStampedModel
-from apps.accounts.models import User
+# УДАЛЕНО: from apps.accounts.models import User
 
 
 class Department(TimeStampedModel):
@@ -42,7 +43,7 @@ class Department(TimeStampedModel):
     )
     
     manager = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -145,7 +146,7 @@ class Employee(TimeStampedModel):
     """
     
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='employee_profile',
         verbose_name=_('user account')
@@ -171,6 +172,14 @@ class Employee(TimeStampedModel):
         on_delete=models.PROTECT,
         related_name='employees',
         verbose_name=_('position')
+    )
+    
+    location = models.ForeignKey(
+        'Location',
+        on_delete=models.PROTECT,
+        related_name='employees',
+        verbose_name=_('location'),
+        help_text=_('Primary work location for this employee')
     )
     
     employment_type = models.CharField(
@@ -366,7 +375,7 @@ class EmployeeDocument(TimeStampedModel):
     )
     
     uploaded_by = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         related_name='uploaded_documents',
@@ -397,3 +406,139 @@ class EmployeeDocument(TimeStampedModel):
         from django.utils import timezone
         delta = self.expiry_date - timezone.now().date()
         return delta.days
+
+
+class Location(TimeStampedModel):
+    """
+    Physical location/clinic where employees work.
+    Represents a healthcare facility, clinic, or office.
+    """
+    
+    name = models.CharField(
+        max_length=100,
+        verbose_name=_('Location Name'),
+        help_text=_('e.g., Toronto Clinic #1, Bern Medical Center')
+    )
+    
+    address = models.CharField(
+        max_length=255,
+        verbose_name=_('Address')
+    )
+    
+    city = models.CharField(
+        max_length=100,
+        verbose_name=_('City')
+    )
+    
+    postal_code = models.CharField(
+        max_length=20,
+        verbose_name=_('Postal Code')
+    )
+    
+    country = models.CharField(
+        max_length=2,
+        choices=[
+            ('CA', _('Canada')),
+            ('CH', _('Switzerland')),
+        ],
+        default='CH',
+        verbose_name=_('Country')
+    )
+    
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name=_('Phone Number')
+    )
+    
+    email = models.EmailField(
+        blank=True,
+        verbose_name=_('Email')
+    )
+    
+    # Optional geolocation (P4 - for future use)
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        verbose_name=_('Latitude'),
+        help_text=_('GPS latitude coordinate (optional)')
+    )
+    
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        verbose_name=_('Longitude'),
+        help_text=_('GPS longitude coordinate (optional)')
+    )
+    
+    # Budget management
+    labor_budget = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        verbose_name=_('Monthly Labor Budget'),
+        help_text=_('Budget for labor costs per month')
+    )
+    
+    # Manager assignment
+    manager = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='managed_locations',
+        verbose_name=_('Location Manager')
+    )
+    
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name=_('Active'),
+        help_text=_('Whether this location is currently active')
+    )
+    
+    notes = models.TextField(
+        blank=True,
+        verbose_name=_('Notes'),
+        help_text=_('Internal notes about this location')
+    )
+    
+    class Meta:
+        verbose_name = _('Location')
+        verbose_name_plural = _('Locations')
+        ordering = ['name']
+        indexes = [
+            models.Index(fields=['name']),
+            models.Index(fields=['is_active']),
+        ]
+    
+    def __str__(self):
+        return f"{self.name} ({self.city})"
+    
+    @property
+    def full_address(self):
+        """Return complete formatted address"""
+        return f"{self.address}, {self.city} {self.postal_code}, {self.get_country_display()}"
+    
+    @property
+    def employee_count(self):
+        """Count active employees at this location"""
+        return self.employees.filter(is_active=True).count()
+    
+    def get_absolute_url(self):
+        """Get URL for location detail page."""
+        from django.urls import reverse
+        return reverse('employees:location_detail', kwargs={'pk': self.pk})
+    
+    def get_edit_url(self):
+        """Get URL for location edit page."""
+        from django.urls import reverse
+        return reverse('employees:location_update', kwargs={'pk': self.pk})
+    
+    def get_delete_url(self):
+        """Get URL for location delete page."""
+        from django.urls import reverse
+        return reverse('employees:location_delete', kwargs={'pk': self.pk})

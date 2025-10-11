@@ -30,4 +30,11 @@ urlpatterns = [
     path('positions/add/', views.PositionCreateView.as_view(), name='position_create'),
     path('positions/<int:pk>/edit/', views.PositionUpdateView.as_view(), name='position_update'),
     path('positions/<int:pk>/delete/', views.PositionDeleteView.as_view(), name='position_delete'),
+    
+    # Location URLs
+    path('locations/', views.LocationListView.as_view(), name='location_list'),
+    path('locations/create/', views.LocationCreateView.as_view(), name='location_create'),
+    path('locations/<int:pk>/', views.LocationDetailView.as_view(), name='location_detail'),
+    path('locations/<int:pk>/edit/', views.LocationUpdateView.as_view(), name='location_update'),
+    path('locations/<int:pk>/delete/', views.LocationDeleteView.as_view(), name='location_delete'),
 ]

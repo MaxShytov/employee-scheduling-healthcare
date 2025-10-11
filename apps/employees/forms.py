@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
 from apps.accounts.models import User
-from .models import Department, Position, Employee, EmployeeDocument
+from .models import Department, Location, Position, Employee, EmployeeDocument
 
 
 class DepartmentForm(forms.ModelForm):
@@ -306,6 +306,126 @@ class EmployeeSearchForm(forms.Form):
             ('', _('All Statuses')),
             ('active', _('Active')),
             ('inactive', _('Inactive'))
+        ],
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        })
+    )
+    
+class LocationForm(forms.ModelForm):
+    """Form for creating/editing locations"""
+    
+    class Meta:
+        model = Location
+        fields = [
+            'name',
+            'address',
+            'city',
+            'postal_code',
+            'country',
+            'phone',
+            'email',
+            'manager',
+            'labor_budget',
+            'latitude',
+            'longitude',
+            'is_active',
+            'notes',
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('e.g., Toronto Clinic #1')
+            }),
+            'address': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('Street address')
+            }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('City name')
+            }),
+            'postal_code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('Postal/ZIP code')
+            }),
+            'country': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('Phone number')
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('contact@clinic.com')
+            }),
+            'manager': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'labor_budget': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0.00',
+                'step': '0.01'
+            }),
+            'latitude': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '46.9479',
+                'step': '0.000001'
+            }),
+            'longitude': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '7.4474',
+                'step': '0.000001'
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': _('Internal notes about this location...')
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Make optional fields clearly marked
+        self.fields['phone'].required = False
+        self.fields['email'].required = False
+        self.fields['manager'].required = False
+        self.fields['manager'].empty_label = _('-- No manager assigned --')
+        self.fields['latitude'].required = False
+        self.fields['longitude'].required = False
+        self.fields['notes'].required = False
+
+
+class LocationSearchForm(forms.Form):
+    """Form for searching/filtering locations"""
+    
+    search = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Search by name, city, or address...')
+        })
+    )
+    
+    country = forms.ChoiceField(
+        required=False,
+        choices=[('', _('All Countries'))] + Location._meta.get_field('country').choices,
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        })
+    )
+    
+    is_active = forms.ChoiceField(
+        required=False,
+        choices=[
+            ('', _('All Status')),
+            ('true', _('Active')),
+            ('false', _('Inactive')),
         ],
         widget=forms.Select(attrs={
             'class': 'form-select'

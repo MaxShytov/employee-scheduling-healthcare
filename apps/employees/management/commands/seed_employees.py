@@ -12,23 +12,24 @@ import re
 import unicodedata
 
 from apps.accounts.models import User
-from apps.employees.models import Department, Position, Employee, EmploymentType
+from apps.employees.models import Department, Position, Location, Employee, EmploymentType
+
 
 def to_ascii_name(s: str) -> str:
-        SPECIALS = {
-            "ß": "ss", "Æ": "AE", "æ": "ae", "Œ": "OE", "œ": "oe",
-            "Ø": "O",  "ø": "o",  "Ð": "D",  "ð": "d",
-            "Þ": "TH", "þ": "th", "Ł": "L",  "ł": "l",
-        }
-        s = s.strip()
-        # Сначала вручную заменим проблемные символы
-        s = "".join(SPECIALS.get(ch, ch) for ch in s)
-        # Уберём диакритику (é→e, ç→c и т.д.)
-        s = unicodedata.normalize("NFKD", s).encode(
-            "ascii", "ignore").decode("ascii")
-        # Оставим только буквы
-        s = re.sub(r"[^A-Za-z]", "", s)
-        return s.lower()
+    SPECIALS = {
+        "ß": "ss", "Æ": "AE", "æ": "ae", "Œ": "OE", "œ": "oe",
+        "Ø": "O",  "ø": "o",  "Ð": "D",  "ð": "d",
+        "Þ": "TH", "þ": "th", "Ł": "L",  "ł": "l",
+    }
+    s = s.strip()
+    # Сначала вручную заменим проблемные символы
+    s = "".join(SPECIALS.get(ch, ch) for ch in s)
+    # Уберём диакритику (é→e, ç→c и т.д.)
+    s = unicodedata.normalize("NFKD", s).encode(
+        "ascii", "ignore").decode("ascii")
+    # Оставим только буквы
+    s = re.sub(r"[^A-Za-z]", "", s)
+    return s.lower()
 
 
 class Command(BaseCommand):
@@ -45,6 +46,7 @@ class Command(BaseCommand):
         if options['clear']:
             self.stdout.write(self.style.WARNING('Clearing existing data...'))
             Employee.objects.all().delete()
+            Location.objects.all().delete()  # ← ДОБАВЛЕНО
             Department.objects.all().delete()
             Position.objects.all().delete()
             # Delete users except superusers
@@ -54,6 +56,11 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Starting data seeding...'))
 
         with transaction.atomic():
+            # Create locations first
+            locations = self.create_locations()
+            self.stdout.write(self.style.SUCCESS(
+                f'✓ Created {len(locations)} locations'))
+            
             # Create departments
             departments = self.create_departments()
             self.stdout.write(self.style.SUCCESS(
@@ -65,12 +72,17 @@ class Command(BaseCommand):
                 f'✓ Created {len(positions)} positions'))
 
             # Create employees
-            employees = self.create_employees(departments, positions)
+            employees = self.create_employees(departments, positions, locations)
             self.stdout.write(self.style.SUCCESS(
                 f'✓ Created {len(employees)} employees'))
 
         self.stdout.write(self.style.SUCCESS(
             '\n✅ Seeding completed successfully!'))
+        self.stdout.write(self.style.SUCCESS(
+            '\n📍 Created locations:'))
+        for location in locations:
+            self.stdout.write(self.style.SUCCESS(
+                f'   • {location.name} - {location.city}'))
         self.stdout.write(self.style.SUCCESS(
             '\nLogin credentials for all employees:'))
         self.stdout.write(self.style.SUCCESS('Password: Password123!'))
@@ -81,6 +93,57 @@ class Command(BaseCommand):
             '  pierre.martin@clinique-alpes.ch'))
         self.stdout.write(self.style.SUCCESS(
             '  sophie.bernard@clinique-alpes.ch'))
+
+    def create_locations(self):
+        """Create clinic locations in Switzerland."""
+        locations_data = [
+            {
+                'name': 'Clinique des Alpes - Genève',
+                'address': 'Rue du Rhône 45',
+                'city': 'Genève',
+                'postal_code': '1204',
+                'country': 'CH',
+                'phone': '+41 22 123 45 67',
+                'email': 'info@clinique-alpes.ch',
+                'labor_budget': Decimal('250000.00'),
+                'latitude': Decimal('46.204391'),
+                'longitude': Decimal('6.143158'),
+                'notes': 'Main clinic location in Geneva city center'
+            },
+            {
+                'name': 'Clinique des Alpes - Lausanne',
+                'address': 'Avenue de la Gare 12',
+                'city': 'Lausanne',
+                'postal_code': '1003',
+                'country': 'CH',
+                'phone': '+41 21 987 65 43',
+                'email': 'lausanne@clinique-alpes.ch',
+                'labor_budget': Decimal('180000.00'),
+                'latitude': Decimal('46.516968'),
+                'longitude': Decimal('6.629117'),
+                'notes': 'Secondary location in Lausanne'
+            },
+            {
+                'name': 'Clinique des Alpes - Bern',
+                'address': 'Spitalstrasse 1',
+                'city': 'Bern',
+                'postal_code': '3010',
+                'country': 'CH',
+                'phone': '+41 31 456 78 90',
+                'email': 'bern@clinique-alpes.ch',
+                'labor_budget': Decimal('150000.00'),
+                'latitude': Decimal('46.947456'),
+                'longitude': Decimal('7.447396'),
+                'notes': 'Branch office in Bern'
+            },
+        ]
+
+        locations = []
+        for data in locations_data:
+            location = Location.objects.create(**data)
+            locations.append(location)
+
+        return locations
 
     def create_departments(self):
         """Create typical departments for a Swiss private clinic."""
@@ -242,7 +305,7 @@ class Command(BaseCommand):
 
         return positions
 
-    def create_employees(self, departments, positions):
+    def create_employees(self, departments, positions, locations):
         """Create sample employees with French names."""
 
         # French first names
@@ -288,6 +351,9 @@ class Command(BaseCommand):
 
         used_names = set()
 
+        # Get main location (Geneva)
+        main_location = locations[0]  # Genève
+
         # Create employees for each position
         for position in positions:
             dept_names = position_dept_map.get(
@@ -316,7 +382,6 @@ class Command(BaseCommand):
                 # Create user
                 local_part = f"{to_ascii_name(first_name)}.{to_ascii_name(last_name)}"
                 email = f"{local_part}@clinique-alpes.ch"
-                # email = f"{first_name.lower()}.{last_name.lower()}@clinique-alpes.ch"
                 username = email
 
                 # Check if user exists
@@ -337,6 +402,12 @@ class Command(BaseCommand):
                 dept_name = random.choice(dept_names)
                 department = next(
                     d for d in departments if d.name == dept_name)
+
+                # Randomly assign location (70% Geneva, 20% Lausanne, 10% Bern)
+                location = random.choices(
+                    locations,
+                    weights=[0.7, 0.2, 0.1]
+                )[0]
 
                 # Generate hire date (between 6 months and 10 years ago)
                 days_ago = random.randint(180, 3650)
@@ -370,6 +441,7 @@ class Command(BaseCommand):
                     employee_id=f"EMP{employee_id_counter:04d}",
                     department=department,
                     position=position,
+                    location=location,  # ← ДОБАВЛЕНО
                     employment_type=employment_type,
                     hire_date=hire_date,
                     hourly_rate=hourly_rate,
@@ -399,5 +471,21 @@ class Command(BaseCommand):
 
                 department.manager = manager.user
                 department.save()
+
+        # Assign location managers
+        for location in locations:
+            loc_employees = Employee.objects.filter(
+                location=location, is_active=True)
+            if loc_employees.exists():
+                # Try to find DA (Directeur Administratif) or senior position
+                admin_employees = loc_employees.filter(
+                    position__code__in=['DA', 'MC', 'MS'])
+                if admin_employees.exists():
+                    manager = random.choice(admin_employees)
+                else:
+                    manager = random.choice(loc_employees)
+
+                location.manager = manager.user
+                location.save()
 
         return employees
