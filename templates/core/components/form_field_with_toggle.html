@@ -1,0 +1,97 @@
+{# templates/core/components/form_field_with_toggle.html #}
+{% load i18n %}
+
+{% comment %}
+Form field with toggle buttons attached.
+
+Props:
+  - field: Django form field (main field)
+  - toggle_field: Django form field (boolean field for toggle)
+  - col_class: column class (optional)
+{% endcomment %}
+
+<div class="{{ col_class|default:'col-12' }}">
+    <label for="{{ field.id_for_label }}" class="form-label">
+        {{ field.label }}
+        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+    
+    <div class="input-group">
+        {% comment %} English: Main input field {% endcomment %}
+        {{ field }}
+        
+        {% comment %} English: Toggle buttons attached to the right {% endcomment %}
+        <div class="btn-group" role="group">
+            {% comment %} English: Hidden checkbox for is_active {% endcomment %}
+            <input type="checkbox" 
+                   id="{{ toggle_field.id_for_label }}" 
+                   name="{{ toggle_field.name }}" 
+                   class="btn-check-toggle d-none"
+                   {% if toggle_field.value %}checked{% endif %}
+                   value="true">
+            
+            {% comment %} English: Active button (green) {% endcomment %}
+            <button type="button" 
+                    class="btn btn-outline-success toggle-btn-active {% if toggle_field.value %}active{% endif %}"
+                    data-target="{{ toggle_field.id_for_label }}"
+                    data-value="true">
+                {% trans "Active" %}
+            </button>
+            
+            {% comment %} English: Inactive button (red) {% endcomment %}
+            <button type="button" 
+                    class="btn btn-outline-danger toggle-btn-inactive {% if not toggle_field.value %}active{% endif %}"
+                    data-target="{{ toggle_field.id_for_label }}"
+                    data-value="false">
+                {% trans "Inactive" %}
+            </button>
+        </div>
+    </div>
+    
+    {% comment %} English: Help text {% endcomment %}
+    {% if field.help_text %}
+        <small class="form-text text-muted">{{ field.help_text }}</small>
+    {% endif %}
+    
+    {% comment %} English: Errors {% endcomment %}
+    {% if field.errors %}
+        <div class="invalid-feedback d-block">
+            {{ field.errors }}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle button functionality
+    document.querySelectorAll('.toggle-btn-active, .toggle-btn-inactive').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const checkbox = document.getElementById(targetId);
+            const isActive = this.dataset.value === 'true';
+            
+            // Update checkbox
+            checkbox.checked = isActive;
+            
+            // Update button states
+            const container = this.closest('.btn-group');
+            container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+});
+</script>
+
+<style>
+.btn-group .btn-outline-success.active {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
+    color: white;
+}
+
+.btn-group .btn-outline-danger.active {
+    background-color: var(--bs-danger);
+    border-color: var(--bs-danger);
+    color: white;
+}
+</style>

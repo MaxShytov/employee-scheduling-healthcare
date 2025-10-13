@@ -2,14 +2,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from typing import Any, Optional
+from django.db.models import Q
 
 
 class BaseFilter:
-    """
-    Base class for all filters.
+    """Base class for all filters."""
     
-    Similar to Django Form Fields pattern - declarative, reusable.
-    """
     def __init__(
         self,
         field_name: str,
@@ -26,6 +24,7 @@ class BaseFilter:
         self.initial = initial
         self.help_text = help_text
         self.value = None
+        self.filter_name = None  # ← Новое: уникальное имя для HTML формы
 
     def get_filter_kwargs(self) -> dict:
         """Returns Q object kwargs for queryset filtering"""
@@ -46,7 +45,7 @@ class BaseFilter:
     def to_template_context(self) -> dict:
         """Returns dict for template rendering"""
         raise NotImplementedError
-
+    
 
 class TextFilter(BaseFilter):
     """Filter for text search (icontains by default)"""
@@ -54,18 +53,37 @@ class TextFilter(BaseFilter):
     def __init__(self, field_name: str, label: str, lookup: str = 'icontains', **kwargs):
         # Extract TextFilter-specific kwargs before passing to parent
         self.placeholder = kwargs.pop('placeholder', '')
+        self.search_fields = kwargs.pop('search_fields', None)  # ← Новое: список полей для поиска
         # Now pass remaining kwargs to parent
         super().__init__(field_name, label, lookup, **kwargs)
+
+    def get_filter_kwargs(self) -> dict:
+        """Returns Q object kwargs for queryset filtering"""
+        if self.value is None or self.value == '':
+            return {}
+        
+        # If multiple search fields specified, use Q objects
+        if self.search_fields:
+            q_objects = Q()
+            for field in self.search_fields:
+                lookup_key = f"{field}__{self.lookup}"
+                q_objects |= Q(**{lookup_key: self.value})
+            return {'__q': q_objects}  # Special marker for Q object
+        
+        # Single field search
+        lookup_key = f"{self.field_name}__{self.lookup}"
+        return {lookup_key: self.value}
 
     def to_template_context(self) -> dict:
         return {
             'type': 'text',
-            'name': self.field_name,
+            'name': self.filter_name or self.field_name,
             'label': self.label,
             'value': self.value or '',
             'placeholder': self.placeholder,
             'help_text': self.help_text,
         }
+
 
 
 class ChoiceFilter(BaseFilter):
@@ -124,8 +142,8 @@ class ChoiceFilter(BaseFilter):
 
     def to_template_context(self) -> dict:
         return {
-            'type': 'select',
-            'name': self.field_name,
+            'type': 'select',  # ← ОБЯЗАТЕЛЬНО должно быть 'select'!
+            'name': self.filter_name or self.field_name,
             'label': self.label,
             'value': str(self.value) if self.value else '',
             'options': self.get_choices(),
@@ -136,8 +154,8 @@ class ChoiceFilter(BaseFilter):
 class BooleanFilter(BaseFilter):
     """Filter for boolean/checkbox"""
     
-    def __init__(self, field_name: str, label: str, **kwargs):
-        # BooleanFilter doesn't have extra params, pass kwargs as-is
+    def __init__(self, field_name: str, label: str, as_buttons: bool = False, **kwargs):
+        self.as_buttons = as_buttons  # ← Новый параметр
         super().__init__(field_name, label, lookup='exact', **kwargs)
 
     def clean(self, value: Any) -> Optional[bool]:
@@ -145,22 +163,32 @@ class BooleanFilter(BaseFilter):
             return True
         elif value in ('false', 'False', '0', 0, False):
             return False
-        return None
+        return None  # None означает "показать всех"
 
     def get_filter_kwargs(self) -> dict:
         if self.value is None:
-            return {}
+            return {}  # Не фильтруем - показываем всех
         return {self.field_name: self.value}
 
     def to_template_context(self) -> dict:
-        return {
-            'type': 'checkbox',
-            'name': self.field_name,
-            'label': self.label,
-            'checked': self.value is True,
-            'help_text': self.help_text,
-        }
-
+        if self.as_buttons:
+            # Render as button group
+            return {
+                'type': 'toggle_buttons',
+                'name': self.filter_name or self.field_name,
+                'label': self.label,
+                'value': self.value,  # None / True / False
+                'help_text': self.help_text,
+            }
+        else:
+            # Render as checkbox
+            return {
+                'type': 'checkbox',
+                'name': self.filter_name or self.field_name,
+                'label': self.label,
+                'checked': self.value is True,
+                'help_text': self.help_text,
+            }
 
 class DateFilter(BaseFilter):
     """Filter for date inputs"""
@@ -178,7 +206,7 @@ class DateFilter(BaseFilter):
     def to_template_context(self) -> dict:
         return {
             'type': 'date',
-            'name': self.field_name,
+            'name': self.filter_name or self.field_name,  # ← Используем filter_name
             'label': self.label,
             'value': self.value.isoformat() if self.value else '',
             'help_text': self.help_text,
@@ -204,7 +232,7 @@ class NumberFilter(BaseFilter):
     def to_template_context(self) -> dict:
         context = {
             'type': 'number',
-            'name': self.field_name,
+            'name': self.filter_name or self.field_name,
             'label': self.label,
             'value': self.value or '',
             'help_text': self.help_text,
@@ -216,7 +244,7 @@ class NumberFilter(BaseFilter):
         return context
 
 
-class FilterSet:  # ← ВОТ ЭТОТ КЛАСС НУЖНО ИСПРАВИТЬ
+class FilterSet:
     """Container for filters with declarative syntax."""
     
     def __init__(self, data: dict = None):
@@ -232,12 +260,14 @@ class FilterSet:  # ← ВОТ ЭТОТ КЛАСС НУЖНО ИСПРАВИТЬ
         """
         filters = {}
         
-        # English: Iterate through class __dict__ to preserve declaration order
-        for name, attr in self.__class__.__dict__.items():  # ← ИСПРАВЬ ЭТУ СТРОКУ
+        # English: Iterate through class __dict__ to preserve declaration order (Python 3.7+)
+        for name, attr in self.__class__.__dict__.items():
             if name.startswith('_'):
                 continue
             if isinstance(attr, BaseFilter):
+                # Create instance copy for this FilterSet instance
                 filter_copy = self._copy_filter(attr)
+                filter_copy.filter_name = name  # ← Устанавливаем уникальное имя
                 filters[name] = filter_copy
         
         return filters
@@ -259,11 +289,12 @@ class FilterSet:  # ← ВОТ ЭТОТ КЛАСС НУЖНО ИСПРАВИТЬ
             return filter_class(
                 filter_obj.field_name,
                 filter_obj.label,
-                lookup=filter_obj.lookup,  # Explicit
+                lookup=filter_obj.lookup,
                 placeholder=filter_obj.placeholder,
+                search_fields=filter_obj.search_fields,  # ← Копируем search_fields
                 **base_kwargs
             )
-        
+                
         elif isinstance(filter_obj, ChoiceFilter):
             return filter_class(
                 filter_obj.field_name,
@@ -297,7 +328,8 @@ class FilterSet:  # ← ВОТ ЭТОТ КЛАСС НУЖНО ИСПРАВИТЬ
             return filter_class(
                 filter_obj.field_name,
                 filter_obj.label,
-                **base_kwargs  # BooleanFilter sets lookup='exact' internally
+                as_buttons=filter_obj.as_buttons,
+                **base_kwargs
             )
         
         else:
@@ -312,7 +344,8 @@ class FilterSet:  # ← ВОТ ЭТОТ КЛАСС НУЖНО ИСПРАВИТЬ
     def _bind_data(self):
         """Bind request.GET data to filters"""
         for name, filter_obj in self.filters.items():
-            value = self.data.get(filter_obj.field_name)
+            # English: Use filter_name (unique) instead of field_name for GET params
+            value = self.data.get(filter_obj.filter_name or filter_obj.field_name)
             if value:
                 filter_obj.bind(value)
 
@@ -321,7 +354,11 @@ class FilterSet:  # ← ВОТ ЭТОТ КЛАСС НУЖНО ИСПРАВИТЬ
         for filter_obj in self.filters.values():
             filter_kwargs = filter_obj.get_filter_kwargs()
             if filter_kwargs:
-                queryset = queryset.filter(**filter_kwargs)
+                # Check for Q object (special key '__q')
+                if '__q' in filter_kwargs:
+                    queryset = queryset.filter(filter_kwargs['__q'])
+                else:
+                    queryset = queryset.filter(**filter_kwargs)
         return queryset
 
     def to_template_context(self) -> list[dict]:

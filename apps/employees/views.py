@@ -92,7 +92,6 @@ class EmployeeListView(FilterMixin, LoginRequiredMixin, PermissionRequiredMixin,
     
     def get_context_data(self, **kwargs):
         """Add statistics and context."""
-        # English: FilterMixin adds 'filters' and 'has_active_filters' to context
         context = super().get_context_data(**kwargs)
         
         # Statistics cards
@@ -137,14 +136,13 @@ class EmployeeListView(FilterMixin, LoginRequiredMixin, PermissionRequiredMixin,
         
         # Table columns configuration
         context['table_columns'] = [
-            {'title': _('ID'), 'width': '8%'},
+            {'title': _('ID'), 'width': '10%'},
             {'title': _('Name'), 'width': '27%'},
-            {'title': _('Department'), 'width': '13%'},
-            {'title': _('Position'), 'width': '13%'},
+            {'title': _('Department'), 'width': '15%'},
+            {'title': _('Position'), 'width': '15%'},
             {'title': _('Type'), 'width': '10%'},
-            {'title': _('Rate'), 'width': '10%'},
-            {'title': _('Status'), 'width': '9%'},
-            {'title': _('Actions'), 'width': '10%', 'class': 'text-end'},
+            {'title': _('Rate'), 'width': '13%'},
+            {'title': _('Actions'), 'width': '10%'},
         ]
         
         # English: Convert employees to table rows format
@@ -153,7 +151,12 @@ class EmployeeListView(FilterMixin, LoginRequiredMixin, PermissionRequiredMixin,
             table_rows.append({
                 'id': employee.pk,
                 'cells': [
-                    {'type': 'strong', 'value': employee.employee_id},
+                    {
+                        'type': 'badge',
+                        'text': _('Active') if employee.is_active else _('Inactive'),
+                        'color': 'success' if employee.is_active else 'secondary',
+                        'subtitle': employee.employee_id
+                    },
                     {
                         'type': 'avatar',
                         'name': employee.user.get_full_name(),
@@ -164,13 +167,14 @@ class EmployeeListView(FilterMixin, LoginRequiredMixin, PermissionRequiredMixin,
                         'type': 'badge',
                         'text': employee.department.code if employee.department else '—',
                         'color': 'secondary',
-                        'subtitle': f"{employee.department.name}<br>{employee.location.name if employee.location else ''}" if employee.department else None
+                        'label': employee.department.name if employee.department else None,
+                        'subtitle': employee.location.name if employee.location else None
                     },
                     {
                         'type': 'badge',
                         'text': employee.position.code if employee.position else '—',
                         'color': 'info',
-                        'subtitle': employee.position.title if employee.position else None
+                        'label': employee.position.title if employee.position else None
                     },
                     {
                         'type': 'badge',
@@ -183,12 +187,7 @@ class EmployeeListView(FilterMixin, LoginRequiredMixin, PermissionRequiredMixin,
                         'currency': 'CHF',
                         'subtitle': f"{float(employee.weekly_hours):.2f} {_('hrs/week')}" if employee.weekly_hours else None
                     },
-                    {
-                        'type': 'status',
-                        'value': employee.is_active,
-                        'true_text': _('Active'),
-                        'false_text': _('Inactive')
-                    },
+
                     {
                         'type': 'actions',
                         'actions': [
@@ -489,7 +488,7 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
                         'field': user_form['profile_picture'],
                         'col_class': 'col-12',
                         'is_image': True,
-                        'current_image_url': current_image_url  # Only for UpdateView
+                        'current_image_url': current_image_url
                     },
                     {'field': user_form['first_name'], 'col_class': 'col-md-6'},
                     {'field': user_form['last_name'], 'col_class': 'col-md-6'},
@@ -503,12 +502,17 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
                 'title': _('Employment Information'),
                 'icon': 'work',
                 'fields': [
-                    {'field': employee_form['employee_id'], 'col_class': 'col-md-6'},
+                    {
+                        'field': employee_form['employee_id'],
+                        'col_class': 'col-md-6',
+                        'has_toggle': True,  # ← Новое: флаг для toggle
+                        'toggle_field': employee_form['is_active'],  # ← Поле is_active
+                    },
                     {'field': employee_form['department'], 'col_class': 'col-md-6'},
                     {'field': employee_form['position'], 'col_class': 'col-md-6'},
-                    {'field': employee_form['location'], 'col_class': 'col-md-6'},  # ← ДОБАВЛЕНО
+                    {'field': employee_form['location'], 'col_class': 'col-md-6'},
                     {'field': employee_form['employment_type'], 'col_class': 'col-md-6'},
-                    {'field': employee_form['weekly_hours'], 'col_class': 'col-md-6'},  # ← ДОБАВЛЕНО
+                    {'field': employee_form['weekly_hours'], 'col_class': 'col-md-6'},
                     {'field': employee_form['hire_date'], 'col_class': 'col-md-6'},
                     {'field': employee_form['hourly_rate'], 'col_class': 'col-md-6'},
                 ]
@@ -643,7 +647,7 @@ class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
                         'field': user_form['profile_picture'],
                         'col_class': 'col-12',
                         'is_image': True,
-                        'current_image_url': current_image_url  # Only for UpdateView
+                        'current_image_url': current_image_url
                     },
                     {'field': user_form['first_name'], 'col_class': 'col-md-6'},
                     {'field': user_form['last_name'], 'col_class': 'col-md-6'},
@@ -657,12 +661,17 @@ class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
                 'title': _('Employment Information'),
                 'icon': 'work',
                 'fields': [
-                    {'field': employee_form['employee_id'], 'col_class': 'col-md-6'},
+                    {
+                        'field': employee_form['employee_id'],
+                        'col_class': 'col-md-6',
+                        'has_toggle': True,  # ← Новое: флаг для toggle
+                        'toggle_field': employee_form['is_active'],  # ← Поле is_active
+                    },
                     {'field': employee_form['department'], 'col_class': 'col-md-6'},
                     {'field': employee_form['position'], 'col_class': 'col-md-6'},
-                    {'field': employee_form['location'], 'col_class': 'col-md-6'},  # ← ДОБАВЛЕНО
+                    {'field': employee_form['location'], 'col_class': 'col-md-6'},
                     {'field': employee_form['employment_type'], 'col_class': 'col-md-6'},
-                    {'field': employee_form['weekly_hours'], 'col_class': 'col-md-6'},  # ← ДОБАВЛЕНО
+                    {'field': employee_form['weekly_hours'], 'col_class': 'col-md-6'},
                     {'field': employee_form['hire_date'], 'col_class': 'col-md-6'},
                     {'field': employee_form['hourly_rate'], 'col_class': 'col-md-6'},
                 ]
@@ -684,7 +693,7 @@ class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
                 ]
             }
         ]
-
+    
     def form_valid(self, form):
         context = self.get_context_data()
         user_form = context['user_form']

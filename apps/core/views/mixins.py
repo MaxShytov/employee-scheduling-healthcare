@@ -8,11 +8,9 @@ class FilterMixin:
     """
     Mixin for ListView to add declarative filtering.
     
-    Usage in view:
-        class EmployeeListView(FilterMixin, ListView):
-            model = Employee
-            filterset_class = EmployeeFilterSet
-            paginate_by = 25
+    Automatically adds to context:
+        - filters: list of filter configs for template
+        - has_active_filters: boolean, True if any filter has value
     """
     filterset_class: Optional[Type[FilterSet]] = None
     
@@ -34,7 +32,13 @@ class FilterMixin:
         
         if self.filterset:
             context['filters'] = self.filterset.to_template_context()
-            context['has_active_filters'] = self.filterset.is_active
+            
+            # English: Check if any filter has active value
+            has_active = any(
+                self.request.GET.get(f['name']) not in [None, '', []]
+                for f in context['filters']
+            )
+            context['has_active_filters'] = has_active
         else:
             context['filters'] = []
             context['has_active_filters'] = False

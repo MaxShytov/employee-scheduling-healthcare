@@ -1,3 +1,4 @@
+{# templates/core/components/form_section_card.html #}
 {% comment %}
 Component: Form Section Card
 Description: Card wrapper for form field groups with icon and title
@@ -8,7 +9,8 @@ Props:
   - fields: list[dict] (required) - List of form fields
     Structure: [
       {'field': form.first_name, 'col_class': 'col-md-6'},
-      {'field': form.last_name, 'col_class': 'col-md-6', 'help_text': 'Custom help'}
+      {'field': form.last_name, 'col_class': 'col-md-6', 'help_text': 'Custom help'},
+      {'field': form.employee_id, 'col_class': 'col-md-6', 'has_toggle': True, 'toggle_field': form.is_active}
     ]
   - card_class: str (optional, default='mb-4') - Additional CSS classes
 
@@ -28,9 +30,14 @@ Usage:
     <div class="card-body">
         <div class="row">
             {% for field_config in fields %}
-                {% if field_config.is_image %}
+                {% if field_config.has_toggle %}
+                    {# Field with toggle buttons (e.g., Employee ID with Active/Inactive) #}
+                    {% include "core/components/form_field_with_toggle.html" with field=field_config.field toggle_field=field_config.toggle_field col_class=field_config.col_class|default:'col-12' %}
+                {% elif field_config.is_image %}
+                    {# Image upload field #}
                     {% include "core/components/profile_picture_field.html" with field=field_config.field current_image_url=field_config.current_image_url col_class=field_config.col_class|default:'col-12' help_text=field_config.help_text %}
                 {% else %}
+                    {# Regular form field #}
                     {% include "core/components/form_field.html" with field=field_config.field col_class=field_config.col_class|default:'col-12' help_text=field_config.help_text %}
                 {% endif %}
             {% endfor %}

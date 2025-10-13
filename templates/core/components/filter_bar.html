@@ -1,64 +1,63 @@
 {# templates/core/components/filter_bar.html #}
 {% load i18n %}
 
-{% comment %}
-Universal filter bar component.
-
-Props:
-  - filters: list[dict] - list of filter configs from FilterSet.to_template_context()
-  - action_url: str - form action URL (usually request.path)
-  - method: str - 'get' (default)
-{% endcomment %}
-
 {% if filters %}
 <div class="filter-bar mb-4">
-  <form method="{{ method|default:'get' }}" action="{{ action_url }}" class="filter-form">
-    <div class="d-flex flex-wrap gap-3 align-items-end">
-      {% comment %} English: Filter fields in horizontal row {% endcomment %}
+  <form method="{{ method|default:'get' }}" action="{{ action_url }}" class="filter-form" id="filterForm">
+    <div class="d-flex flex-wrap gap-3 align-items-center">
       {% for filter in filters %}
         {% if filter.type == 'text' %}
           <div class="filter-field" style="min-width: 200px;">
             <label for="id_{{ filter.name }}" class="form-label small text-muted mb-1">{{ filter.label }}</label>
-            <input 
-              type="text" 
-              id="id_{{ filter.name }}" 
-              name="{{ filter.name }}" 
-              value="{{ filter.value }}" 
-              placeholder="{{ filter.placeholder }}" 
-              class="form-control form-control-sm">
+            <div class="input-group">
+              <input 
+                type="text" 
+                id="id_{{ filter.name }}" 
+                name="{{ filter.name }}" 
+                value="{{ filter.value }}" 
+                placeholder="{{ filter.placeholder }}" 
+                class="form-control form-control-sm debounce-input"
+                data-debounce="500">
+              {% if filter.value %}
+                <button class="clear-input-btn" type="button" data-target="id_{{ filter.name }}" title="{% trans 'Clear' %}">
+                  <span class="material-icons" style="font-size: 16px;">close</span>
+                </button>
+              {% endif %}
+            </div>
             {% if filter.help_text %}<small class="form-text text-muted">{{ filter.help_text }}</small>{% endif %}
           </div>
 
         {% elif filter.type == 'select' %}
           <div class="filter-field" style="min-width: 180px;">
             <label for="id_{{ filter.name }}" class="form-label small text-muted mb-1">{{ filter.label }}</label>
-            <select id="id_{{ filter.name }}" name="{{ filter.name }}" class="form-select form-select-sm">
+            <select id="id_{{ filter.name }}" name="{{ filter.name }}" class="form-select form-select-sm auto-submit">
               {% for option in filter.options %}
-                <option value="{{ option.value }}" {% if option.value == filter.value %}selected{% endif %}>
-                  {{ option.label }}
-                </option>
+                <option value="{{ option.value }}" {% if option.value == filter.value %}selected{% endif %}>{{ option.label }}</option>
               {% endfor %}
             </select>
             {% if filter.help_text %}<small class="form-text text-muted">{{ filter.help_text }}</small>{% endif %}
           </div>
 
+        {% elif filter.type == 'toggle_buttons' %}
+          <div class="filter-field">
+            <label class="form-label small text-muted mb-1 d-block">{{ filter.label }}</label>
+            <input type="hidden" id="id_{{ filter.name }}" name="{{ filter.name }}" value="{% if filter.value == True %}true{% elif filter.value == False %}false{% endif %}" class="toggle-value-input">
+            <div class="btn-group btn-group-sm" role="group" data-toggle-group="{{ filter.name }}">
+              <button type="button" class="btn btn-outline-success toggle-filter-btn {% if filter.value == True %}active{% endif %}" data-value="true">
+                {% trans "Active" %}
+              </button>
+              <button type="button" class="btn btn-outline-danger toggle-filter-btn {% if filter.value == False %}active{% endif %}" data-value="false">
+                {% trans "Inactive" %}
+              </button>
+            </div>
+            {% if filter.help_text %}<small class="form-text text-muted d-block mt-1">{{ filter.help_text }}</small>{% endif %}
+          </div>
+
         {% elif filter.type == 'checkbox' %}
           <div class="filter-field d-flex align-items-center">
-            {% comment %} English: Checkbox styled as success button (green when checked) {% endcomment %}
-            <input 
-              type="checkbox" 
-              id="id_{{ filter.name }}" 
-              name="{{ filter.name }}" 
-              value="true" 
-              {% if filter.checked %}checked{% endif %} 
-              class="btn-check"
-              autocomplete="off">
-            <label 
-              for="id_{{ filter.name }}" 
-              class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
-              {% if filter.checked %}
-                <span class="material-icons" style="font-size: 16px;">check</span>
-              {% endif %}
+            <input type="checkbox" id="id_{{ filter.name }}" name="{{ filter.name }}" value="true" {% if filter.checked %}checked{% endif %} class="btn-check auto-submit-checkbox" autocomplete="off">
+            <label for="id_{{ filter.name }}" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
+              {% if filter.checked %}<span class="material-icons" style="font-size: 16px;">check</span>{% endif %}
               <span>{{ filter.label }}</span>
             </label>
             {% if filter.help_text %}<small class="form-text text-muted d-block mt-1">{{ filter.help_text }}</small>{% endif %}
@@ -67,67 +66,266 @@ Props:
         {% elif filter.type == 'date' %}
           <div class="filter-field" style="min-width: 160px;">
             <label for="id_{{ filter.name }}" class="form-label small text-muted mb-1">{{ filter.label }}</label>
-            <input 
-              type="date" 
-              id="id_{{ filter.name }}" 
-              name="{{ filter.name }}" 
-              value="{{ filter.value }}" 
-              class="form-control form-control-sm">
+            <input type="date" id="id_{{ filter.name }}" name="{{ filter.name }}" value="{{ filter.value }}" class="form-control form-control-sm auto-submit">
             {% if filter.help_text %}<small class="form-text text-muted">{{ filter.help_text }}</small>{% endif %}
           </div>
 
         {% elif filter.type == 'number' %}
           <div class="filter-field" style="min-width: 140px;">
             <label for="id_{{ filter.name }}" class="form-label small text-muted mb-1">{{ filter.label }}</label>
-            <input 
-              type="number" 
-              id="id_{{ filter.name }}" 
-              name="{{ filter.name }}" 
-              value="{{ filter.value }}" 
-              {% if filter.min %}min="{{ filter.min }}"{% endif %} 
-              {% if filter.max %}max="{{ filter.max }}"{% endif %} 
-              class="form-control form-control-sm">
+            <div class="input-group">
+              <input 
+                type="number" 
+                id="id_{{ filter.name }}" 
+                name="{{ filter.name }}" 
+                value="{{ filter.value }}" 
+                {% if filter.min %}min="{{ filter.min }}"{% endif %} 
+                {% if filter.max %}max="{{ filter.max }}"{% endif %} 
+                class="form-control form-control-sm debounce-input"
+                data-debounce="500">
+              {% if filter.value %}
+                <button class="clear-input-btn" type="button" data-target="id_{{ filter.name }}" title="{% trans 'Clear' %}">
+                  <span class="material-icons" style="font-size: 16px;">close</span>
+                </button>
+              {% endif %}
+            </div>
             {% if filter.help_text %}<small class="form-text text-muted">{{ filter.help_text }}</small>{% endif %}
           </div>
         {% endif %}
       {% endfor %}
 
-      {% comment %} English: Action buttons as button group (merged appearance) {% endcomment %}
+      {% comment %} English: Action buttons - show Clear only if filters are active {% endcomment %}
+      {% if has_active_filters %}
       <div class="filter-actions">
         {% comment %} English: Empty label for alignment {% endcomment %}
         <label class="form-label small text-muted mb-1 d-block">&nbsp;</label>
         
-        <div class="btn-group btn-group-sm" role="group">
-          <button type="submit" class="btn btn-primary d-flex align-items-center gap-1">
-            <span class="material-icons" style="font-size: 16px;">filter_list</span>
-            <span>{% trans "Apply" %}</span>
-          </button>
-          <a href="{{ action_url }}" class="btn btn-outline-secondary d-flex align-items-center gap-1">
-            <span class="material-icons" style="font-size: 16px;">clear</span>
-            <span>{% trans "Clear" %}</span>
-          </a>
-        </div>
+        <a href="{{ action_url }}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
+          <span class="material-icons" style="font-size: 16px;">clear</span>
+          <span>{% trans "Clear all" %}</span>
+        </a>
       </div>
+      {% endif %}
     </div>
   </form>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('filterForm');
+  const debounceTimers = {};
+
+// === RESTORE FOCUS after page reload ===
+const lastFocusedId = sessionStorage.getItem('filterFocusedField');
+if (lastFocusedId) {
+  const field = document.getElementById(lastFocusedId);
+  if (field) {
+    // Small delay to ensure page is fully loaded
+    setTimeout(() => {
+      field.focus();
+      // Always move cursor to END of text for text inputs
+      if (field.type === 'text' || field.type === 'search' || field.type === 'number') {
+        const length = field.value.length;
+        field.setSelectionRange(length, length);
+      }
+    }, 100);
+  }
+  sessionStorage.removeItem('filterFocusedField');
+  sessionStorage.removeItem('filterCursorPosition');
+}
+
+  // === SAVE FOCUS before form submit ===
+  function saveFocusState() {
+    const activeElement = document.activeElement;
+    if (activeElement && activeElement.id && activeElement.closest('.filter-bar')) {
+      sessionStorage.setItem('filterFocusedField', activeElement.id);
+      // Save cursor position for text inputs
+      if (activeElement.type === 'text' || activeElement.type === 'search' || activeElement.type === 'number') {
+        sessionStorage.setItem('filterCursorPosition', activeElement.selectionStart);
+      }
+    }
+  }
+
+  // === 1. DEBOUNCE для текстовых и числовых полей ===
+  document.querySelectorAll('.debounce-input').forEach(input => {
+    const delay = parseInt(input.dataset.debounce) || 500;
+    
+    // Input event - debounced submit
+    input.addEventListener('input', function() {
+      const inputId = this.id;
+      
+      // Clear existing timer
+      if (debounceTimers[inputId]) {
+        clearTimeout(debounceTimers[inputId]);
+      }
+      
+      // Set new timer
+      debounceTimers[inputId] = setTimeout(() => {
+        saveFocusState();
+        form.submit();
+      }, delay);
+    });
+    
+    // Blur event - submit immediately when leaving field (Tab, click away, etc.)
+    input.addEventListener('blur', function() {
+      const inputId = this.id;
+      
+      // Clear debounce timer if exists
+      if (debounceTimers[inputId]) {
+        clearTimeout(debounceTimers[inputId]);
+        delete debounceTimers[inputId];
+      }
+      
+      // Check if value changed from initial
+      const currentValue = this.value;
+      const initialValue = this.defaultValue;
+      
+      // Submit if value is different
+      if (currentValue !== initialValue) {
+        saveFocusState();
+        form.submit();
+      }
+    });
+  });
+
+  // === 2. AUTO-SUBMIT для select и date полей ===
+  document.querySelectorAll('.auto-submit').forEach(element => {
+    element.addEventListener('change', function() {
+      saveFocusState();
+      form.submit();
+    });
+  });
+
+  // === 3. AUTO-SUBMIT для checkbox ===
+  document.querySelectorAll('.auto-submit-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      saveFocusState();
+      form.submit();
+    });
+  });
+
+  // === 4. CLEAR BUTTON - EVENT DELEGATION ===
+  form.addEventListener('click', function(e) {
+    // Check if click was on clear button or its child
+    const clearBtn = e.target.closest('.clear-input-btn');
+    if (clearBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const targetId = clearBtn.dataset.target;
+      const input = document.getElementById(targetId);
+      
+      if (input) {
+        input.value = '';
+        input.defaultValue = ''; // Update defaultValue too
+        
+        // Clear debounce timer
+        if (debounceTimers[targetId]) {
+          clearTimeout(debounceTimers[targetId]);
+          delete debounceTimers[targetId];
+        }
+        
+        saveFocusState();
+        form.submit();
+      }
+    }
+  });
+
+  // === 5. TOGGLE BUTTONS для Active/Inactive ===
+  document.querySelectorAll('.toggle-filter-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const btnGroup = this.closest('[data-toggle-group]');
+      const groupName = btnGroup.dataset.toggleGroup;
+      const hiddenInput = document.getElementById('id_' + groupName);
+      const clickedValue = this.dataset.value;
+      const currentValue = hiddenInput.value;
+      
+      // Toggle logic
+      if (currentValue === clickedValue) {
+        hiddenInput.value = '';
+        btnGroup.querySelectorAll('.toggle-filter-btn').forEach(b => {
+          b.classList.remove('active');
+        });
+      } else {
+        hiddenInput.value = clickedValue;
+        btnGroup.querySelectorAll('.toggle-filter-btn').forEach(b => {
+          b.classList.remove('active');
+        });
+        this.classList.add('active');
+      }
+      
+      saveFocusState();
+      form.submit();
+    });
+  });
+});
+</script>
+
 <style>
+  /* Input group with clear button - fixed width */
+  .input-group {
+    position: relative;
+  }
+  
+  .input-group .form-control {
+    padding-right: 2.5rem;
+    border-radius: 0.25rem !important; /* Force rounded corners */
+  }
+  
+  .input-group .clear-input-btn {
+    position: absolute;
+    right: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    border: none;
+    background: transparent;
+    padding: 0 0.5rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    height: calc(100% - 4px);
+    border-radius: 0 0.25rem 0.25rem 0; /* Rounded right corners */
+  }
+  
+  .input-group .clear-input-btn:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 0 0.25rem 0.25rem 0;
+  }
+
   /* MD3 Filter Chip behavior */
-  .btn-check:checked + .btn-outline-primary {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
+  .btn-check:checked + .btn-outline-success {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
     color: white;
   }
   
-  .btn-check:checked + .btn-outline-primary:hover {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
+  .btn-check:checked + .btn-outline-success:hover {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
     opacity: 0.9;
   }
   
-  /* Smooth transition */
-  .btn-outline-primary {
+  /* Toggle button group styles */
+  .btn-group .toggle-filter-btn.active.btn-outline-success {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
+    color: white;
+  }
+  
+  .btn-group .toggle-filter-btn.active.btn-outline-danger {
+    background-color: var(--bs-danger);
+    border-color: var(--bs-danger);
+    color: white;
+  }
+  
+  .btn-group .toggle-filter-btn,
+  .btn-outline-success {
     transition: all 0.2s ease-in-out;
   }
 </style>
