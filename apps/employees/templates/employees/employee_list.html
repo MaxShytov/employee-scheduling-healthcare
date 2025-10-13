@@ -18,7 +18,7 @@
         {% endif %}
 
         {# Filter Section #}
-        {% include "core/components/filter_bar.html" with form=filter_form show_search=True search_placeholder=_("Search by name, ID, or email...") show_department_filter=True show_position_filter=True show_status_filter=True %}
+        {% include "core/components/filter_bar.html" with form=filter_form show_search=True search_placeholder=_("Search by name, ID, or email...") show_department_filter=True show_location_filter=True show_position_filter=True show_status_filter=True %}
 
         {# Employee Table #}
         {% include "core/components/data_table.html" with columns=table_columns rows=table_rows empty_state=empty_state_config|default:empty_state_config %}

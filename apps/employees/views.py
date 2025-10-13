@@ -68,15 +68,18 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     
     def get_queryset(self):
         """Apply filters and search to queryset."""
+        # English: Include location in select_related for optimization
         queryset = super().get_queryset().select_related(
             'user', 
             'department', 
-            'position'
+            'position',
+            'location'  # ← ОБЯЗАТЕЛЬНО для оптимизации
         )
         
         # Get filter parameters
         search = self.request.GET.get('search', '')
         department = self.request.GET.get('department')
+        location = self.request.GET.get('location')  # ← ДОБАВЛЕНО
         position = self.request.GET.get('position')
         status = self.request.GET.get('status')
         employment_type = self.request.GET.get('employment_type')
@@ -93,6 +96,10 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         # Apply filters
         if department:
             queryset = queryset.filter(department_id=department)
+        
+        # English: Filter by location
+        if location:  # ← ДОБАВЛЕНО
+            queryset = queryset.filter(location_id=location)
         
         if position:
             queryset = queryset.filter(position_id=position)
@@ -112,149 +119,119 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         """Add statistics and filter form to context."""
         context = super().get_context_data(**kwargs)
         
-        # Get current time
-        now = timezone.now()
-        
-        # Calculate statistics
-        total_employees = Employee.objects.filter(is_active=True).count()
-        last_month_employees = Employee.objects.filter(
-            is_active=True,
-            created_at__gte=now - timedelta(days=30)
-        ).count()
-        
-        # Calculate trend (percentage change)
-        if total_employees > 0:
-            trend = round((last_month_employees / total_employees) * 100, 1)
-        else:
-            trend = 0
-        
-        # Add statistics
-        context['stats'] = {
-            'total_active': total_employees,
-            'active_trend': trend,
-            'total_departments': Department.objects.filter(is_active=True).count(),
-            'total_positions': Position.objects.filter(is_active=True).count(),
-            'expiring_certifications': 0,  # Placeholder for now
-        }
-        
-        # Prepare stats cards for the component
+        # Statistics cards
         context['stats_cards'] = [
             {
-                'title': 'Total Active',
-                'value': total_employees,
+                'title': _('Total Employees'),
+                'value': self.get_queryset().count(),
                 'icon': 'people',
                 'bg_color': 'primary',
-                'trend_value': trend,
-                'trend_direction': 'up' if trend > 0 else 'flat',
             },
             {
-                'title': 'Departments',
-                'value': Department.objects.filter(is_active=True).count(),
-                'icon': 'apartment',
+                'title': _('Active'),
+                'value': self.get_queryset().filter(is_active=True).count(),
+                'icon': 'check_circle',
                 'bg_color': 'success',
             },
             {
-                'title': 'Positions',
-                'value': Position.objects.filter(is_active=True).count(),
-                'icon': 'work',
-                'bg_color': 'info',
+                'title': _('Inactive'),
+                'value': self.get_queryset().filter(is_active=False).count(),
+                'icon': 'cancel',
+                'bg_color': 'danger',
             },
             {
-                'title': 'Total Records',
-                'value': self.get_queryset().count(),
-                'icon': 'badge',
-                'bg_color': 'warning',
+                'title': _('Departments'),
+                'value': Department.objects.filter(is_active=True).count(),
+                'icon': 'business',
+                'bg_color': 'info',
             },
         ]
         
         # Add filter form
         context['filter_form'] = EmployeeFilterForm(self.request.GET or None)
         
-        # Add breadcrumbs
-        context['breadcrumb_items'] = [
-            {'title': 'Dashboard', 'url': reverse_lazy('dashboard:home')},
-            {'title': 'Employees', 'active': True}
-        ]
-        
-        # Add breadcrumbs - используем name вместо title для совместимости
+        # Breadcrumbs
         context['breadcrumb_items'] = [
             {
-                'name': 'Dashboard',
+                'name': _('Dashboard'),
                 'url': reverse_lazy('dashboard:home')
             },
             {
-                'name': 'Employees',
+                'name': _('Employees'),
                 'active': True
             }
         ]
         
         # Table columns configuration
         context['table_columns'] = [
-            {'title': 'ID', 'width': '10%'},
-            {'title': 'Name', 'width': '25%'},
-            {'title': 'Department', 'width': '15%'},
-            {'title': 'Position', 'width': '15%'},
-            {'title': 'Type', 'width': '10%'},
-            {'title': 'Rate', 'width': '10%'},
-            {'title': 'Status', 'width': '8%'},
-            {'title': 'Actions', 'width': '7%', 'class': 'text-end'},
+            {'title': _('ID'), 'width': '8%'},
+            {'title': _('Name'), 'width': '27%'},
+            {'title': _('Department'), 'width': '13%'},
+            {'title': _('Position'), 'width': '13%'},
+            {'title': _('Type'), 'width': '10%'},
+            {'title': _('Rate'), 'width': '10%'},
+            {'title': _('Status'), 'width': '9%'},
+            {'title': _('Actions'), 'width': '10%', 'class': 'text-end'},
         ]
         
-        # Convert employees to table rows format
+        # English: Convert employees to table rows format with location and weekly_hours
         table_rows = []
         for employee in context['employees']:
+            
             table_rows.append({
                 'id': employee.pk,
                 'cells': [
                     {'type': 'strong', 'value': employee.employee_id},
                     {
                         'type': 'avatar',
-                        'name': employee.user.get_full_name,
-                        'subtitle': employee.user.email,
-                        'avatar_url': employee.user.profile_picture.url if employee.user.profile_picture else None
-                    },
-                    {
-                        'type': 'badges' if employee.department else 'text',
-                        'badges': [{'text': employee.department.code, 'color': 'secondary'}] if employee.department else None,
-                        'text': employee.department.name if employee.department else '-'
-                    },
-                    {
-                        'type': 'badges' if employee.position else 'text',
-                        'badges': [{'text': employee.position.code, 'color': 'info'}] if employee.position else None,
-                        'text': employee.position.title if employee.position else '-'
+                        'name': employee.user.get_full_name(),
+                        'subtitle': employee.user.email,  # English: Only email under name
+                        'avatar_url': employee.user.avatar.url if hasattr(employee.user, 'avatar') and employee.user.avatar else None,
                     },
                     {
                         'type': 'badge',
-                        'text': employee.get_employment_type_display or 'Full-time',
-                        'color': 'light text-dark'
+                        'text': employee.department.code if employee.department else '—',
+                        'color': 'secondary',
+                        'subtitle': f"{employee.department.name}<br>{employee.location.name if employee.location else ''}" if employee.department else None  # English: Department name + location
+                    },
+                    {
+                        'type': 'badge',
+                        'text': employee.position.code if employee.position else '—',
+                        'color': 'info',
+                        'subtitle': employee.position.title if employee.position else None
+                    },
+                    {
+                        'type': 'badge',
+                        'text': employee.get_employment_type_display(),
+                        'color': 'primary' if employee.employment_type == 'FT' else 'warning'
                     },
                     {
                         'type': 'currency',
-                        'value': employee.hourly_rate,
-                        'currency': 'CHF'
+                        'value': float(employee.hourly_rate) if employee.hourly_rate else 0,  # English: Convert Decimal to float
+                        'currency': 'CHF',
+                        'subtitle': f"{float(employee.weekly_hours):.2f} {_('hrs/week')}" if employee.weekly_hours else None  # English: Weekly hours under rate, convert to float
                     },
                     {
                         'type': 'status',
                         'value': employee.is_active,
-                        'true_text': 'Active',
-                        'false_text': 'Inactive'
+                        'true_text': _('Active'),
+                        'false_text': _('Inactive')
                     },
                     {
                         'type': 'actions',
-                        'class': 'text-end',
                         'actions': [
                             {
                                 'type': 'link',
                                 'url': reverse_lazy('employees:employee_detail', kwargs={'pk': employee.pk}),
                                 'icon': 'visibility',
-                                'title': 'View',
+                                'title': _('View'),
                                 'color': 'primary'
                             },
                             {
                                 'type': 'link',
                                 'url': reverse_lazy('employees:employee_update', kwargs={'pk': employee.pk}),
                                 'icon': 'edit',
-                                'title': 'Edit',
+                                'title': _('Edit'),
                                 'color': 'secondary'
                             }
                         ]
@@ -267,29 +244,16 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         # Empty state configuration
         context['empty_state_config'] = {
             'icon': 'people_outline',
-            'title': 'No employees found',
-            'message': 'Start by adding your first employee or adjust your filters',
-            'button_text': 'Add First Employee',
+            'title': _('No employees found'),
+            'message': _('Start by adding your first employee or adjust your filters'),
+            'button_text': _('Add First Employee'),
             'button_url': reverse_lazy('employees:employee_create'),
         }
         
         # Add URLs for actions
         context['employees_create_url'] = reverse_lazy('employees:employee_create')
         
-        # Add helper properties to employees
-        for employee in context['employees']:
-            employee.has_expiring_certifications = False  # Placeholder
-            employee.get_status_display = 'active' if employee.is_active else 'inactive'
-        
         return context
-
-# apps/employees/views.py
-from django.views.generic import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
-from .models import Employee, EmployeeDocument
-
 
 class EmployeeDetailView(LoginRequiredMixin, DetailView):
     """Display employee details with tabbed interface."""
@@ -596,11 +560,7 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
         ]
     
     def post(self, request, *args, **kwargs):
-        """Handle POST request with both forms."""
-        logger.info("=== EMPLOYEE CREATE POST REQUEST ===")
-        logger.info(f"POST data: {request.POST}")
-        logger.info(f"FILES data: {request.FILES}")
-        
+        """Handle POST request with both forms."""        
         self.object = None
         form = self.get_form()
         user_form = EmployeeUserForm(request.POST, request.FILES)
@@ -608,25 +568,11 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
         # English: Validate both forms
         employee_form_valid = form.is_valid()
         user_form_valid = user_form.is_valid()
-        
-        logger.info(f"Employee form valid: {employee_form_valid}")
-        logger.info(f"User form valid: {user_form_valid}")
-        
-        if not employee_form_valid:
-            logger.error(f"Employee form errors: {form.errors.as_json()}")
-            for field, errors in form.errors.items():
-                logger.error(f"  {field}: {errors}")
-        
-        if not user_form_valid:
-            logger.error(f"User form errors: {user_form.errors.as_json()}")
-            for field, errors in user_form.errors.items():
-                logger.error(f"  {field}: {errors}")
+
         
         if employee_form_valid and user_form_valid:
-            logger.info("Both forms valid, creating employee...")
             return self.form_valid(form, user_form)
         else:
-            logger.warning("Form validation failed")
             return self.form_invalid(form, user_form)
     
     def form_valid(self, form, user_form):
@@ -638,13 +584,11 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
                 user.username = user.email
                 user.set_password('Password123!')
                 user.save()
-                logger.info(f"User created: {user.username}")
 
                 # English: Create employee
                 employee = form.save(commit=False)
                 employee.user = user
                 employee.save()
-                logger.info(f"Employee created: {employee.full_name} (ID: {employee.pk})")
 
                 messages.success(
                     self.request,
@@ -652,7 +596,6 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
                 )
                 return redirect('employees:employee_detail', pk=employee.pk)
         except Exception as e:
-            logger.exception(f"Error creating employee: {e}")
             messages.error(
                 self.request, 
                 _(f'Error creating employee: {str(e)}')
@@ -661,7 +604,6 @@ class EmployeeCreateView(LoginRequiredMixin, CreateView):
     
     def form_invalid(self, form, user_form=None):
         """Handle invalid form submission."""
-        logger.warning("Rendering form with errors")
         messages.error(
             self.request,
             _('Please correct the errors below.')

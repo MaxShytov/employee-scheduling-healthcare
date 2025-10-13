@@ -1,3 +1,22 @@
+{% comment %}
+Component: table_row.html
+Description: Single table row with various cell types
+
+Props:
+  - row: dict with 'id', 'class', and 'cells' list
+  - Each cell can have: type, value, and type-specific properties
+
+Supported cell types:
+  - text: Simple text
+  - strong: Bold text
+  - avatar: Avatar with name and subtitle (uses avatar_with_info component)
+  - badge: Badge with optional subtitle
+  - badges: Multiple badges
+  - status: Boolean status badge
+  - currency: Currency value with optional subtitle
+  - actions: Action buttons
+  - html: Raw HTML
+{% endcomment %}
 {% load i18n %}
 
 <tr{% if row.id %} data-id="{{ row.id }}"{% endif %}{% if row.class %} class="{{ row.class }}"{% endif %}>
@@ -15,7 +34,9 @@
             {% endif %}
         {% elif cell.type == "badge" %}
             <span class="badge bg-{{ cell.color|default:'secondary' }}">{{ cell.text }}</span>
-            {% if cell.subtitle %}<br><small>{{ cell.subtitle }}</small>{% endif %}
+            {% if cell.subtitle %}
+                <br><small class="text-muted" style="line-height: 1.4;">{{ cell.subtitle|safe }}</small>
+            {% endif %}
         {% elif cell.type == "badges" %}
             {% for badge in cell.badges %}
                 <span class="badge bg-{{ badge.color|default:'secondary' }}">{{ badge.text }}</span>
@@ -29,6 +50,9 @@
             {% endif %}
         {% elif cell.type == "currency" %}
             <strong>{{ cell.currency|default:"CHF" }} {{ cell.value|floatformat:2 }}</strong>
+            {% if cell.subtitle %}
+                <br><small class="text-muted">{{ cell.subtitle }}</small>
+            {% endif %}
         {% elif cell.type == "actions" %}
             <div class="btn-group btn-group-sm">
                 {% for action in cell.actions %}
