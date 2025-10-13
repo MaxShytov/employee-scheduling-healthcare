@@ -1,150 +1,21 @@
 {% extends "layouts/dashboard_layout.html" %}
-{% load static %}
-{% load i18n %}
+{% load static i18n %}
 
 {% block title %}{{ page_title }} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-{# Breadcrumbs #}
+
+{% comment %} English: Breadcrumbs navigation {% endcomment %}
 {% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
+{% comment %} English: Page header with back button {% endcomment %}
+{% include "core/components/page_header.html" with title=page_title subtitle=page_subtitle show_back=True back_url=cancel_url %}
+
+{% comment %} English: Form container - all HTML is in component {% endcomment %}
 <div class="row justify-content-center">
     <div class="col-lg-10">
-        {% include "core/components/page_header.html" with title=page_title subtitle="Fill in the employee information below" back_url=cancel_url %}
-        
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            {% if user_form.non_field_errors or form.non_field_errors %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>{% trans "Error!" %}</strong> {% trans "Please correct the errors below." %}
-                    {% if user_form.non_field_errors %}
-                        {{ user_form.non_field_errors }}
-                    {% endif %}
-                    {% if form.non_field_errors %}
-                        {{ form.non_field_errors }}
-                    {% endif %}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endif %}
-            
-            <!-- Personal Information Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
-                        <span class="material-icons align-middle me-2">person</span>
-                        {% trans "Personal Information" %}
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Profile Picture -->
-                        {% if user_form.profile_picture %}
-                        <div class="col-12 mb-3">
-                            <label for="{{ user_form.profile_picture.id_for_label }}" class="form-label">
-                                {% trans "Profile Picture" %}
-                            </label>
-                            {% if object and object.user.profile_picture %}
-                            <div class="mb-2">
-                                <img src="{{ object.user.profile_picture.url }}" 
-                                    class="rounded-circle" 
-                                    style="width: 80px; height: 80px; object-fit: cover;"
-                                    alt="Current photo">
-                                <p class="text-muted small mt-1">{% trans "Current photo" %}</p>
-                            </div>
-                            {% endif %}
-                            {{ user_form.profile_picture }}
-                            <small class="form-text text-muted">
-                                {% trans "Upload JPG, PNG or GIF (max 5MB)" %}
-                            </small>
-                            {% if user_form.profile_picture.errors %}
-                                <div class="invalid-feedback d-block">{{ user_form.profile_picture.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-                        
-                        {% include "core/components/form_field.html" with field=user_form.first_name col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=user_form.last_name col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=user_form.email col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=user_form.phone col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=user_form.date_of_birth col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=user_form.country col_class="col-md-6" %}
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Employment Information Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
-                        <span class="material-icons align-middle me-2">work</span>
-                        {% trans "Employment Information" %}
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% include "core/components/form_field.html" with field=form.employee_id col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=form.employment_type col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=form.department col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=form.position col_class="col-md-6" %}
-                        
-                        {# Location field - only if it exists in form #}
-                        {% if form.location %}
-                        {% include "core/components/form_field.html" with field=form.location col_class="col-md-6" %}
-                        {% endif %}
-                        
-                        {% include "core/components/form_field.html" with field=form.hire_date col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=form.termination_date col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=form.hourly_rate col_class="col-md-6" help_text="Hourly rate in Swiss Francs (CHF)" %}
-                        {% include "core/components/form_field.html" with field=form.weekly_hours col_class="col-md-6" %}
-                        
-                        <div class="col-12 mb-3">
-                            <div class="form-check">
-                                {{ form.is_active }}
-                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
-                                    {% trans "Active Employee" %}
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Emergency Contact Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
-                        <span class="material-icons align-middle me-2">emergency</span>
-                        {% trans "Emergency Contact" %}
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% include "core/components/form_field.html" with field=form.emergency_contact_name col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=form.emergency_contact_phone col_class="col-md-6" %}
-                        {% include "core/components/form_field.html" with field=form.emergency_contact_relationship col_class="col-12" %}
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Notes Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
-                        <span class="material-icons align-middle me-2">notes</span>
-                        {% trans "Additional Notes" %}
-                    </h5>
-                </div>
-                <div class="card-body">
-                    {% include "core/components/form_field.html" with field=form.notes col_class="col-12" %}
-                </div>
-            </div>
-            
-            <!-- Actions -->
-            <div class="mb-4">
-                {% include "core/components/action_buttons.html" with cancel_url=cancel_url submit_text=form_action %}
-            </div>
-        </form>
+        {% include "core/components/form_container.html" with forms=forms sections=form_sections enctype='multipart/form-data' cancel_url=cancel_url submit_text=submit_text %}
     </div>
 </div>
+
 {% endblock %}

@@ -1,0 +1,41 @@
+{% comment %}
+Component: Form Container
+Description: Wrapper for forms with errors display and sections
+
+Props:
+  - forms: list (required) - List of forms to check for errors
+  - sections: list[dict] (required) - List of form sections
+    Structure: [
+      {
+        'title': _('Personal Information'),
+        'icon': 'person',
+        'fields': [
+          {'field': form.first_name, 'col_class': 'col-md-6'},
+          {'field': form.last_name, 'col_class': 'col-md-6'}
+        ]
+      }
+    ]
+  - enctype: str (optional) - Form enctype attribute (e.g., 'multipart/form-data')
+  - cancel_url: str (required) - Cancel button URL
+  - submit_text: str (optional, default='Save') - Submit button text
+  - submit_icon: str (optional, default='save') - Submit button icon
+
+Usage:
+  {% include "core/components/form_container.html" with forms=forms_list sections=form_sections enctype='multipart/form-data' cancel_url=cancel_url submit_text=_('Save Employee') %}
+{% endcomment %}
+{% load i18n %}
+
+<form method="post" {% if enctype %}enctype="{{ enctype }}"{% endif %}>
+    {% csrf_token %}
+    
+    {% comment %} English: Display form errors if any {% endcomment %}
+    {% include "core/components/form_errors_alert.html" with forms=forms %}
+    
+    {% comment %} English: Render each section {% endcomment %}
+    {% for section in sections %}
+        {% include "core/components/form_section_card.html" with title=section.title icon=section.icon fields=section.fields %}
+    {% endfor %}
+    
+    {% comment %} English: Action buttons {% endcomment %}
+    {% include "core/components/action_buttons.html" with cancel_url=cancel_url submit_text=submit_text|default:_('Save') submit_icon=submit_icon|default:'save' %}
+</form>

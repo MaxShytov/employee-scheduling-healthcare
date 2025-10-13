@@ -1,0 +1,44 @@
+{% comment %}
+Component: Profile Picture Upload Field
+Description: File upload field with image preview for profile pictures
+
+Props:
+  - field: form field (required) - Django form FileField/ImageField
+  - current_image_url: str (optional) - URL of current image
+  - col_class: str (optional, default='col-12') - Column CSS class
+  - help_text: str (optional) - Custom help text
+
+Usage:
+  {% include "core/components/profile_picture_field.html" with field=user_form.profile_picture current_image_url=object.user.profile_picture.url %}
+{% endcomment %}
+{% load i18n %}
+
+<div class="{{ col_class|default:'col-12' }} mb-3">
+    <label for="{{ field.id_for_label }}" class="form-label">
+        {{ field.label }}
+        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+    
+    {% comment %} English: Show current image preview if exists {% endcomment %}
+    {% if current_image_url %}
+    <div class="mb-2">
+        <img src="{{ current_image_url }}" 
+             class="rounded-circle" 
+             style="width: 80px; height: 80px; object-fit: cover;"
+             alt="{% trans 'Current photo' %}">
+        <p class="text-muted small mt-1">{% trans "Current photo" %}</p>
+    </div>
+    {% endif %}
+    
+    {{ field }}
+    
+    {% comment %} English: Help text {% endcomment %}
+    <small class="form-text text-muted">
+        {{ help_text|default:_("Upload JPG, PNG or GIF (max 5MB)") }}
+    </small>
+    
+    {% comment %} English: Field errors {% endcomment %}
+    {% if field.errors %}
+        <div class="invalid-feedback d-block">{{ field.errors.0 }}</div>
+    {% endif %}
+</div>

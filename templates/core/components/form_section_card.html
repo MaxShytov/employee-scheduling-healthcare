@@ -1,0 +1,39 @@
+{% comment %}
+Component: Form Section Card
+Description: Card wrapper for form field groups with icon and title
+
+Props:
+  - title: str (required) - Section title
+  - icon: str (optional) - Material icon name
+  - fields: list[dict] (required) - List of form fields
+    Structure: [
+      {'field': form.first_name, 'col_class': 'col-md-6'},
+      {'field': form.last_name, 'col_class': 'col-md-6', 'help_text': 'Custom help'}
+    ]
+  - card_class: str (optional, default='mb-4') - Additional CSS classes
+
+Usage:
+  {% include "core/components/form_section_card.html" with title=_('Personal Information') icon='person' fields=personal_fields %}
+{% endcomment %}
+
+<div class="card border-0 shadow-sm {{ card_class|default:'mb-4' }}">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">
+            {% if icon %}
+            <span class="material-icons align-middle me-2">{{ icon }}</span>
+            {% endif %}
+            {{ title }}
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for field_config in fields %}
+                {% if field_config.is_image %}
+                    {% include "core/components/profile_picture_field.html" with field=field_config.field current_image_url=field_config.current_image_url col_class=field_config.col_class|default:'col-12' help_text=field_config.help_text %}
+                {% else %}
+                    {% include "core/components/form_field.html" with field=field_config.field col_class=field_config.col_class|default:'col-12' help_text=field_config.help_text %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

@@ -2,6 +2,7 @@
 Views for employee management.
 """
 
+import logging
 from django.views.generic import ListView
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -410,11 +411,18 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
                             'badge_text': employee.position.code,
                             'badge_class': 'bg-info'
                         },
+                        {
+                            'label': _('Location'),
+                            'value': employee.location.name if employee.location else '—',
+                        },
                         {'label': _('Hire Date'), 'value': employee.hire_date.strftime('%B %d, %Y') if employee.hire_date else '—'},
+                        {'label': _('Weekly Hours'), 'value': f"{employee.weekly_hours} hours" if employee.weekly_hours else '—'},
+                        {'label': _('Hourly Rate'), 'value': f"CHF {employee.hourly_rate:.2f}" if employee.hourly_rate else '—'},
                         {'label': _('Years of Service'), 'value': f"{employee.years_of_service} years" if employee.years_of_service else '—'},
                     ]
                 }
             ]
+    
             
             # English: Add termination info if applicable
             if employee.termination_date:
@@ -494,53 +502,177 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
         
         return context
 
+# apps/employees/views.py
 class EmployeeCreateView(LoginRequiredMixin, CreateView):
-    """Create new employee."""
-
     model = Employee
     template_name = 'employees/employee_form.html'
     form_class = EmployeeForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # English: User form instance
+        if 'user_form' not in context:
+            if self.request.POST:
+                context['user_form'] = EmployeeUserForm(
+                    self.request.POST, 
+                    self.request.FILES
+                )
+            else:
+                context['user_form'] = EmployeeUserForm()
+        
+        # English: Page metadata
         context['page_title'] = _('Add Employee')
-        context['form_action'] = _('Create Employee')
+        context['page_subtitle'] = _('Fill in the employee information below')
         context['cancel_url'] = reverse_lazy('employees:employee_list')
-
-        # Breadcrumbs
+        context['submit_text'] = _('Create Employee')
+        
+        # English: Breadcrumbs
         context['breadcrumb_items'] = [
-            {'name': _('Employees'), 'url': reverse(
-                'employees:employee_list')},
-            {'name': _('Create')},
+            {'name': _('Home'), 'url': reverse('dashboard:home')},
+            {'name': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'name': _('Create'), 'url': None},
         ]
-
+        
+        # English: Prepare forms list for error handling
+        context['forms'] = [context['user_form'], context['form']]
+        
+        # English: Prepare form sections
+        context['form_sections'] = self._get_form_sections(context['form'], context['user_form'])
+        
         return context
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        user_form = context['user_form']
-
-        if user_form.is_valid():
+    
+    def _get_form_sections(self, employee_form, user_form, current_image_url=None):
+        """Prepare structured form sections data."""
+        return [
+            {
+                'title': _('Personal Information'),
+                'icon': 'person',
+                'fields': [
+                    {
+                        'field': user_form['profile_picture'],
+                        'col_class': 'col-12',
+                        'is_image': True,
+                        'current_image_url': current_image_url  # Only for UpdateView
+                    },
+                    {'field': user_form['first_name'], 'col_class': 'col-md-6'},
+                    {'field': user_form['last_name'], 'col_class': 'col-md-6'},
+                    {'field': user_form['email'], 'col_class': 'col-md-6'},
+                    {'field': user_form['phone'], 'col_class': 'col-md-6'},
+                    {'field': user_form['date_of_birth'], 'col_class': 'col-md-6'},
+                    {'field': user_form['country'], 'col_class': 'col-md-6'},
+                ]
+            },
+            {
+                'title': _('Employment Information'),
+                'icon': 'work',
+                'fields': [
+                    {'field': employee_form['employee_id'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['department'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['position'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['location'], 'col_class': 'col-md-6'},  # ← ДОБАВЛЕНО
+                    {'field': employee_form['employment_type'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['weekly_hours'], 'col_class': 'col-md-6'},  # ← ДОБАВЛЕНО
+                    {'field': employee_form['hire_date'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['hourly_rate'], 'col_class': 'col-md-6'},
+                ]
+            },
+            {
+                'title': _('Emergency Contact'),
+                'icon': 'emergency',
+                'fields': [
+                    {'field': employee_form['emergency_contact_name'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['emergency_contact_phone'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['emergency_contact_relationship'], 'col_class': 'col-12'},
+                ]
+            },
+            {
+                'title': _('Additional Notes'),
+                'icon': 'notes',
+                'fields': [
+                    {'field': employee_form['notes'], 'col_class': 'col-12'},
+                ]
+            }
+        ]
+    
+    def post(self, request, *args, **kwargs):
+        """Handle POST request with both forms."""
+        logger.info("=== EMPLOYEE CREATE POST REQUEST ===")
+        logger.info(f"POST data: {request.POST}")
+        logger.info(f"FILES data: {request.FILES}")
+        
+        self.object = None
+        form = self.get_form()
+        user_form = EmployeeUserForm(request.POST, request.FILES)
+        
+        # English: Validate both forms
+        employee_form_valid = form.is_valid()
+        user_form_valid = user_form.is_valid()
+        
+        logger.info(f"Employee form valid: {employee_form_valid}")
+        logger.info(f"User form valid: {user_form_valid}")
+        
+        if not employee_form_valid:
+            logger.error(f"Employee form errors: {form.errors.as_json()}")
+            for field, errors in form.errors.items():
+                logger.error(f"  {field}: {errors}")
+        
+        if not user_form_valid:
+            logger.error(f"User form errors: {user_form.errors.as_json()}")
+            for field, errors in user_form.errors.items():
+                logger.error(f"  {field}: {errors}")
+        
+        if employee_form_valid and user_form_valid:
+            logger.info("Both forms valid, creating employee...")
+            return self.form_valid(form, user_form)
+        else:
+            logger.warning("Form validation failed")
+            return self.form_invalid(form, user_form)
+    
+    def form_valid(self, form, user_form):
+        """Handle valid form submission."""
+        try:
             with transaction.atomic():
-                # Create user account
+                # English: Create user account
                 user = user_form.save(commit=False)
                 user.username = user.email
-                user.set_password('Password123!')  # Default password
+                user.set_password('Password123!')
                 user.save()
+                logger.info(f"User created: {user.username}")
 
-                # Create employee
+                # English: Create employee
                 employee = form.save(commit=False)
                 employee.user = user
                 employee.save()
+                logger.info(f"Employee created: {employee.full_name} (ID: {employee.pk})")
 
                 messages.success(
                     self.request,
                     _(f'Employee {employee.full_name} created successfully. Default password: Password123!')
                 )
                 return redirect('employees:employee_detail', pk=employee.pk)
-        else:
-            return self.form_invalid(form)
-
+        except Exception as e:
+            logger.exception(f"Error creating employee: {e}")
+            messages.error(
+                self.request, 
+                _(f'Error creating employee: {str(e)}')
+            )
+            return self.form_invalid(form, user_form)
+    
+    def form_invalid(self, form, user_form=None):
+        """Handle invalid form submission."""
+        logger.warning("Rendering form with errors")
+        messages.error(
+            self.request,
+            _('Please correct the errors below.')
+        )
+        
+        # English: Pass user_form to context
+        context = self.get_context_data(form=form)
+        if user_form:
+            context['user_form'] = user_form
+        
+        return self.render_to_response(context)
 
 class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
     model = Employee
@@ -550,7 +682,7 @@ class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Create user form instance
+        # English: User form instance for update
         if self.request.POST:
             context['user_form'] = EmployeeUserForm(
                 self.request.POST,
@@ -560,21 +692,84 @@ class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
         else:
             context['user_form'] = EmployeeUserForm(instance=self.object.user)
 
+        # English: Page metadata
         context['page_title'] = _('Edit Employee')
-        context['form_action'] = _('Save Changes')
-        context['cancel_url'] = reverse_lazy(
-            'employees:employee_detail', kwargs={'pk': self.object.pk})
+        context['page_subtitle'] = _('Update employee information')
+        context['cancel_url'] = reverse_lazy('employees:employee_detail', kwargs={'pk': self.object.pk})
+        context['submit_text'] = _('Save Changes')
 
-        # Breadcrumbs
+        # English: Breadcrumbs
         context['breadcrumb_items'] = [
-            {'name': _('Employees'), 'url': reverse(
-                'employees:employee_list')},
-            {'name': self.object.full_name, 'url': reverse(
-                'employees:employee_detail', kwargs={'pk': self.object.pk})},
-            {'name': _('Edit')},
+            {'name': _('Home'), 'url': reverse('dashboard:home')},
+            {'name': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'name': self.object.full_name, 'url': reverse('employees:employee_detail', kwargs={'pk': self.object.pk})},
+            {'name': _('Edit'), 'url': None},
         ]
+        
+        # English: Prepare forms list
+        context['forms'] = [context['user_form'], context['form']]
+        
+        # English: Prepare form sections (same structure as create)
+        context['form_sections'] = self._get_form_sections(
+            context['form'], 
+            context['user_form'],
+            current_image_url=self.object.user.profile_picture.url if self.object.user.profile_picture else None
+        )
 
         return context
+    
+    def _get_form_sections(self, employee_form, user_form, current_image_url=None):
+        """Prepare structured form sections data."""
+        return [
+            {
+                'title': _('Personal Information'),
+                'icon': 'person',
+                'fields': [
+                    {
+                        'field': user_form['profile_picture'],
+                        'col_class': 'col-12',
+                        'is_image': True,
+                        'current_image_url': current_image_url  # Only for UpdateView
+                    },
+                    {'field': user_form['first_name'], 'col_class': 'col-md-6'},
+                    {'field': user_form['last_name'], 'col_class': 'col-md-6'},
+                    {'field': user_form['email'], 'col_class': 'col-md-6'},
+                    {'field': user_form['phone'], 'col_class': 'col-md-6'},
+                    {'field': user_form['date_of_birth'], 'col_class': 'col-md-6'},
+                    {'field': user_form['country'], 'col_class': 'col-md-6'},
+                ]
+            },
+            {
+                'title': _('Employment Information'),
+                'icon': 'work',
+                'fields': [
+                    {'field': employee_form['employee_id'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['department'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['position'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['location'], 'col_class': 'col-md-6'},  # ← ДОБАВЛЕНО
+                    {'field': employee_form['employment_type'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['weekly_hours'], 'col_class': 'col-md-6'},  # ← ДОБАВЛЕНО
+                    {'field': employee_form['hire_date'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['hourly_rate'], 'col_class': 'col-md-6'},
+                ]
+            },
+            {
+                'title': _('Emergency Contact'),
+                'icon': 'emergency',
+                'fields': [
+                    {'field': employee_form['emergency_contact_name'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['emergency_contact_phone'], 'col_class': 'col-md-6'},
+                    {'field': employee_form['emergency_contact_relationship'], 'col_class': 'col-12'},
+                ]
+            },
+            {
+                'title': _('Additional Notes'),
+                'icon': 'notes',
+                'fields': [
+                    {'field': employee_form['notes'], 'col_class': 'col-12'},
+                ]
+            }
+        ]
 
     def form_valid(self, form):
         context = self.get_context_data()

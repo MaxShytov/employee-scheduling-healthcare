@@ -1,0 +1,25 @@
+{% comment %}
+Component: Form Errors Alert
+Description: Display form non-field errors in dismissible alert
+
+Props:
+  - forms: list (required) - List of forms to check for errors
+    Example: [user_form, employee_form]
+  - message: str (optional) - Custom error message
+  - alert_class: str (optional, default='alert-danger') - Alert CSS class
+
+Usage:
+  {% include "core/components/form_errors_alert.html" with forms=forms_list %}
+{% endcomment %}
+{% load i18n %}
+
+{% comment %} English: Check if any form has non-field errors {% endcomment %}
+{% for form in forms %}
+    {% if form.non_field_errors %}
+        <div class="alert {{ alert_class|default:'alert-danger' }} alert-dismissible fade show" role="alert">
+            <strong>{% trans "Error!" %}</strong> {{ message|default:_("Please correct the errors below.") }}
+            {{ form.non_field_errors }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+{% endfor %}
