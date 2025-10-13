@@ -1,127 +1,134 @@
+{# templates/core/components/filter_bar.html #}
+{% load i18n %}
+
 {% comment %}
-Component: filter_bar.html
-Description: Filter bar with search and multiple filter dropdowns
+Universal filter bar component.
 
 Props:
-  - form: Form object with filter fields
-  - show_search: bool (optional) - Show search field
-  - search_placeholder: str (optional) - Search placeholder text
-  - show_department_filter: bool (optional) - Show department dropdown
-  - show_location_filter: bool (optional) - Show location dropdown
-  - show_position_filter: bool (optional) - Show position dropdown
-  - show_status_filter: bool (optional) - Show status dropdown
-  - show_employment_type_filter: bool (optional) - Show employment type dropdown
-
-Usage:
-  {% include "core/components/filter_bar.html" with form=filter_form show_search=True show_department_filter=True show_location_filter=True show_position_filter=True show_status_filter=True %}
+  - filters: list[dict] - list of filter configs from FilterSet.to_template_context()
+  - action_url: str - form action URL (usually request.path)
+  - method: str - 'get' (default)
 {% endcomment %}
-{% load i18n %}
-{% load widget_tweaks %}
 
-<div class="card mb-4 border-0 shadow-sm">
-    <div class="card-body">
-        <form method="get" id="filterForm" class="needs-validation">
-            <div class="row g-2 align-items-end">
-                {% comment %} English: Search field - reduced to col-2 {% endcomment %}
-                {% if show_search %}
-                <div class="col-2">
-                    {% if form.search %}
-                        <label class="form-label small text-muted mb-1">{{ form.search.label }}</label>
-                        {{ form.search|add_class:"form-control form-control-sm" }}
-                    {% else %}
-                        <label class="form-label small text-muted mb-1">{% trans "Search" %}</label>
-                        <input type="text" 
-                               name="search" 
-                               class="form-control form-control-sm" 
-                               placeholder="{{ search_placeholder|default:'Search...' }}"
-                               value="{{ request.GET.search }}">
-                    {% endif %}
-                </div>
-                {% endif %}
-                
-                {% comment %} English: Department filter {% endcomment %}
-                {% if show_department_filter and form.department %}
-                <div class="col-2">
-                    <label class="form-label small text-muted mb-1">{{ form.department.label }}</label>
-                    {{ form.department|add_class:"form-select form-select-sm" }}
-                </div>
-                {% endif %}
-                
-                {% comment %} English: Location filter - NEW {% endcomment %}
-                {% if show_location_filter and form.location %}
-                <div class="col-2">
-                    <label class="form-label small text-muted mb-1">{{ form.location.label }}</label>
-                    {{ form.location|add_class:"form-select form-select-sm" }}
-                </div>
-                {% endif %}
-                
-                {% comment %} English: Position filter {% endcomment %}
-                {% if show_position_filter and form.position %}
-                <div class="col-2">
-                    <label class="form-label small text-muted mb-1">{{ form.position.label }}</label>
-                    {{ form.position|add_class:"form-select form-select-sm" }}
-                </div>
-                {% endif %}
-                
-                {% comment %} English: Status filter {% endcomment %}
-                {% if show_status_filter and form.status %}
-                <div class="col-2">
-                    <label class="form-label small text-muted mb-1">{{ form.status.label }}</label>
-                    {{ form.status|add_class:"form-select form-select-sm" }}
-                </div>
-                {% endif %}
-                
-                {% comment %} English: Employment type filter {% endcomment %}
-                {% if show_employment_type_filter and form.employment_type %}
-                <div class="col-2">
-                    <label class="form-label small text-muted mb-1">{{ form.employment_type.label }}</label>
-                    {{ form.employment_type|add_class:"form-select form-select-sm" }}
-                </div>
-                {% endif %}
-                
-                {% comment %} English: Action buttons - fixed size col-2 to prevent wrapping {% endcomment %}
-                <div class="col-2">
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary btn-sm flex-fill">
-                            <span class="material-icons align-middle" style="font-size: 16px;">filter_list</span>
-                            <span class="d-none d-lg-inline ms-1">{% trans "Apply" %}</span>
-                        </button>
-                        <a href="{{ request.path }}" class="btn btn-outline-secondary btn-sm flex-fill">
-                            <span class="material-icons align-middle" style="font-size: 16px;">clear</span>
-                            <span class="d-none d-lg-inline ms-1">{% trans "Clear" %}</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </form>
+{% if filters %}
+<div class="filter-bar mb-4">
+  <form method="{{ method|default:'get' }}" action="{{ action_url }}" class="filter-form">
+    <div class="d-flex flex-wrap gap-3 align-items-end">
+      {% comment %} English: Filter fields in horizontal row {% endcomment %}
+      {% for filter in filters %}
+        {% if filter.type == 'text' %}
+          <div class="filter-field" style="min-width: 200px;">
+            <label for="id_{{ filter.name }}" class="form-label small text-muted mb-1">{{ filter.label }}</label>
+            <input 
+              type="text" 
+              id="id_{{ filter.name }}" 
+              name="{{ filter.name }}" 
+              value="{{ filter.value }}" 
+              placeholder="{{ filter.placeholder }}" 
+              class="form-control form-control-sm">
+            {% if filter.help_text %}<small class="form-text text-muted">{{ filter.help_text }}</small>{% endif %}
+          </div>
+
+        {% elif filter.type == 'select' %}
+          <div class="filter-field" style="min-width: 180px;">
+            <label for="id_{{ filter.name }}" class="form-label small text-muted mb-1">{{ filter.label }}</label>
+            <select id="id_{{ filter.name }}" name="{{ filter.name }}" class="form-select form-select-sm">
+              {% for option in filter.options %}
+                <option value="{{ option.value }}" {% if option.value == filter.value %}selected{% endif %}>
+                  {{ option.label }}
+                </option>
+              {% endfor %}
+            </select>
+            {% if filter.help_text %}<small class="form-text text-muted">{{ filter.help_text }}</small>{% endif %}
+          </div>
+
+        {% elif filter.type == 'checkbox' %}
+          <div class="filter-field d-flex align-items-center">
+            {% comment %} English: Checkbox styled as success button (green when checked) {% endcomment %}
+            <input 
+              type="checkbox" 
+              id="id_{{ filter.name }}" 
+              name="{{ filter.name }}" 
+              value="true" 
+              {% if filter.checked %}checked{% endif %} 
+              class="btn-check"
+              autocomplete="off">
+            <label 
+              for="id_{{ filter.name }}" 
+              class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
+              {% if filter.checked %}
+                <span class="material-icons" style="font-size: 16px;">check</span>
+              {% endif %}
+              <span>{{ filter.label }}</span>
+            </label>
+            {% if filter.help_text %}<small class="form-text text-muted d-block mt-1">{{ filter.help_text }}</small>{% endif %}
+          </div>
+
+        {% elif filter.type == 'date' %}
+          <div class="filter-field" style="min-width: 160px;">
+            <label for="id_{{ filter.name }}" class="form-label small text-muted mb-1">{{ filter.label }}</label>
+            <input 
+              type="date" 
+              id="id_{{ filter.name }}" 
+              name="{{ filter.name }}" 
+              value="{{ filter.value }}" 
+              class="form-control form-control-sm">
+            {% if filter.help_text %}<small class="form-text text-muted">{{ filter.help_text }}</small>{% endif %}
+          </div>
+
+        {% elif filter.type == 'number' %}
+          <div class="filter-field" style="min-width: 140px;">
+            <label for="id_{{ filter.name }}" class="form-label small text-muted mb-1">{{ filter.label }}</label>
+            <input 
+              type="number" 
+              id="id_{{ filter.name }}" 
+              name="{{ filter.name }}" 
+              value="{{ filter.value }}" 
+              {% if filter.min %}min="{{ filter.min }}"{% endif %} 
+              {% if filter.max %}max="{{ filter.max }}"{% endif %} 
+              class="form-control form-control-sm">
+            {% if filter.help_text %}<small class="form-text text-muted">{{ filter.help_text }}</small>{% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      {% comment %} English: Action buttons as button group (merged appearance) {% endcomment %}
+      <div class="filter-actions">
+        {% comment %} English: Empty label for alignment {% endcomment %}
+        <label class="form-label small text-muted mb-1 d-block">&nbsp;</label>
+        
+        <div class="btn-group btn-group-sm" role="group">
+          <button type="submit" class="btn btn-primary d-flex align-items-center gap-1">
+            <span class="material-icons" style="font-size: 16px;">filter_list</span>
+            <span>{% trans "Apply" %}</span>
+          </button>
+          <a href="{{ action_url }}" class="btn btn-outline-secondary d-flex align-items-center gap-1">
+            <span class="material-icons" style="font-size: 16px;">clear</span>
+            <span>{% trans "Clear" %}</span>
+          </a>
+        </div>
+      </div>
     </div>
+  </form>
 </div>
 
 <style>
-.form-label.small {
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* English: Ensure form controls are compact */
-.form-select-sm,
-.form-control-sm {
-    font-size: 0.875rem;
-}
-
-.form-select-sm {
-    padding: 0.375rem 2rem 0.375rem 0.75rem;
-}
-
-.form-control-sm {
-    padding: 0.375rem 0.75rem;
-}
-
-/* English: Compact button group */
-.btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
-}
+  /* MD3 Filter Chip behavior */
+  .btn-check:checked + .btn-outline-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+  }
+  
+  .btn-check:checked + .btn-outline-primary:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    opacity: 0.9;
+  }
+  
+  /* Smooth transition */
+  .btn-outline-primary {
+    transition: all 0.2s ease-in-out;
+  }
 </style>
+{% endif %}

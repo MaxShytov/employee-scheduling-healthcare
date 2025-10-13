@@ -1,3 +1,4 @@
+# apps/core/views/general.py
 """
 Core views.
 """

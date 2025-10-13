@@ -27,6 +27,7 @@ from django.views.generic import (
 )
 
 from apps.accounts.models import User
+from apps.employees.filters import EmployeeFilterSet
 from .models import Department, Location, Position, Employee, EmployeeDocument
 from .forms import (
     DepartmentForm, EmployeeFilterForm, LocationForm, LocationSearchForm, PositionForm,
@@ -51,12 +52,18 @@ from datetime import timedelta
 from .models import Employee, Department, Position
 from .forms import EmployeeFilterForm
 
+# apps/employees/views.py
+# В начале файла добавь импорт:
+from apps.core.views.mixins import FilterMixin
+from apps.employees.filters import EmployeeFilterSet
+
+# ... остальные импорты ...
 
 # ============================================
 # Employee List View
 # ============================================
 
-class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class EmployeeListView(FilterMixin, LoginRequiredMixin, PermissionRequiredMixin, ListView):
     """
     Display list of employees with filtering and search capabilities.
     """
@@ -65,77 +72,46 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     context_object_name = 'employees'
     paginate_by = 20
     permission_required = 'employees.view_employee'
+    filterset_class = EmployeeFilterSet  # FilterMixin will use this
     
     def get_queryset(self):
-        """Apply filters and search to queryset."""
-        # English: Include location in select_related for optimization
-        queryset = super().get_queryset().select_related(
-            'user', 
-            'department', 
+        """Apply filters and optimize query."""
+        # English: FilterMixin.get_queryset() will automatically apply filters from filterset_class
+        queryset = super().get_queryset()
+        
+        # English: Optimize with select_related
+        queryset = queryset.select_related(
+            'user',
+            'department',
             'position',
-            'location'  # ← ОБЯЗАТЕЛЬНО для оптимизации
+            'location'
         )
         
-        # Get filter parameters
-        search = self.request.GET.get('search', '')
-        department = self.request.GET.get('department')
-        location = self.request.GET.get('location')  # ← ДОБАВЛЕНО
-        position = self.request.GET.get('position')
-        status = self.request.GET.get('status')
-        employment_type = self.request.GET.get('employment_type')
-        
-        # Apply search
-        if search:
-            queryset = queryset.filter(
-                Q(user__first_name__icontains=search) |
-                Q(user__last_name__icontains=search) |
-                Q(user__email__icontains=search) |
-                Q(employee_id__icontains=search)
-            )
-        
-        # Apply filters
-        if department:
-            queryset = queryset.filter(department_id=department)
-        
-        # English: Filter by location
-        if location:  # ← ДОБАВЛЕНО
-            queryset = queryset.filter(location_id=location)
-        
-        if position:
-            queryset = queryset.filter(position_id=position)
-        
-        if status:
-            if status == 'active':
-                queryset = queryset.filter(is_active=True)
-            elif status == 'inactive':
-                queryset = queryset.filter(is_active=False)
-        
-        if employment_type:
-            queryset = queryset.filter(employment_type=employment_type)
-        
-        return queryset.order_by('-created_at')
+        # English: Order by user's name
+        return queryset.order_by('user__first_name', 'user__last_name')
     
     def get_context_data(self, **kwargs):
-        """Add statistics and filter form to context."""
+        """Add statistics and context."""
+        # English: FilterMixin adds 'filters' and 'has_active_filters' to context
         context = super().get_context_data(**kwargs)
         
         # Statistics cards
         context['stats_cards'] = [
             {
                 'title': _('Total Employees'),
-                'value': self.get_queryset().count(),
+                'value': Employee.objects.count(),
                 'icon': 'people',
                 'bg_color': 'primary',
             },
             {
                 'title': _('Active'),
-                'value': self.get_queryset().filter(is_active=True).count(),
+                'value': Employee.objects.filter(is_active=True).count(),
                 'icon': 'check_circle',
                 'bg_color': 'success',
             },
             {
                 'title': _('Inactive'),
-                'value': self.get_queryset().filter(is_active=False).count(),
+                'value': Employee.objects.filter(is_active=False).count(),
                 'icon': 'cancel',
                 'bg_color': 'danger',
             },
@@ -146,9 +122,6 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                 'bg_color': 'info',
             },
         ]
-        
-        # Add filter form
-        context['filter_form'] = EmployeeFilterForm(self.request.GET or None)
         
         # Breadcrumbs
         context['breadcrumb_items'] = [
@@ -174,10 +147,9 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             {'title': _('Actions'), 'width': '10%', 'class': 'text-end'},
         ]
         
-        # English: Convert employees to table rows format with location and weekly_hours
+        # English: Convert employees to table rows format
         table_rows = []
         for employee in context['employees']:
-            
             table_rows.append({
                 'id': employee.pk,
                 'cells': [
@@ -185,14 +157,14 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                     {
                         'type': 'avatar',
                         'name': employee.user.get_full_name(),
-                        'subtitle': employee.user.email,  # English: Only email under name
+                        'subtitle': employee.user.email,
                         'avatar_url': employee.user.avatar.url if hasattr(employee.user, 'avatar') and employee.user.avatar else None,
                     },
                     {
                         'type': 'badge',
                         'text': employee.department.code if employee.department else '—',
                         'color': 'secondary',
-                        'subtitle': f"{employee.department.name}<br>{employee.location.name if employee.location else ''}" if employee.department else None  # English: Department name + location
+                        'subtitle': f"{employee.department.name}<br>{employee.location.name if employee.location else ''}" if employee.department else None
                     },
                     {
                         'type': 'badge',
@@ -207,9 +179,9 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                     },
                     {
                         'type': 'currency',
-                        'value': float(employee.hourly_rate) if employee.hourly_rate else 0,  # English: Convert Decimal to float
+                        'value': float(employee.hourly_rate) if employee.hourly_rate else 0,
                         'currency': 'CHF',
-                        'subtitle': f"{float(employee.weekly_hours):.2f} {_('hrs/week')}" if employee.weekly_hours else None  # English: Weekly hours under rate, convert to float
+                        'subtitle': f"{float(employee.weekly_hours):.2f} {_('hrs/week')}" if employee.weekly_hours else None
                     },
                     {
                         'type': 'status',
