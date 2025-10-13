@@ -1,0 +1,20 @@
+
+{% comment %}
+Component: Documents Tab Content
+Description: Card with documents table or empty state
+{% endcomment %}
+{% load i18n %}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% comment %} English: Header with Upload button {% endcomment %}
+        {% include "core/components/page_header.html" with title=_('Documents') icon='description' actions=documents_actions size='small' %}
+        
+        {% comment %} English: Show table if documents exist, otherwise empty state {% endcomment %}
+        {% if documents %}
+            {% include "core/components/data_table.html" with columns=documents_columns rows=documents_rows %}
+        {% else %}
+            {% include "core/components/empty_state.html" with icon='description' title=_('No documents yet') message=_('Upload documents for this employee') action_url=document_upload_url action_text=_('Upload Document') %}
+        {% endif %}
+    </div>
+</div>

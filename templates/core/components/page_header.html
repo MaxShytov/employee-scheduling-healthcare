@@ -1,29 +1,78 @@
 {% load i18n %}
 
+{% comment %}
+Component: Page Header
+Description: Material Design 3 page header with optional back button and actions
 
-<div class="d-flex {% if back_url %}align-items-center{% else %}justify-content-between align-items-center{% endif %} mb-4">
-    {% if back_url %}
+Props:
+  - title: str (required) - Page title
+  - subtitle: str (optional) - Subtitle text
+  - icon: str (optional) - Material icon name
+  - size: str (optional, default='normal') - 'normal' or 'small'
+  - show_back: bool (optional, default=False) - Show back button
+  - back_url: str (optional) - URL for back button
+  - action_url: str (optional, deprecated) - Single action URL
+  - action_text: str (optional, deprecated) - Single action text
+  - action_icon: str (optional, deprecated) - Single action icon
+  - actions: list[dict] (optional) - List of action buttons
+    Structure: [
+      {
+        'label': _('Edit'),
+        'icon': 'edit',
+        'href': url,
+        'style': 'primary|secondary|danger|ghost'
+      }
+    ]
+
+Usage:
+  {% include "core/components/page_header.html" with 
+      title=_('Employee Details')
+      subtitle=employee.position
+      show_back=True
+      back_url=list_url
+      actions=header_actions
+  %}
+{% endcomment %}
+
+<div class="d-flex {% if show_back or back_url %}align-items-center{% else %}justify-content-between align-items-center{% endif %} {% if size == 'small' %}mb-3{% else %}mb-4{% endif %}">
+    {% comment %} English: Back button if needed {% endcomment %}
+    {% if show_back or back_url %}
     <a href="{{ back_url }}" class="btn btn-outline-secondary me-3">
         <span class="material-icons align-middle" style="font-size: 18px;">arrow_back</span>
     </a>
     {% endif %}
     
-    <div {% if not back_url and action_url %}class="flex-grow-1"{% endif %}>
-        <h1 class="h3 mb-0">
+    {% comment %} English: Title and subtitle {% endcomment %}
+    <div class="flex-grow-1">
+        <h1 class="{% if size == 'small' %}h5{% else %}h3{% endif %} mb-0">
             {% if icon %}
-            <span class="material-icons align-middle me-2" style="font-size: 32px;">{{ icon }}</span>
+            <span class="material-icons align-middle me-2" style="font-size: {% if size == 'small' %}24{% else %}32{% endif %}px;">{{ icon }}</span>
             {% endif %}
             {{ title }}
         </h1>
         {% if subtitle %}
-        <p class="text-muted mb-0">{{ subtitle }}</p>
+        <p class="text-muted mb-0 {% if size == 'small' %}small{% endif %}">{{ subtitle }}</p>
         {% endif %}
     </div>
     
-    {% if action_url %}
-    <a href="{{ action_url }}" class="btn btn-primary">
-        <span class="material-icons align-middle me-2" style="font-size: 18px;">{{ action_icon|default:"add" }}</span>
-        {{ action_text }}
-    </a>
-    {% endif %}
+    {% comment %} English: Action buttons {% endcomment %}
+    <div class="ms-auto">
+        {% if actions %}
+            {% for action in actions %}
+                <a href="{{ action.href }}" 
+                   class="btn btn-{% if action.style == 'danger' %}outline-danger{% elif action.style == 'secondary' %}outline-secondary{% elif action.style == 'ghost' %}link{% else %}{{ action.style|default:'primary' }}{% endif %} {% if not forloop.last %}me-2{% endif %}">
+                    {% if action.icon %}
+                    <span class="material-icons align-middle me-2" style="font-size: 18px;">{{ action.icon }}</span>
+                    {% endif %}
+                    {{ action.label }}
+                </a>
+            {% endfor %}
+        {% elif action_url %}
+            {% comment %} English: Backward compatibility for single action {% endcomment %}
+            <a href="{{ action_url }}" class="btn btn-primary">
+                <span class="material-icons align-middle me-2" style="font-size: 18px;">{{ action_icon|default:"add" }}</span>
+                {{ action_text }}
+            </a>
+        {% endif %}
+    </div>
 </div>

@@ -1,0 +1,29 @@
+{% comment %}
+Component: Tab Content Card
+Description: Card wrapper for tab content with sections
+
+Props:
+  - sections: list[dict] (required)
+    Structure: [
+      {
+        'title': _('Personal Information'),
+        'icon': 'person',
+        'show_divider': False,  # For second+ sections
+        'items': [
+          {'label': _('Name'), 'value': 'John Doe'},
+          {'label': _('Email'), 'value': 'john@example.com'}
+        ]
+      }
+    ]
+
+Usage:
+  {% include "core/components/tab_content_card.html" with sections=personal_tab_sections %}
+{% endcomment %}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% for section in sections %}
+            {% include "core/components/info_section.html" with title=section.title icon=section.icon items=section.items show_divider=section.show_divider %}
+        {% endfor %}
+    </div>
+</div>

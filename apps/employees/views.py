@@ -282,36 +282,217 @@ class EmployeeListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         
         return context
 
-class EmployeeDetailView(LoginRequiredMixin, DetailView):
-    """Employee detail view with tabs."""
+# apps/employees/views.py
+from django.views.generic import DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+from .models import Employee, EmployeeDocument
 
+
+class EmployeeDetailView(LoginRequiredMixin, DetailView):
+    """Display employee details with tabbed interface."""
+    
     model = Employee
     template_name = 'employees/employee_detail.html'
     context_object_name = 'employee'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Get active tab from query params
-        context['active_tab'] = self.request.GET.get('tab', 'personal')
-
-        # Get employee documents
-        context['documents'] = self.object.documents.all().order_by(
-            '-created_at')
-
-        # URL for document upload
-        context['upload_url'] = reverse_lazy('employees:document_upload', kwargs={
-                                             'employee_pk': self.object.pk})
-
-        # Breadcrumbs
+        employee = self.object
+        
+        # English: Determine active tab from query params
+        active_tab = self.request.GET.get('tab', 'personal')
+        context['active_tab'] = active_tab
+        
+        # English: Breadcrumbs
         context['breadcrumb_items'] = [
-            {'name': _('Employees'), 'url': reverse(
-                'employees:employee_list')},
-            {'name': self.object.full_name},
+            {'name': _('Home'), 'url': reverse('dashboard:home')},
+            {'name': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'name': employee.full_name, 'url': None},
+        ]
+        
+        # English: Page header data
+        context['page_subtitle'] = f"{employee.position.title} • {employee.department.name}"
+        context['back_url'] = reverse('employees:employee_list')
+        context['header_actions'] = [
+            {
+                'label': _('Edit'),
+                'icon': 'edit',
+                'href': reverse('employees:employee_update', kwargs={'pk': employee.pk}),
+                'style': 'primary'
+            },
+            {
+                'label': _('Delete'),
+                'icon': 'delete',
+                'href': reverse('employees:employee_delete', kwargs={'pk': employee.pk}),
+                'style': 'danger'
+            }
+        ]
+        
+        # English: Get documents for all tabs (needed for badge count)
+        documents = employee.documents.all()
+        
+        # English: Tabs configuration
+        context['tabs'] = [
+            {
+                'id': 'personal',
+                'label': _('Personal Info'),
+                'icon': 'person',
+                'url': '?tab=personal'
+            },
+            {
+                'id': 'work',
+                'label': _('Work Info'),
+                'icon': 'work',
+                'url': '?tab=work'
+            },
+            {
+                'id': 'documents',
+                'label': _('Documents'),
+                'icon': 'description',
+                'badge': documents.count(),
+                'url': '?tab=documents'
+            }
+        ]
+        
+        # English: Personal tab sections
+        if active_tab == 'personal':
+            context['personal_sections'] = [
+                {
+                    'title': _('Personal Information'),
+                    'icon': 'person',
+                    'show_divider': False,
+                    'items': [
+                        {'label': _('First Name'), 'value': employee.user.first_name},
+                        {'label': _('Last Name'), 'value': employee.user.last_name},
+                        {'label': _('Email Address'), 'value': employee.user.email},
+                        {'label': _('Phone Number'), 'value': employee.user.phone or '—'},
+                        {'label': _('Date of Birth'), 'value': employee.user.date_of_birth or '—'},
+                        {'label': _('Country'), 'value': employee.user.country.name if employee.user.country else '—'},
+                    ]
+                },
+                {
+                    'title': _('Emergency Contact'),
+                    'icon': 'emergency',
+                    'show_divider': True,
+                    'items': [
+                        {'label': _('Contact Name'), 'value': employee.emergency_contact_name or '—'},
+                        {'label': _('Contact Phone'), 'value': employee.emergency_contact_phone or '—'},
+                        {
+                            'label': _('Relationship'),
+                            'value': employee.emergency_contact_relationship or '—',
+                            'col_class': 'col-12'
+                        },
+                    ]
+                }
+            ]
+        
+        # English: Work tab sections
+        if active_tab == 'work':
+            context['work_sections'] = [
+                {
+                    'title': _('Employment Information'),
+                    'icon': 'work',
+                    'show_divider': False,
+                    'items': [
+                        {'label': _('Employee ID'), 'value': employee.employee_id},
+                        {'label': _('Employment Type'), 'value': employee.get_employment_type_display()},
+                        {
+                            'label': _('Department'),
+                            'value': employee.department.name,
+                            'badge_text': employee.department.code,
+                            'badge_class': 'bg-secondary'
+                        },
+                        {
+                            'label': _('Position'),
+                            'value': employee.position.title,
+                            'badge_text': employee.position.code,
+                            'badge_class': 'bg-info'
+                        },
+                        {'label': _('Hire Date'), 'value': employee.hire_date.strftime('%B %d, %Y') if employee.hire_date else '—'},
+                        {'label': _('Years of Service'), 'value': f"{employee.years_of_service} years" if employee.years_of_service else '—'},
+                    ]
+                }
+            ]
+            
+            # English: Add termination info if applicable
+            if employee.termination_date:
+                context['work_sections'][0]['items'].append({
+                    'label': _('Termination Date'),
+                    'value': employee.termination_date.strftime('%B %d, %Y')
+                })
+    
+        # English: Documents tab - ALWAYS prepare this data
+        context['documents'] = documents
+        context['document_upload_url'] = reverse(
+            'employees:document_upload',
+            kwargs={'pk': employee.pk}
+        )
+        context['documents_actions'] = [
+            {
+                'label': _('Upload Document'),
+                'icon': 'upload',
+                'href': context['document_upload_url'],
+                'style': 'primary'
+            }
         ]
 
+        # English: Prepare documents table if there are documents
+        if documents.exists():
+            # English: Columns configuration for data_table component
+            context['documents_columns'] = [
+                {'title': _('Title'), 'width': '30%'},
+                {'title': _('Type'), 'width': '20%'},
+                {'title': _('Uploaded'), 'width': '20%'},
+                {'title': _('Actions'), 'width': '30%', 'class': 'text-end'},
+            ]
+            
+            # English: Rows in correct format with cells[]
+            context['documents_rows'] = []
+            for doc in documents:
+                context['documents_rows'].append({
+                    'id': doc.pk,
+                    'cells': [
+                        {
+                            'type': 'text',
+                            'value': doc.title
+                        },
+                        {
+                            'type': 'badge',
+                            'text': doc.get_document_type_display(),
+                            'color': 'info'
+                        },
+                        {
+                            'type': 'text',
+                            'value': doc.created_at.strftime('%Y-%m-%d')
+                        },
+                        {
+                            'type': 'actions',
+                            'actions': [
+                                {
+                                    'type': 'link',
+                                    'url': doc.file.url,
+                                    'icon': 'download',
+                                    'color': 'primary',
+                                    'title': _('Download')
+                                },
+                                {
+                                    'type': 'link',
+                                    'url': reverse(
+                                        'employees:document_delete',
+                                        kwargs={'pk': employee.pk, 'doc_pk': doc.pk}
+                                    ),
+                                    'icon': 'delete',
+                                    'color': 'danger',
+                                    'title': _('Delete')
+                                }
+                            ]
+                        }
+                    ]
+                })
+        
         return context
-
 
 class EmployeeCreateView(LoginRequiredMixin, CreateView):
     """Create new employee."""

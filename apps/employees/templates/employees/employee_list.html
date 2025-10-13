@@ -6,26 +6,26 @@
 
     {% block dashboard_content %}
 
-    {# Breadcrumbs #}
-    {% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
+        {# Breadcrumbs #}
+        {% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
-    {# Page Header #}
-    {% include "core/components/page_header.html" with title=_("Employees") subtitle=_("Manage your medical staff and personnel") icon="people" action_url=employees_create_url action_text=_("Add Employee") action_icon="person_add" only %}
+        {# Page Header #}
+        {% include "core/components/page_header.html" with title=_("Employees") subtitle=_("Manage your medical staff and personnel") icon="people" action_url=employees_create_url action_text=_("Add Employee") action_icon="person_add" only %}
 
-    {# Statistics Cards #}
-    {% if stats_cards %}
-        {% include "core/components/stats_row.html" with stats_cards=stats_cards %}
-    {% endif %}
+        {# Statistics Cards #}
+        {% if stats_cards %}
+            {% include "core/components/stats_row.html" with stats_cards=stats_cards %}
+        {% endif %}
 
-    {# Filter Section #}
-    {% include "core/components/filter_bar.html" with form=filter_form show_search=True search_placeholder=_("Search by name, ID, or email...") show_department_filter=True show_position_filter=True show_status_filter=True %}
+        {# Filter Section #}
+        {% include "core/components/filter_bar.html" with form=filter_form show_search=True search_placeholder=_("Search by name, ID, or email...") show_department_filter=True show_position_filter=True show_status_filter=True %}
 
-    {# Employee Table #}
-    {% include "core/components/data_table.html" with columns=table_columns rows=table_rows empty_state=empty_state_config|default:default_empty_state %}
+        {# Employee Table #}
+        {% include "core/components/data_table.html" with columns=table_columns rows=table_rows empty_state=empty_state_config|default:empty_state_config %}
 
-    {# Pagination #}
-    {% if is_paginated %}
-        {% include "core/components/pagination.html" %}
-    {% endif %}
+        {# Pagination #}
+        {% if is_paginated %}
+            {% include "core/components/pagination.html" %}
+        {% endif %}
 
     {% endblock %}

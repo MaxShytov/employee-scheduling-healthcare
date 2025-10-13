@@ -1,0 +1,59 @@
+{% comment %}
+Component: profile_tabs_layout.html - Profile with Tabs Layout
+Description: Two-column layout for detail pages with profile card and tabs
+
+Props:
+  - employee: object (required) - Employee object for profile_card
+  - tabs: list[dict] (required) - Tabs configuration
+  - active_tab: str (required) - Active tab ID
+  - personal_sections: list[dict] (optional) - Personal tab sections
+  - work_sections: list[dict] (optional) - Work tab sections
+  - documents: queryset (optional) - Documents queryset
+  - documents_columns: list[dict] (optional) - Table columns for documents
+  - documents_rows: list[dict] (optional) - Table rows for documents
+  - documents_actions: list[dict] (optional) - Actions for documents tab
+  - document_upload_url: str (optional) - Upload document URL
+
+Usage:
+  {% include "core/components/profile_tabs_layout.html" with 
+      employee=employee 
+      tabs=tabs 
+      active_tab=active_tab
+      personal_sections=personal_sections
+      work_sections=work_sections
+      documents=documents
+      documents_columns=documents_columns
+      documents_rows=documents_rows
+      documents_actions=documents_actions
+      document_upload_url=document_upload_url
+  %}
+{% endcomment %}
+{% load i18n %}
+
+<div class="row mb-4">
+    {% comment %} English: Profile card - left column {% endcomment %}
+    <div class="col-md-4">
+        {% include "core/components/profile_card.html" with employee=employee %}
+    </div>
+    
+    {% comment %} English: Tabs content - right column {% endcomment %}
+    <div class="col-md-8">
+        {% comment %} English: Tabs navigation {% endcomment %}
+        {% include "core/components/tabs_navigation.html" with tabs=tabs active_tab=active_tab %}
+        
+        {% comment %} English: Personal info tab {% endcomment %}
+        {% if active_tab == 'personal' and personal_sections %}
+            {% include "core/components/tab_content_card.html" with sections=personal_sections %}
+        {% endif %}
+        
+        {% comment %} English: Work info tab {% endcomment %}
+        {% if active_tab == 'work' and work_sections %}
+            {% include "core/components/tab_content_card.html" with sections=work_sections %}
+        {% endif %}
+        
+        {% comment %} English: Documents tab {% endcomment %}
+        {% if active_tab == 'documents' %}
+            {% include "core/components/documents_tab_content.html" with documents=documents documents_columns=documents_columns documents_rows=documents_rows documents_actions=documents_actions document_upload_url=document_upload_url %}
+        {% endif %}
+    </div>
+</div>
