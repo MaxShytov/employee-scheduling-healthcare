@@ -2,6 +2,7 @@
 Views for employee management.
 """
 import json
+from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -15,6 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+from apps.core.views.base import BaseListView
 from apps.core.views.mixins import FilterMixin, BreadcrumbMixin, ProtectedDeleteMixin
 from apps.employees.filters import EmployeeFilterSet
 from .models import Department, Location, Position, Employee, EmployeeDocument
@@ -22,10 +24,185 @@ from .forms import (
     DepartmentForm, LocationForm, LocationSearchForm, PositionForm,
     EmployeeUserForm, EmployeeForm, EmployeeDocumentForm
 )
+from apps.core.cache import make_key, make_params_hash, get_or_set_stats
+
 
 # ============================================
 # Employee Views
 # ============================================
+
+
+class EmployeeListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, BaseListView):
+    """Display list of employees with filtering."""
+    model = Employee
+    template_name = 'employees/employee_list.html'
+    context_object_name = 'employees'
+    permission_required = 'employees.view_employee'
+    filterset_class = EmployeeFilterSet
+
+    def get_breadcrumbs(self):
+        return [
+            {'name': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'name': _('Employees'), 'url': None},
+        ]
+
+    def get_queryset(self):
+        """Apply filters and optimize query."""
+        # English: FilterMixin.get_queryset() will automatically apply filters from filterset_class
+        queryset = super().get_queryset()
+
+        # English: Optimize with select_related
+        queryset = queryset.select_related(
+            'user',
+            'department',
+            'position',
+            'location'
+        )
+
+        # English: Order by user's name
+        return queryset.order_by('user__first_name', 'user__last_name')
+
+    def prepare_table_rows(self, employees):
+        """
+        Prepare table rows data for data_table component.
+        English: Separate method for cleaner get_context_data.
+
+        Args:
+            employees: QuerySet of Employee objects
+
+        Returns:
+            list: Formatted rows for data_table component
+        """
+        table_rows = []
+
+        for employee in employees:
+            table_rows.append({
+                'id': employee.pk,
+                'cells': [
+                    {
+                        'type': 'badge',
+                        'text': _('Active') if employee.is_active else _('Inactive'),
+                        'color': 'success' if employee.is_active else 'secondary',
+                        'subtitle': employee.employee_id
+                    },
+                    {
+                        'type': 'avatar',
+                        'name': employee.user.get_full_name(),
+                        'subtitle': employee.user.email,
+                        'avatar_url': employee.user.profile_picture_url,
+                    },
+                    {
+                        'type': 'badge',
+                        'text': employee.department.code if employee.department else '—',
+                        'color': 'secondary',
+                        'label': employee.department.name if employee.department else None,
+                        'subtitle': employee.location.name if employee.location else None
+                    },
+                    {
+                        'type': 'badge',
+                        'text': employee.position.code if employee.position else '—',
+                        'color': 'info',
+                        'label': employee.position.title if employee.position else None
+                    },
+                    {
+                        'type': 'badge',
+                        'text': employee.get_employment_type_display(),
+                        'color': 'primary' if employee.employment_type == 'FT' else 'warning'
+                    },
+                    {
+                        'type': 'currency',
+                        'value': float(employee.hourly_rate) if employee.hourly_rate else 0,
+                        'currency': 'CHF',
+                        'subtitle': f"{float(employee.weekly_hours):.2f} {_('hrs/week')}" if employee.weekly_hours else None
+                    },
+                    {
+                        'type': 'actions',
+                        'actions': [
+                            {
+                                'type': 'link',
+                                # ✅ Используем reverse
+                                'url': reverse('employees:employee_detail', kwargs={'pk': employee.pk}),
+                                'icon': 'visibility',
+                                'title': _('View'),
+                                'color': 'primary'
+                            },
+                            {
+                                'type': 'link',
+                                # ✅ Используем reverse
+                                'url': reverse('employees:employee_update', kwargs={'pk': employee.pk}),
+                                'icon': 'edit',
+                                'title': _('Edit'),
+                                'color': 'secondary'
+                            }
+                        ]
+                    }
+                ]
+            })
+
+        return table_rows
+
+    def _produce_stats(self):
+        # English: Heavy aggregates computed once per TTL
+        total = Employee.objects.count()
+        active = Employee.objects.filter(is_active=True).count()
+        inactive = total - active
+        dept_count = Department.objects.filter(is_active=True).count()
+        return [
+            {'title': _('Total Employees'), 'value': total,
+             'icon': 'people', 'bg_color': 'primary'},
+            {'title': _('Active'),          'value': active,
+             'icon': 'check_circle', 'bg_color': 'success'},
+            {'title': _('Inactive'),        'value': inactive,
+             'icon': 'cancel', 'bg_color': 'danger'},
+            {'title': _('Departments'),     'value': dept_count,
+             'icon': 'business', 'bg_color': 'info'},
+        ]
+
+    def get_statistics(self):
+        # если статистика зависит от фильтров
+        params_hash = make_params_hash(self.request.GET)
+        key = make_key('stats', 'employees', 'employee_list',
+                       'global', params_hash)
+        return get_or_set_stats(key, self._produce_stats)
+
+    def get_context_data(self, **kwargs):
+        """Add statistics and context."""
+        context = super().get_context_data(**kwargs)
+
+        # Statistics cards
+
+        context['stats_cards'] = self.get_statistics()
+
+        # Table columns configuration
+        context['table_columns'] = [
+            {'title': _('ID')},
+            {'title': _('Name'), 'width': '27%'},
+            {'title': _('Department'), 'width': '15%'},
+            {'title': _('Position'), 'width': '15%'},
+            {'title': _('Type'), 'width': '10%'},
+            {'title': _('Rate'), 'align': 'end'},
+            {'title': _('Actions'), 'width': '10%'},
+        ]
+
+        # English: Convert employees to table rows format
+
+        context['table_rows'] = self.prepare_table_rows(context['employees'])
+
+        # Empty state configuration
+        context['empty_state_config'] = {
+            'icon': 'people_outline',
+            'title': _('No employees found'),
+            'message': _('Start by adding your first employee or adjust your filters'),
+            'button_text': _('Add First Employee'),
+            'button_url': reverse('employees:employee_create')
+        }
+
+        # Add URLs for actions
+        context['employees_create_url'] = reverse_lazy(
+            'employees:employee_create')
+
+        return context
+
 
 class EmployeeFormMixin:
     """
@@ -189,7 +366,7 @@ class EmployeeFormMixin:
         context = self.get_context_data(form=form)
         context['user_form'] = user_form
         return self.render_to_response(context)
-    
+
     def get_success_url(self):
         """Default success URL - redirect to detail view."""
         # English: For UpdateView, self.object already exists
@@ -198,172 +375,6 @@ class EmployeeFormMixin:
             return reverse_lazy('employees:employee_detail', kwargs={'pk': self.object.pk})
         return reverse_lazy('employees:employee_list')
 
-class EmployeeListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, ListView):
-    """Display list of employees with filtering."""
-    model = Employee
-    template_name = 'employees/employee_list.html'
-    context_object_name = 'employees'
-    paginate_by = 20
-    permission_required = 'employees.view_employee'
-    filterset_class = EmployeeFilterSet
-
-    breadcrumb_base = [
-        {'name': _('Dashboard'), 'url': 'dashboard:home'},
-        {'name': _('Employees'), 'url': None},
-    ]
-
-    def get_queryset(self):
-        """Apply filters and optimize query."""
-        # English: FilterMixin.get_queryset() will automatically apply filters from filterset_class
-        queryset = super().get_queryset()
-
-        # English: Optimize with select_related
-        queryset = queryset.select_related(
-            'user',
-            'department',
-            'position',
-            'location'
-        )
-
-        # English: Order by user's name
-        return queryset.order_by('user__first_name', 'user__last_name')
-
-    def get_context_data(self, **kwargs):
-        """Add statistics and context."""
-        context = super().get_context_data(**kwargs)
-
-        # Statistics cards
-        context['stats_cards'] = [
-            {
-                'title': _('Total Employees'),
-                'value': Employee.objects.count(),
-                'icon': 'people',
-                'bg_color': 'primary',
-            },
-            {
-                'title': _('Active'),
-                'value': Employee.objects.filter(is_active=True).count(),
-                'icon': 'check_circle',
-                'bg_color': 'success',
-            },
-            {
-                'title': _('Inactive'),
-                'value': Employee.objects.filter(is_active=False).count(),
-                'icon': 'cancel',
-                'bg_color': 'danger',
-            },
-            {
-                'title': _('Departments'),
-                'value': Department.objects.filter(is_active=True).count(),
-                'icon': 'business',
-                'bg_color': 'info',
-            },
-        ]
-
-        # Breadcrumbs
-        context['breadcrumb_items'] = [
-            {
-                'name': _('Dashboard'),
-                'url': reverse_lazy('dashboard:home')
-            },
-            {
-                'name': _('Employees'),
-                'active': True
-            }
-        ]
-
-        # Table columns configuration
-        context['table_columns'] = [
-            {'title': _('ID'), 'width': '10%'},
-            {'title': _('Name'), 'width': '27%'},
-            {'title': _('Department'), 'width': '15%'},
-            {'title': _('Position'), 'width': '15%'},
-            {'title': _('Type'), 'width': '10%'},
-            {'title': _('Rate'), 'width': '13%'},
-            {'title': _('Actions'), 'width': '10%'},
-        ]
-
-        # English: Convert employees to table rows format
-        table_rows = []
-        for employee in context['employees']:
-            table_rows.append({
-                'id': employee.pk,
-                'cells': [
-                    {
-                        'type': 'badge',
-                        'text': _('Active') if employee.is_active else _('Inactive'),
-                        'color': 'success' if employee.is_active else 'secondary',
-                        'subtitle': employee.employee_id
-                    },
-                    {
-                        'type': 'avatar',
-                        'name': employee.user.get_full_name(),
-                        'subtitle': employee.user.email,
-                        'avatar_url': employee.user.avatar.url if hasattr(employee.user, 'avatar') and employee.user.avatar else None,
-                    },
-                    {
-                        'type': 'badge',
-                        'text': employee.department.code if employee.department else '—',
-                        'color': 'secondary',
-                        'label': employee.department.name if employee.department else None,
-                        'subtitle': employee.location.name if employee.location else None
-                    },
-                    {
-                        'type': 'badge',
-                        'text': employee.position.code if employee.position else '—',
-                        'color': 'info',
-                        'label': employee.position.title if employee.position else None
-                    },
-                    {
-                        'type': 'badge',
-                        'text': employee.get_employment_type_display(),
-                        'color': 'primary' if employee.employment_type == 'FT' else 'warning'
-                    },
-                    {
-                        'type': 'currency',
-                        'value': float(employee.hourly_rate) if employee.hourly_rate else 0,
-                        'currency': 'CHF',
-                        'subtitle': f"{float(employee.weekly_hours):.2f} {_('hrs/week')}" if employee.weekly_hours else None
-                    },
-
-                    {
-                        'type': 'actions',
-                        'actions': [
-                            {
-                                'type': 'link',
-                                'url': reverse_lazy('employees:employee_detail', kwargs={'pk': employee.pk}),
-                                'icon': 'visibility',
-                                'title': _('View'),
-                                'color': 'primary'
-                            },
-                            {
-                                'type': 'link',
-                                'url': reverse_lazy('employees:employee_update', kwargs={'pk': employee.pk}),
-                                'icon': 'edit',
-                                'title': _('Edit'),
-                                'color': 'secondary'
-                            }
-                        ]
-                    }
-                ]
-            })
-
-        context['table_rows'] = table_rows
-
-        # Empty state configuration
-        context['empty_state_config'] = {
-            'icon': 'people_outline',
-            'title': _('No employees found'),
-            'message': _('Start by adding your first employee or adjust your filters'),
-            'button_text': _('Add First Employee'),
-            'button_url': reverse_lazy('employees:employee_create'),
-        }
-
-        # Add URLs for actions
-        context['employees_create_url'] = reverse_lazy(
-            'employees:employee_create')
-
-        return context
 
 class EmployeeCreateView(EmployeeFormMixin, BreadcrumbMixin, LoginRequiredMixin, CreateView):
     """Create new employee with user account."""
@@ -451,52 +462,57 @@ class EmployeeUpdateView(EmployeeFormMixin, BreadcrumbMixin, LoginRequiredMixin,
         messages.success(self.request, _('Employee updated successfully.'))
         return super().form_valid(form)
 
-class EmployeeDetailView(LoginRequiredMixin, DetailView):
+
+class EmployeeDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
     """Display employee details with tabbed interface."""
 
     model = Employee
     template_name = 'employees/employee_detail.html'
     context_object_name = 'employee'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        employee = self.object
-
-        # English: Determine active tab from query params
-        active_tab = self.request.GET.get('tab', 'personal')
-        context['active_tab'] = active_tab
-
-        # English: Breadcrumbs
-        context['breadcrumb_items'] = [
-            {'name': _('Home'), 'url': reverse('dashboard:home')},
-            {'name': _('Employees'), 'url': reverse(
-                'employees:employee_list')},
-            {'name': employee.full_name, 'url': None},
+    def get_breadcrumbs(self):
+        """Breadcrumbs for employee detail."""
+        return [
+            {'name': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'name': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'name': self.object.full_name, 'url': None},
         ]
 
-        # English: Page header data
-        context['page_subtitle'] = f"{employee.position.title} • {employee.department.name}"
-        context['back_url'] = reverse('employees:employee_list')
-        context['header_actions'] = [
+    def get_header_actions(self):
+        """
+        Prepare header actions for page_header component.
+        English: Edit and delete buttons configuration.
+        
+        Returns:
+            list: Action buttons for header
+        """
+        return [
             {
                 'label': _('Edit'),
                 'icon': 'edit',
-                'href': reverse('employees:employee_update', kwargs={'pk': employee.pk}),
+                'href': reverse('employees:employee_update', kwargs={'pk': self.object.pk}),
                 'style': 'primary'
             },
             {
                 'label': _('Delete'),
                 'icon': 'delete',
-                'href': reverse('employees:employee_delete', kwargs={'pk': employee.pk}),
+                'href': reverse('employees:employee_delete', kwargs={'pk': self.object.pk}),
                 'style': 'danger'
             }
         ]
 
-        # English: Get documents for all tabs (needed for badge count)
-        documents = employee.documents.all()
-
-        # English: Tabs configuration
-        context['tabs'] = [
+    def get_tabs_config(self, documents_count):
+        """
+        Prepare tabs configuration.
+        English: Tab navigation with badge counts.
+        
+        Args:
+            documents_count: Number of documents for badge
+            
+        Returns:
+            list: Tabs configuration
+        """
+        return [
             {
                 'id': 'personal',
                 'label': _('Personal Info'),
@@ -513,97 +529,210 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
                 'id': 'documents',
                 'label': _('Documents'),
                 'icon': 'description',
-                'badge': documents.count(),
+                'badge': documents_count,
                 'url': '?tab=documents'
             }
         ]
 
-        # English: Personal tab sections
+    def get_personal_sections(self):
+        """
+        Prepare personal information sections.
+        English: Personal and emergency contact data for detail view.
+        
+        Returns:
+            list: Section data for info display component
+        """
+        employee = self.object
+        
+        return [
+            {
+                'title': _('Personal Information'),
+                'icon': 'person',
+                'show_divider': False,
+                'items': [
+                    {'label': _('First Name'), 'value': employee.user.first_name},
+                    {'label': _('Last Name'), 'value': employee.user.last_name},
+                    {'label': _('Email Address'), 'value': employee.user.email},
+                    {'label': _('Phone Number'), 'value': employee.user.phone or '—'},
+                    {'label': _('Date of Birth'), 'value': employee.user.date_of_birth or '—'},
+                    {
+                        'label': _('Country'),
+                        'value': employee.user.country.name if employee.user.country else '—'
+                    },
+                ]
+            },
+            {
+                'title': _('Emergency Contact'),
+                'icon': 'emergency',
+                'show_divider': True,
+                'items': [
+                    {
+                        'label': _('Contact Name'),
+                        'value': employee.emergency_contact_name or '—'
+                    },
+                    {
+                        'label': _('Contact Phone'),
+                        'value': employee.emergency_contact_phone or '—'
+                    },
+                    {
+                        'label': _('Relationship'),
+                        'value': employee.emergency_contact_relationship or '—',
+                        'col_class': 'col-12'
+                    },
+                ]
+            }
+        ]
+
+    def get_work_sections(self):
+        """
+        Prepare work information sections.
+        English: Employment details including termination if applicable.
+        
+        Returns:
+            list: Section data for info display component
+        """
+        employee = self.object
+        
+        items = [
+            {'label': _('Employee ID'), 'value': employee.employee_id},
+            {'label': _('Employment Type'), 'value': employee.get_employment_type_display()},
+            {
+                'label': _('Department'),
+                'value': employee.department.name,
+                'badge_text': employee.department.code,
+                'badge_class': 'bg-secondary'
+            },
+            {
+                'label': _('Position'),
+                'value': employee.position.title,
+                'badge_text': employee.position.code,
+                'badge_class': 'bg-info'
+            },
+            {
+                'label': _('Location'),
+                'value': employee.location.name if employee.location else '—',
+            },
+            {
+                'label': _('Hire Date'),
+                'value': employee.hire_date.strftime('%B %d, %Y') if employee.hire_date else '—'
+            },
+            {
+                'label': _('Weekly Hours'),
+                'value': f"{employee.weekly_hours} hours" if employee.weekly_hours else '—'
+            },
+            {
+                'label': _('Hourly Rate'),
+                'value': f"CHF {employee.hourly_rate:.2f}" if employee.hourly_rate else '—'
+            },
+            {
+                'label': _('Years of Service'),
+                'value': f"{employee.years_of_service} years" if employee.years_of_service else '—'
+            },
+        ]
+        
+        # English: Add termination info if applicable
+        if employee.termination_date:
+            items.append({
+                'label': _('Termination Date'),
+                'value': employee.termination_date.strftime('%B %d, %Y')
+            })
+        
+        return [
+            {
+                'title': _('Employment Information'),
+                'icon': 'work',
+                'show_divider': False,
+                'items': items
+            }
+        ]
+
+    def prepare_documents_table(self, documents):
+        """
+        Prepare documents table data.
+        English: Convert documents queryset to table rows format.
+        
+        Args:
+            documents: QuerySet of EmployeeDocument objects
+            
+        Returns:
+            dict: Table columns and rows configuration
+        """
+        if not documents.exists():
+            return None
+        
+        employee = self.object
+        
+        columns = [
+            {'title': _('Title')},
+            {'title': _('Type')},
+            {'title': _('Uploaded')},
+            {'title': _('Actions'), 'align': 'end'},
+        ]
+        
+        rows = []
+        for doc in documents:
+            rows.append({
+                'id': doc.pk,
+                'cells': [
+                    {'type': 'text', 'value': doc.title},
+                    {
+                        'type': 'badge',
+                        'text': doc.get_document_type_display(),
+                        'color': 'info'
+                    },
+                    {'type': 'text', 'value': doc.created_at.strftime('%Y-%m-%d')},
+                    {
+                        'type': 'actions',
+                        'actions': [
+                            {
+                                'type': 'link',
+                                'url': doc.file.url,
+                                'icon': 'download',
+                                'color': 'primary',
+                                'title': _('Download')
+                            },
+                            {
+                                'type': 'link',
+                                'url': reverse(
+                                    'employees:document_delete',
+                                    kwargs={'pk': employee.pk, 'doc_pk': doc.pk}
+                                ),
+                                'icon': 'delete',
+                                'color': 'danger',
+                                'title': _('Delete')
+                            }
+                        ]
+                    }
+                ]
+            })
+        
+        return {'columns': columns, 'rows': rows}
+
+    def get_context_data(self, **kwargs):
+        """Add tab-specific context data."""
+        context = super().get_context_data(**kwargs)
+        employee = self.object
+
+        # English: Determine active tab from query params
+        active_tab = self.request.GET.get('tab', 'personal')
+        context['active_tab'] = active_tab
+
+        # English: Page header data
+        context['page_subtitle'] = f"{employee.position.title} • {employee.department.name}"
+        context['back_url'] = reverse('employees:employee_list')
+        context['header_actions'] = self.get_header_actions()
+
+        # English: Get documents for all tabs (needed for badge count)
+        documents = employee.documents.all()
+
+        # English: Tabs configuration
+        context['tabs'] = self.get_tabs_config(documents.count())
+
+        # English: Tab-specific sections
         if active_tab == 'personal':
-            context['personal_sections'] = [
-                {
-                    'title': _('Personal Information'),
-                    'icon': 'person',
-                    'show_divider': False,
-                    'items': [
-                        {'label': _('First Name'),
-                         'value': employee.user.first_name},
-                        {'label': _('Last Name'),
-                         'value': employee.user.last_name},
-                        {'label': _('Email Address'),
-                         'value': employee.user.email},
-                        {'label': _('Phone Number'),
-                         'value': employee.user.phone or '—'},
-                        {'label': _('Date of Birth'),
-                         'value': employee.user.date_of_birth or '—'},
-                        {'label': _(
-                            'Country'), 'value': employee.user.country.name if employee.user.country else '—'},
-                    ]
-                },
-                {
-                    'title': _('Emergency Contact'),
-                    'icon': 'emergency',
-                    'show_divider': True,
-                    'items': [
-                        {'label': _('Contact Name'),
-                         'value': employee.emergency_contact_name or '—'},
-                        {'label': _(
-                            'Contact Phone'), 'value': employee.emergency_contact_phone or '—'},
-                        {
-                            'label': _('Relationship'),
-                            'value': employee.emergency_contact_relationship or '—',
-                            'col_class': 'col-12'
-                        },
-                    ]
-                }
-            ]
-
-        # English: Work tab sections
-        if active_tab == 'work':
-            context['work_sections'] = [
-                {
-                    'title': _('Employment Information'),
-                    'icon': 'work',
-                    'show_divider': False,
-                    'items': [
-                        {'label': _('Employee ID'),
-                         'value': employee.employee_id},
-                        {'label': _('Employment Type'),
-                         'value': employee.get_employment_type_display()},
-                        {
-                            'label': _('Department'),
-                            'value': employee.department.name,
-                            'badge_text': employee.department.code,
-                            'badge_class': 'bg-secondary'
-                        },
-                        {
-                            'label': _('Position'),
-                            'value': employee.position.title,
-                            'badge_text': employee.position.code,
-                            'badge_class': 'bg-info'
-                        },
-                        {
-                            'label': _('Location'),
-                            'value': employee.location.name if employee.location else '—',
-                        },
-                        {'label': _('Hire Date'), 'value': employee.hire_date.strftime(
-                            '%B %d, %Y') if employee.hire_date else '—'},
-                        {'label': _(
-                            'Weekly Hours'), 'value': f"{employee.weekly_hours} hours" if employee.weekly_hours else '—'},
-                        {'label': _(
-                            'Hourly Rate'), 'value': f"CHF {employee.hourly_rate:.2f}" if employee.hourly_rate else '—'},
-                        {'label': _(
-                            'Years of Service'), 'value': f"{employee.years_of_service} years" if employee.years_of_service else '—'},
-                    ]
-                }
-            ]
-
-            # English: Add termination info if applicable
-            if employee.termination_date:
-                context['work_sections'][0]['items'].append({
-                    'label': _('Termination Date'),
-                    'value': employee.termination_date.strftime('%B %d, %Y')
-                })
+            context['personal_sections'] = self.get_personal_sections()
+        elif active_tab == 'work':
+            context['work_sections'] = self.get_work_sections()
 
         # English: Documents tab - ALWAYS prepare this data
         context['documents'] = documents
@@ -621,107 +750,185 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
         ]
 
         # English: Prepare documents table if there are documents
-        if documents.exists():
-            # English: Columns configuration for data_table component
-            context['documents_columns'] = [
-                {'title': _('Title'), 'width': '30%'},
-                {'title': _('Type'), 'width': '20%'},
-                {'title': _('Uploaded'), 'width': '20%'},
-                {'title': _('Actions'), 'width': '30%', 'class': 'text-end'},
-            ]
-
-            # English: Rows in correct format with cells[]
-            context['documents_rows'] = []
-            for doc in documents:
-                context['documents_rows'].append({
-                    'id': doc.pk,
-                    'cells': [
-                        {
-                            'type': 'text',
-                            'value': doc.title
-                        },
-                        {
-                            'type': 'badge',
-                            'text': doc.get_document_type_display(),
-                            'color': 'info'
-                        },
-                        {
-                            'type': 'text',
-                            'value': doc.created_at.strftime('%Y-%m-%d')
-                        },
-                        {
-                            'type': 'actions',
-                            'actions': [
-                                {
-                                    'type': 'link',
-                                    'url': doc.file.url,
-                                    'icon': 'download',
-                                    'color': 'primary',
-                                    'title': _('Download')
-                                },
-                                {
-                                    'type': 'link',
-                                    'url': reverse(
-                                        'employees:document_delete',
-                                        kwargs={'pk': employee.pk,
-                                                'doc_pk': doc.pk}
-                                    ),
-                                    'icon': 'delete',
-                                    'color': 'danger',
-                                    'title': _('Delete')
-                                }
-                            ]
-                        }
-                    ]
-                })
+        documents_table = self.prepare_documents_table(documents)
+        if documents_table:
+            context['documents_columns'] = documents_table['columns']
+            context['documents_rows'] = documents_table['rows']
 
         return context
 
 
-class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
+class EmployeeDeleteView(BreadcrumbMixin, LoginRequiredMixin, DeleteView):
+    """Delete employee with validation and proper error handling."""
+    
     model = Employee
     template_name = 'employees/employee_confirm_delete.html'
     success_url = reverse_lazy('employees:employee_list')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['cancel_url'] = reverse_lazy(
-            'employees:employee_detail', kwargs={'pk': self.object.pk})
-
-        # Prepare HTML messages
-        context['message_html'] = mark_safe(
-            f'{_("Are you sure you want to delete")} <strong>{self.object.full_name}</strong>?<br>'
-            f'{_("This action cannot be undone.")}'
-        )
-
-        context['warning_html'] = mark_safe(
-            f'{_("This will permanently delete:")}'
-            '<ul class="mb-0 mt-2">'
-            f'<li>{_("Employee profile and employment history")}</li>'
-            f'<li>{_("Associated user account")}</li>'
-            f'<li>{_("All uploaded documents")}</li>'
-            f'<li>{_("Time clock records (if any)")}</li>'
-            '</ul>'
-        )
-
-        # Breadcrumbs
-        context['breadcrumb_items'] = [
-            {'name': _('Employees'), 'url': reverse(
-                'employees:employee_list')},
-            {'name': self.object.full_name, 'url': reverse(
-                'employees:employee_detail', kwargs={'pk': self.object.pk})},
-            {'name': _('Delete')},
+    def get_breadcrumbs(self):
+        """Breadcrumbs for employee delete."""
+        return [
+            {'name': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'name': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'name': self.object.full_name, 'url': reverse('employees:employee_detail', kwargs={'pk': self.object.pk})},
+            {'name': _('Delete'), 'url': None},
         ]
 
+
+    def get_blocking_references(self):
+        """
+        Check for blocking references that prevent deletion.
+        English: Returns list of blocking references with details.
+        Uses app registry to avoid import errors for optional apps.
+        
+        Returns:
+            list: Blocking references or empty list if safe to delete
+        """
+        employee = self.object
+        blocking = []
+        
+        # English: Check for active shifts (if schedules app exists)
+        if apps.is_installed('apps.schedules'):
+            try:
+                Shift = apps.get_model('schedules', 'Shift')
+                from django.utils import timezone
+                
+                future_shifts = Shift.objects.filter(
+                    employee=employee,
+                    start_datetime__gte=timezone.now()
+                ).count()
+                
+                if future_shifts > 0:
+                    blocking.append({
+                        'type': 'future_shifts',
+                        'count': future_shifts,
+                        'message': _('%(count)d future shift(s) scheduled') % {'count': future_shifts}
+                    })
+            except LookupError:
+                # English: Model doesn't exist yet
+                pass
+        
+        # English: Check for timeclock records (if timeclock app exists)
+        if apps.is_installed('apps.timeclock'):
+            try:
+                TimeEntry = apps.get_model('timeclock', 'TimeEntry')
+                
+                open_entries = TimeEntry.objects.filter(
+                    employee=employee,
+                    clock_out__isnull=True
+                ).count()
+                
+                if open_entries > 0:
+                    blocking.append({
+                        'type': 'open_timeclock',
+                        'count': open_entries,
+                        'message': _('%(count)d open timeclock entry(ies)') % {'count': open_entries}
+                    })
+            except LookupError:
+                # English: Model doesn't exist yet
+                pass
+        
+        # English: Check for uploaded documents (always available)
+        document_count = employee.documents.count()
+        if document_count > 0:
+            blocking.append({
+                'type': 'documents',
+                'count': document_count,
+                'message': _('%(count)d uploaded document(s)') % {'count': document_count}
+            })
+        
+        return blocking
+
+    def get_warning_items(self):
+        """
+        Get list of items that will be deleted.
+        English: Information about what will be permanently deleted.
+        
+        Returns:
+            list: Warning items for display
+        """
+        return [
+            _('Employee profile and employment history'),
+            _('Associated user account'),
+            _('All uploaded documents'),
+            _('Time clock records (if any)'),
+            _('Schedule history'),
+        ]
+
+    def get_context_data(self, **kwargs):
+        """Add delete confirmation context."""
+        context = super().get_context_data(**kwargs)
+        employee = self.object
+        
+        # English: Cancel URL
+        context['cancel_url'] = reverse(
+            'employees:employee_detail',
+            kwargs={'pk': employee.pk}
+        )
+        
+        # English: Main confirmation message
+        context['object_name'] = employee.full_name
+        context['confirmation_message'] = _('Are you sure you want to delete this employee?')
+        context['warning_message'] = _('This action cannot be undone.')
+        
+        # English: Warning items
+        context['warning_items'] = self.get_warning_items()
+        
+        # English: Check for blocking references
+        blocking_refs = self.get_blocking_references()
+        context['has_blocking_refs'] = len(blocking_refs) > 0
+        context['blocking_refs'] = blocking_refs
+        
+        # English: If blocked, show appropriate message
+        if context['has_blocking_refs']:
+            context['blocking_message'] = _(
+                'Cannot delete this employee. Please resolve the following issues first:'
+            )
+        
         return context
 
+    def post(self, request, *args, **kwargs):
+        """Handle POST with validation."""
+        self.object = self.get_object()
+        
+        # English: Check for blocking references before deletion
+        blocking_refs = self.get_blocking_references()
+        
+        if blocking_refs:
+            # English: Build error message
+            messages_list = [ref['message'] for ref in blocking_refs]
+            error_msg = _('Cannot delete employee: ') + '; '.join(messages_list)
+            messages.error(request, error_msg)
+            return redirect('employees:employee_detail', pk=self.object.pk)
+        
+        # English: Safe to delete - proceed
+        return super().post(request, *args, **kwargs)
+
     def form_valid(self, form):
-        messages.success(self.request, _('Employee deleted successfully.'))
-        return super().form_valid(form)
+        """Handle successful deletion."""
+        employee_name = self.object.full_name
+        
+        # English: Delete user account along with employee
+        user = self.object.user
+        
+        messages.success(
+            self.request,
+            _('Employee "%(name)s" has been deleted successfully.') % {'name': employee_name}
+        )
+        
+        # English: Delete employee (cascade will handle documents)
+        response = super().form_valid(form)
+        
+        # English: Delete associated user account
+        if user:
+            user.delete()
+        
+        return response
 
 # ============================================
 # Bulk Actions (временная заглушка)
 # ============================================
+
 
 @require_POST
 @login_required
@@ -765,7 +972,7 @@ class DepartmentListView(LoginRequiredMixin, ListView):
     model = Department
     template_name = 'employees/department_list.html'
     context_object_name = 'departments'
-    paginate_by = 12
+    paginate_by = 25
 
     def get_queryset(self):
         return Department.objects.annotate(
@@ -900,7 +1107,7 @@ class PositionListView(LoginRequiredMixin, ListView):
     model = Position
     template_name = 'employees/position_list.html'
     context_object_name = 'positions'
-    paginate_by = 12
+    paginate_by = 25
 
     def get_queryset(self):
         return Position.objects.annotate(
@@ -1063,14 +1270,23 @@ def employee_document_upload(request, pk):
 def employee_document_delete(request, pk, doc_pk):
     """Delete employee document."""
     employee = get_object_or_404(Employee, pk=pk)
-    document = get_object_or_404(
-        EmployeeDocument, pk=doc_pk, employee=employee)
+    
+    # English: Try to get document, handle case when already deleted
+    try:
+        document = EmployeeDocument.objects.get(pk=doc_pk, employee=employee)
+    except EmployeeDocument.DoesNotExist:
+        # English: Document already deleted (user pressed Back button)
+        messages.info(
+            request,
+            _('This document has already been deleted.')
+        )
+        url = reverse('employees:employee_detail', kwargs={'pk': employee.pk}) + '?tab=documents'
+        return HttpResponseRedirect(url)
 
     if request.method == 'POST':
         document.delete()
         messages.success(request, _('Document deleted successfully.'))
-        url = reverse('employees:employee_detail', kwargs={
-                      'pk': employee.pk}) + '?tab=documents'
+        url = reverse('employees:employee_detail', kwargs={'pk': employee.pk}) + '?tab=documents'
         return HttpResponseRedirect(url)
 
     return render(request, 'employees/document_confirm_delete.html', {
@@ -1079,68 +1295,6 @@ def employee_document_delete(request, pk, doc_pk):
         'page_title': _('Delete Document')
     })
 
-# class DocumentUploadView(LoginRequiredMixin, CreateView):
-#     model = Document
-#     form_class = DocumentForm
-#     template_name = 'employees/document_upload.html'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         employee = get_object_or_404(Employee, pk=self.kwargs['employee_pk'])
-#         context['employee'] = employee
-#         context['page_title'] = _('Upload Document')
-#         context['subtitle'] = _('for') + ' ' + employee.full_name  # ← Добавьте эту строку
-#         context['cancel_url'] = reverse_lazy('employees:employee_detail', kwargs={'pk': employee.pk}) + '?tab=documents'
-
-#         # Breadcrumbs
-#         context['breadcrumb_items'] = [
-#             {'name': _('Employees'), 'url': reverse('employees:employee_list')},
-#             {'name': employee.full_name, 'url': reverse('employees:employee_detail', kwargs={'pk': employee.pk})},
-#             {'name': _('Upload Document')},
-#         ]
-
-#         return context
-
-#     def form_valid(self, form):
-#         employee = get_object_or_404(Employee, pk=self.kwargs['employee_pk'])
-#         form.instance.employee = employee
-#         form.instance.uploaded_by = self.request.user
-#         messages.success(self.request, _('Document uploaded successfully.'))
-#         return super().form_valid(form)
-
-#     def get_success_url(self):
-#         return reverse_lazy('employees:employee_detail', kwargs={'pk': self.kwargs['employee_pk']}) + '?tab=documents'
-
-
-# class DocumentDeleteView(LoginRequiredMixin, DeleteView):
-#     model = Document
-#     template_name = 'employees/document_confirm_delete.html'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['employee'] = self.object.employee
-#         context['cancel_url'] = reverse_lazy('employees:employee_detail', kwargs={'pk': self.object.employee.pk}) + '?tab=documents'
-
-#         # Prepare HTML message
-#         context['message_html'] = mark_safe(
-#             f'{_("Are you sure you want to delete this document?")} <br>'
-#             f'<strong>{self.object.title}</strong>'
-#         )
-
-#         context['warning_message'] = _('This will permanently delete the document file. This action cannot be undone.')
-
-#         # Breadcrumbs
-#         context['breadcrumb_items'] = [
-#             {'name': _('Employees'), 'url': reverse('employees:employee_list')},
-#             {'name': self.object.employee.full_name, 'url': reverse('employees:employee_detail', kwargs={'pk': self.object.employee.pk}) + '?tab=documents'},
-#             {'name': _('Delete Document')},
-#         ]
-
-#         return context
-
-#     def get_success_url(self):
-#         messages.success(self.request, _('Document deleted successfully.'))
-#         return reverse_lazy('employees:employee_detail', kwargs={'pk': self.object.employee.pk}) + '?tab=documents'
 
 # ============================================
 # Location Views (Class-Based)
@@ -1153,7 +1307,7 @@ class LocationListView(LoginRequiredMixin, ListView):
     model = Location
     template_name = 'employees/location_list.html'
     context_object_name = 'locations'
-    paginate_by = 20  # ← Встроенная пагинация как у Employee
+    paginate_by = 25
 
     def get_queryset(self):
         # Use emp_count instead of employee_count to avoid conflict with property

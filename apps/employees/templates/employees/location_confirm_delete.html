@@ -1,113 +1,75 @@
-{% extends 'base.html' %}
+{% extends "core/layouts/base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Delete Location" %} - {{ block.super }}{% endblock %}
-
 {% block content %}
-<div class="container py-4">
+<div class="container-fluid py-4">
+    {% include "core/components/breadcrumbs.html" %}
     
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{% url 'employees:location_list' %}">{% trans "Locations" %}</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{% url 'employees:location_detail' location.pk %}">{{ location.name }}</a>
-            </li>
-            <li class="breadcrumb-item active">{% trans "Delete" %}</li>
-        </ol>
-    </nav>
-    
-    <!-- Warning Card -->
     <div class="row justify-content-center">
         <div class="col-lg-6">
-            <div class="card border-danger">
+            <div class="card">
                 <div class="card-header bg-danger text-white">
                     <h5 class="mb-0">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        {% trans "Confirm Delete Location" %}
+                        <i class="material-icons align-middle">warning</i>
+                        {% trans "Delete Employee" %}
                     </h5>
                 </div>
+                
                 <div class="card-body">
-                    
-                    <!-- Location Info -->
-                    <div class="alert alert-warning mb-4">
-                        <h6 class="alert-heading">
-                            <i class="bi bi-info-circle me-1"></i>
-                            {% trans "You are about to delete the following location:" %}
-                        </h6>
-                        <hr>
-                        <p class="mb-0">
-                            <strong>{% trans "Name:" %}</strong> {{ location.name }}<br>
-                            <strong>{% trans "Address:" %}</strong> {{ location.full_address }}
-                        </p>
-                    </div>
-                    
-                    <!-- Employee Count Warning -->
-                    {% if employee_count > 0 %}
-                    <div class="alert alert-danger">
-                        <h6 class="alert-heading">
-                            <i class="bi bi-exclamation-triangle me-1"></i>
-                            {% trans "Warning!" %}
-                        </h6>
-                        <p class="mb-0">
-                            {% blocktrans count counter=employee_count %}
-                                This location has <strong>{{ counter }} active employee</strong>.
-                                Deleting this location will affect scheduling and records.
-                            {% plural %}
-                                This location has <strong>{{ counter }} active employees</strong>.
-                                Deleting this location will affect scheduling and records.
-                            {% endblocktrans %}
-                        </p>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Explanation -->
-                    <div class="alert alert-info mb-4">
-                        <h6 class="alert-heading">
-                            <i class="bi bi-lightbulb me-1"></i>
-                            {% trans "What happens when you delete?" %}
-                        </h6>
-                        <ul class="mb-0">
-                            <li>{% trans "The location will be marked as <strong>inactive</strong>" %}</li>
-                            <li>{% trans "It will not appear in active location lists" %}</li>
-                            <li>{% trans "Historical data will be preserved" %}</li>
-                            <li>{% trans "Employees assigned to this location will keep their records" %}</li>
-                            <li>{% trans "You can reactivate the location later if needed" %}</li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Confirmation Form -->
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="{% url 'employees:location_detail' location.pk %}" 
-                               class="btn btn-secondary">
-                                <i class="bi bi-x-circle me-1"></i>
-                                {% trans "Cancel" %}
-                            </a>
-                            
-                            <button type="submit" class="btn btn-danger">
-                                <i class="bi bi-trash me-1"></i>
-                                {% trans "Yes, Delete Location" %}
-                            </button>
+                    {% if has_blocking_refs %}
+                        {# Blocked - cannot delete #}
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">
+                                <i class="material-icons align-middle">block</i>
+                                {{ blocking_message }}
+                            </h6>
+                            <ul class="mb-0">
+                                {% for ref in blocking_refs %}
+                                    <li>{{ ref.message }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                    </form>
-                    
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ cancel_url }}" class="btn btn-primary">
+                                {% trans "Back to Employee" %}
+                            </a>
+                        </div>
+                    {% else %}
+                        {# Safe to delete #}
+                        <div class="alert alert-danger">
+                            <h6 class="alert-heading">{{ confirmation_message }}</h6>
+                            <p class="mb-0">
+                                {% trans "Employee:" %} <strong>{{ object_name }}</strong>
+                            </p>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">{{ warning_message }}</h6>
+                            <p class="mb-2">{% trans "This will permanently delete:" %}</p>
+                            <ul class="mb-0">
+                                {% for item in warning_items %}
+                                    <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ cancel_url }}" class="btn btn-secondary">
+                                    {% trans "Cancel" %}
+                                </a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="material-icons align-middle">delete</i>
+                                    {% trans "Delete Employee" %}
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
                 </div>
-            </div>
-            
-            <!-- Additional Info -->
-            <div class="text-center mt-3">
-                <small class="text-muted">
-                    <i class="bi bi-shield-check me-1"></i>
-                    {% trans "This is a soft delete. Data can be recovered by reactivating the location." %}
-                </small>
             </div>
         </div>
     </div>
-    
 </div>
 {% endblock %}

@@ -92,22 +92,6 @@ DATABASES = {
     }
 }
 
-# Password validation
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Zurich'  # Switzerland timezone
@@ -162,3 +146,27 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# ============================================
+# Pagination Settings
+# ============================================
+
+PAGINATION_DEFAULTS = {
+    'default': 25,
+    'employees': 25,
+    'departments': 12,
+    'positions': 12,
+    'locations': 20,
+    'patients': 50,  # English: Medical records may need larger pages
+    'appointments': 30,
+    'shifts': 20,
+}
+
+# English: Fallback for views without specific pagination
+DEFAULT_PAGINATE_BY = PAGINATION_DEFAULTS['default']
+
+# Единые таймауты кеша
+CACHE_TIMEOUTS = {
+    "stats": 300,  # сек, агрегаты/виджеты
+}
+CACHE_NS = "esh"  # короткий префикс ключей проекта
