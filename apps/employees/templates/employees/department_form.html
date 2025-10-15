@@ -1,45 +1,69 @@
 {% extends "layouts/dashboard_layout.html" %}
-{% load static %}
-{% load i18n %}
+{% load static i18n %}
 
 {% block title %}{{ page_title }} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-{# Breadcrumbs #}
-{% include "core/components/breadcrumbs.html" with items=breadcrumb_items %}
 
+{% comment %} English: Breadcrumbs navigation {% endcomment %}
+{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
+
+{% comment %} English: Page header with back button {% endcomment %}
+{% include "core/components/page_header.html" with title=page_title subtitle=page_subtitle icon="business" show_back=True back_url=cancel_url %}
+
+{% comment %} English: Form container {% endcomment %}
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        {% include "core/components/page_header.html" with title=page_title subtitle="Department information" back_url=cancel_url %}
-        
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <div class="row">
-                        {% include "core/components/form_field.html" with field=form.name col_class="col-12" %}
-                        
-                        {% include "core/components/form_field.html" with field=form.code col_class="col-md-6" help_text="Short code for the department (e.g., URG, CHIR, MED)" %}
-                        
-                        {% include "core/components/form_field.html" with field=form.manager col_class="col-md-6" %}
-                        
-                        {% include "core/components/form_field.html" with field=form.description col_class="col-12" %}
-                        
-                        <div class="col-12 mb-3">
-                            <div class="form-check">
-                                {{ form.is_active }}
-                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
-                                    {% trans "Active Department" %}
-                                </label>
-                            </div>
+    <div class="col-lg-10">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% comment %} English: Display non-field errors if any {% endcomment %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>{% trans "Error!" %}</strong> {% trans "Please correct the errors below." %}
+                    {{ form.non_field_errors }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endif %}
+            
+            {% comment %} English: Render form sections {% endcomment %}
+            {% for section in form_sections %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            {% if section.icon %}
+                            <span class="material-icons align-middle me-2">{{ section.icon }}</span>
+                            {% endif %}
+                            {{ section.title }}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for field_data in section.fields %}
+                                {% include "core/components/form_field.html" with field=field_data.field col_class=field_data.col_class|default:'col-md-6' %}
+                            {% endfor %}
                         </div>
                     </div>
-                    
-                    {% include "core/components/action_buttons.html" with cancel_url=cancel_url submit_text="Save Department" %}
-                </form>
+                </div>
+            {% endfor %}
+            
+            {% comment %} English: Form actions {% endcomment %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
+                            <span class="material-icons align-middle me-2" style="font-size: 18px;">close</span>
+                            {% trans "Cancel" %}
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="material-icons align-middle me-2" style="font-size: 18px;">save</span>
+                            {{ submit_text }}
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
-{% endblock %}
+
+{% endblock dashboard_content %}

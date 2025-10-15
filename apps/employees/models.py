@@ -13,16 +13,20 @@ from apps.core.models import TimeStampedModel
 # УДАЛЕНО: from apps.accounts.models import User
 
 
+# apps/employees/models.py
+
 class Department(TimeStampedModel):
     """
     Department/Unit within the healthcare facility.
     Examples: Emergency, ICU, Cardiology, Surgery, etc.
     """
     
+    # English: Core fields
     name = models.CharField(
         _('department name'),
         max_length=100,
-        unique=True
+        unique=True,
+        help_text=_('Full department name')
     )
     
     code = models.CharField(
@@ -34,61 +38,154 @@ class Department(TimeStampedModel):
     
     description = models.TextField(
         _('description'),
-        blank=True
+        blank=True,
+        help_text=_('Detailed department description')
     )
     
-    is_active = models.BooleanField(
-        _('is active'),
-        default=True
-    )
-    
+    # English: Organizational structure
     manager = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='managed_departments',
-        verbose_name=_('department manager')
+        verbose_name=_('department manager'),
+        help_text=_('User responsible for this department')
+    )
+    
+    # English: Status and validity
+    is_active = models.BooleanField(
+        _('is active'),
+        default=True,
+        help_text=_('Whether this department is currently operational')
+    )
+    
+    effective_from = models.DateField(
+        _('effective from'),
+        null=True,
+        blank=True,
+        help_text=_('Date when department became operational')
+    )
+    
+    effective_to = models.DateField(
+        _('effective to'),
+        null=True,
+        blank=True,
+        help_text=_('Date when department ceased operations')
+    )
+    
+    # English: Additional metadata
+    phone_extension = models.CharField(
+        _('phone extension'),
+        max_length=10,
+        blank=True,
+        help_text=_('Internal phone extension')
+    )
+    
+    location_notes = models.TextField(
+        _('location notes'),
+        blank=True,
+        help_text=_('Physical location details within facility')
     )
     
     class Meta:
         verbose_name = _('department')
         verbose_name_plural = _('departments')
         ordering = ['name']
+        indexes = [
+            models.Index(fields=['code']),
+            models.Index(fields=['is_active']),
+        ]
     
     def __str__(self):
         return f"{self.code} - {self.name}"
     
+    # ========================================
+    # Properties
+    # ========================================
+    
     @property
     def employee_count(self):
-        """Return number of employees in this department."""
+        """Return total number of employees in this department."""
+        return self.employees.count()
+    
+    @property
+    def active_employee_count(self):
+        """Return number of active employees in this department."""
         return self.employees.filter(is_active=True).count()
     
+    @property
+    def inactive_employee_count(self):
+        """Return number of inactive employees in this department."""
+        return self.employees.filter(is_active=False).count()
+    
+    @property
+    def manager_display(self):
+        """Return manager full name or dash if none."""
+        return self.manager.get_full_name() if self.manager else '—'
+    
+    # ========================================
+    # URL helpers
+    # ========================================
+    
+    def get_absolute_url(self):
+        """Return URL for department detail view."""
+        from django.urls import reverse
+        return reverse('employees:department_detail', kwargs={'pk': self.pk})
+    
+    def get_edit_url(self):
+        """Return URL for department edit view."""
+        from django.urls import reverse
+        return reverse('employees:department_update', kwargs={'pk': self.pk})
+    
+    def get_delete_url(self):
+        """Return URL for department delete view."""
+        from django.urls import reverse
+        return reverse('employees:department_delete', kwargs={'pk': self.pk})
+    
+    # ========================================
+    # Component helpers
+    # ========================================
+    
     def get_card_items(self):
-        """Returns list of items for info_card component"""
+        """
+        Returns list of items for info_card component.
+        English: Used in detail views and listings.
+        """
         items = [
             {
                 'icon': 'people',
-                'value': self.employees.filter(is_active=True).count(),
-                'label': 'employees'
+                'value': self.active_employee_count,
+                'label': _('Active Employees')
             }
         ]
+        
+        if self.inactive_employee_count > 0:
+            items.append({
+                'icon': 'people_outline',
+                'value': self.inactive_employee_count,
+                'label': _('Inactive Employees')
+            })
         
         if self.manager:
             items.append({
                 'icon': 'person',
-                'label': f'Manager: {self.manager.get_full_name()}'
+                'label': _('Manager: %(name)s') % {'name': self.manager.get_full_name()}
             })
         
         return items
-
-    def get_edit_url(self):
-        from django.urls import reverse
-        return reverse('employees:department_update', kwargs={'pk': self.pk})
-
-    def get_delete_url(self):
-        from django.urls import reverse
-        return reverse('employees:department_delete', kwargs={'pk': self.pk})
+    
+    def get_stats_summary(self):
+        """
+        Returns summary statistics for dashboard/overview.
+        English: Used in list views and analytics.
+        """
+        return {
+            'total_employees': self.employee_count,
+            'active_employees': self.active_employee_count,
+            'inactive_employees': self.inactive_employee_count,
+            'has_manager': bool(self.manager),
+        }
 
 
 class Position(TimeStampedModel):

@@ -5,16 +5,16 @@
             {% if forloop.last and not item.url %}
                 {# Последний элемент без URL - делаем его активным #}
                 <li class="breadcrumb-item active" aria-current="page">
-                    {{ item.name }}
+                    {{ item.label }}
                 </li>
             {% else %}
                 <li class="breadcrumb-item">
                     <a href="{{ item.url }}" class="text-decoration-none">
-                        {% if forloop.first and not item.name %}
+                        {% if forloop.first and not item.label %}
                             {# Первый элемент - домашняя страница #}
                             <span class="material-icons align-middle" style="font-size: 18px;">home</span>
                         {% else %}
-                            {{ item.name }}
+                            {{ item.label }}
                         {% endif %}
                     </a>
                 </li>

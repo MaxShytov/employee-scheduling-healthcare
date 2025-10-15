@@ -51,8 +51,8 @@ class BreadcrumbMixin:
     Usage:
         class MyView(BreadcrumbMixin, ListView):
             breadcrumb_base = [
-                {'name': _('Home'), 'url': 'core:home'},
-                {'name': _('Employees'), 'url': 'employees:employee_list'},
+                {'label': _('Home'), 'url': 'core:home'},
+                {'label': _('Employees'), 'url': 'employees:employee_list'},
             ]
     """
     breadcrumb_base: List[Dict[str, Any]] = []

@@ -1,0 +1,25 @@
+{% comment %}
+Component: badge - Badge display
+Description: Display a badge with text and styling
+
+Props (when used directly):
+  - badge: dict (required) - {'text': str, 'class': str}
+  - align: str (optional) - Text alignment (default: 'start')
+
+Props (when used via custom block):
+  - block_data: dict with 'badge' and 'align'
+
+Usage:
+  {% include "core/components/blocks/badge.html" with badge=status_badge align="center" %}
+  {% include "core/components/blocks/badge.html" with block_data=data %}
+{% endcomment %}
+
+{% if block_data %}
+    <div class="text-{{ block_data.align|default:'start' }} mb-3">
+        <span class="badge {{ block_data.badge.class }}">{{ block_data.badge.text }}</span>
+    </div>
+{% else %}
+    <div class="text-{{ align|default:'start' }} mb-3">
+        <span class="badge {{ badge.class }}">{{ badge.text }}</span>
+    </div>
+{% endif %}

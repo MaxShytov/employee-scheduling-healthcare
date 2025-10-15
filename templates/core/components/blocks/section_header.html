@@ -1,0 +1,31 @@
+{% load i18n %}
+
+{% comment %}
+Component: section_header - Section header with icon and badge
+Description: Section title with optional icon and badge
+
+Props:
+  - icon: str (optional) - Material icon name
+  - title: str (required) - Section title
+  - badge: dict (optional) - {'text': str, 'class': str}
+  - margin: str (optional) - Margin class (default: 'mb-3')
+
+Usage:
+  {% include "core/components/blocks/section_header.html" with
+      icon="info"
+      title="Basic Information"
+      badge=status_badge
+  %}
+{% endcomment %}
+
+<div class="d-flex align-items-center justify-content-between {{ margin|default:'mb-3' }}">
+    <h6 class="mb-0 d-flex align-items-center">
+        {% if icon %}
+            <span class="material-icons me-2" style="font-size: 20px;">{{ icon }}</span>
+        {% endif %}
+        {{ title }}
+    </h6>
+    {% if badge %}
+        <span class="badge {{ badge.class }}">{{ badge.text }}</span>
+    {% endif %}
+</div>

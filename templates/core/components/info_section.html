@@ -1,31 +1,21 @@
-{% comment %}
-Component: Info Section
-Description: Section with icon, title and grid of info rows
-
-Props:
-  - title: str (required) - Section title
-  - icon: str (optional) - Material icon name
-  - items: list[dict] (required) - List of info rows
-    Structure: [
-      {'label': _('Name'), 'value': 'John Doe', 'col_class': 'col-md-6'},
-      {'label': _('Email'), 'value': 'john@example.com', 'badge_text': 'Verified', 'badge_class': 'bg-success'}
-    ]
-  - show_divider: bool (optional, default=False) - Show hr before section
-
-Usage:
-  {% include "core/components/info_section.html" with title=_('Personal Information') icon='person' items=personal_info_items %}
-{% endcomment %}
-
+{# templates/core/components/info_section.html #}
 {% if show_divider %}
 <hr class="my-4">
 {% endif %}
 
-<h5 class="{% if not show_divider %}card-title {% endif %}mb-3">
-    {% if icon %}
-    <span class="material-icons align-middle me-2">{{ icon }}</span>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="{% if not show_divider %}card-title {% endif %}mb-0">
+        {% if icon %}
+        <span class="material-icons align-middle me-2">{{ icon }}</span>
+        {% endif %}
+        {{ title }}
+    </h5>
+    
+    {% comment %} English: Badge in header {% endcomment %}
+    {% if badge %}
+    <span class="badge {{ badge.class|default:'bg-primary' }}">{{ badge.text }}</span>
     {% endif %}
-    {{ title }}
-</h5>
+</div>
 
 <div class="row g-3">
     {% for item in items %}

@@ -1,0 +1,55 @@
+{% load i18n %}
+{% load static %}
+
+{% comment %}
+Component: avatar_header - Avatar with Name and Subtitle
+Description: Display avatar (or icon), name, subtitle, and optional badge
+
+Props:
+  - avatar_url: str (optional) - URL to avatar image
+  - avatar_initials: str (optional) - Initials if no avatar (e.g., "AL")
+  - avatar_color: str (optional) - Background color for initials (default: primary)
+  - icon: str (optional) - Material icon name if no avatar
+  - name: str (required) - Main name/title
+  - subtitle: str (optional) - Subtitle text
+  - badge: dict (optional) - {'text': str, 'class': str} (e.g., {'text': 'Active', 'class': 'bg-success'})
+
+Usage:
+  {% include "core/components/blocks/avatar_header.html" with
+      avatar_url=employee.user.profile_picture.url
+      avatar_initials="AL"
+      name="Alexandre Lefebvre"
+      subtitle="Secrétaire Médicale"
+      badge=badge_config
+  %}
+{% endcomment %}
+
+<div class="text-center mb-4">
+    {# Avatar or Icon #}
+    {% if avatar_url %}
+        <img src="{{ avatar_url }}" alt="{{ name }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+    {% elif avatar_initials %}
+        <div class="rounded-circle bg-{{ avatar_color|default:'primary' }} text-white mb-3 mx-auto d-flex align-items-center justify-content-center"
+             style="width: 120px; height: 120px; font-size: 48px; font-weight: 600;">
+            {{ avatar_initials }}
+        </div>
+    {% elif icon %}
+        <div class="rounded-circle bg-{{ avatar_color|default:'primary' }} text-white mb-3 mx-auto d-flex align-items-center justify-content-center"
+             style="width: 120px; height: 120px;">
+            <span class="material-icons" style="font-size: 64px;">{{ icon }}</span>
+        </div>
+    {% endif %}
+
+    {# Name #}
+    <h5 class="mb-1 fw-bold">{{ name }}</h5>
+
+    {# Subtitle #}
+    {% if subtitle %}
+        <p class="text-muted mb-2">{{ subtitle }}</p>
+    {% endif %}
+
+    {# Badge #}
+    {% if badge %}
+        <span class="badge {{ badge.class }}">{{ badge.text }}</span>
+    {% endif %}
+</div>

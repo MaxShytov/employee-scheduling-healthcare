@@ -2,27 +2,32 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% trans "Departments" %} - MedShift Scheduler{% endblock %}
+{% block title %}{% trans "Departments" %} - MedShift{% endblock %}
 
 {% block dashboard_content %}
-{# Breadcrumbs #}
-{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
-{% include "core/components/page_header.html" with title="Departments" subtitle="Manage hospital departments and units" icon="apartment" action_url=create_url action_text="Add Department" %}
+    {# Breadcrumbs #}
+    {% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
-<div class="row g-4">
-    {% for department in departments %}
-    <div class="col-md-6 col-lg-4">
-        {% include "core/components/info_card.html" with title=department.name badge_text=department.code status_text=department.is_active|yesno:"Active,Inactive" status_class=department.is_active|yesno:"bg-success,bg-secondary" description=department.description card_items=department.get_card_items edit_url=department.get_edit_url delete_url=department.get_delete_url %}
-    </div>
-    {% empty %}
-    <div class="col-12">
-        {% include "core/components/empty_state.html" with icon="apartment" title="No departments yet" message="Create your first department to organize your workforce" action_url=create_url action_text="Add First Department" %}
-    </div>
-    {% endfor %}
-</div>
+    {# Page Header #}
+    {% include "core/components/page_header.html" with title=page_title subtitle=page_subtitle icon="business" show_back=True back_url=back_url actions=header_actions only %}
 
-{% if is_paginated %}
-    {% include "core/components/pagination.html" %}
-{% endif %}
-{% endblock %}
+    {# Statistics Cards #}
+    {% if stats_cards %}
+        {% include "core/components/stats_row.html" with stats_cards=stats_cards %}
+    {% endif %}
+
+    {# Filters #}
+    {% if filters %}
+        {% include "core/components/filter_bar.html" with filters=filters has_active=has_active_filters %}
+    {% endif %}
+
+    {# Department Table #}
+    {% include "core/components/data_table.html" with columns=table_columns rows=table_rows empty_state=empty_state_config %}
+
+    {# Pagination #}
+    {% if is_paginated %}
+        {% include "core/components/pagination.html" with page_obj=page_obj querydict=request.GET %}
+    {% endif %}
+
+{% endblock dashboard_content %}

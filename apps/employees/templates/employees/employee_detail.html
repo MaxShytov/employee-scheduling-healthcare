@@ -5,13 +5,13 @@
 
 {% block dashboard_content %}
 
-{% comment %} English: Breadcrumbs navigation {% endcomment %}
+{# Breadcrumbs navigation #}
 {% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
-{% comment %} English: Page header with back button and actions {% endcomment %}
+{# Page header with back button and actions #}
 {% include "core/components/page_header.html" with title=employee.full_name subtitle=page_subtitle show_back=True back_url=back_url actions=header_actions %}
 
-{% comment %} English: Profile and tabs layout - all HTML is now in component {% endcomment %}
-{% include "core/components/profile_tabs_layout.html" with employee=employee tabs=tabs active_tab=active_tab personal_sections=personal_sections work_sections=work_sections documents=documents documents_columns=documents_columns documents_rows=documents_rows documents_actions=documents_actions document_upload_url=document_upload_url %}
+{# Universal Detail Layout with Component Blocks and Tabs #}
+{% include "core/components/detail_layout.html" with sidebar_blocks=sidebar_blocks content_blocks=content_blocks tabs=tabs active_tab=active_tab %}
 
 {% endblock %}

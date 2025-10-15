@@ -1,0 +1,13 @@
+{% comment %}
+Component: divider - Horizontal divider line
+Description: Simple horizontal divider with optional margin
+
+Props:
+  - margin: str (optional) - Margin class (default: 'my-3')
+
+Usage:
+  {% include "core/components/blocks/divider.html" %}
+  {% include "core/components/blocks/divider.html" with margin="my-4" %}
+{% endcomment %}
+
+<hr class="{{ margin|default:'my-3' }}">

@@ -1,0 +1,33 @@
+{% extends "layouts/dashboard_layout.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ department.name }} - {% trans "Department" %} - MedShift{% endblock %}
+
+{% block dashboard_content %}
+
+{# Breadcrumbs #}
+{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
+
+{# Page Header #}
+{% include "core/components/page_header.html" with title=page_title subtitle=page_subtitle icon="business" show_back=True back_url=back_url actions=header_actions %}
+
+{# Universal Detail Layout with Component Blocks and Tabs #}
+{% include "core/components/detail_layout.html" with sidebar_blocks=sidebar_blocks content_blocks=content_blocks tabs=tabs active_tab=active_tab stats_cards=stats_cards %}
+
+{# Additional sections below if needed (Validity Period, Location Notes) #}
+{% if additional_sections %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                {% for section in additional_sections %}
+                    {% include "core/components/info_section.html" with title=section.title icon=section.icon items=section.items show_divider=section.show_divider %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock dashboard_content %}

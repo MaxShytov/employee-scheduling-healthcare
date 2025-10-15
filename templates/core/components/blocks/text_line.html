@@ -1,0 +1,18 @@
+{% comment %}
+Component: text_line - Simple text line
+Description: Display a line of text with optional styling
+
+Props:
+  - text: str (required) - Text to display
+  - class: str (optional) - CSS classes (default: 'text-muted')
+  - margin: str (optional) - Margin class (default: 'mb-2')
+  - align: str (optional) - Text alignment (default: 'start')
+
+Usage:
+  {% include "core/components/blocks/text_line.html" with text="Secrétaire Médicale" %}
+  {% include "core/components/blocks/text_line.html" with text="Administration" class="fw-bold" %}
+{% endcomment %}
+
+<p class="{{ class|default:'text-muted' }} {{ margin|default:'mb-2' }} text-{{ align|default:'start' }}">
+    {{ text }}
+</p>

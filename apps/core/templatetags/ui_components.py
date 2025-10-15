@@ -208,13 +208,13 @@ def search_filters(form, show_search=True):
 def breadcrumbs(items):
     """
     Render breadcrumb navigation.
-    
+
     Usage:
         {% breadcrumbs items %}
         where items = [
-            {'name': 'Home', 'url': '/'},
-            {'name': 'Employees', 'url': '/employees/'},
-            {'name': 'John Doe'},  # Last item (active)
+            {'label': 'Home', 'url': '/'},
+            {'label': 'Employees', 'url': '/employees/'},
+            {'label': 'John Doe'},  # Last item (active)
         ]
     """
     return {'items': items}

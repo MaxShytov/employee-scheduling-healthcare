@@ -1,0 +1,123 @@
+{% load i18n %}
+
+{% comment %}
+Component: detail_layout - Universal Detail Page Layout
+Description: Two-column layout with sidebar (left) and content area (right), both populated with component blocks
+
+Props:
+  - sidebar_blocks: list[dict] (required) - List of blocks for left sidebar
+  - content_blocks: list[dict] (required) - List of blocks for right content area
+  - tabs: list[dict] (optional) - Tabs configuration
+  - active_tab: str (optional) - Active tab ID
+  - stats_cards: list[dict] (optional) - Statistics cards above content
+
+Block types and their props:
+  1. avatar_header: {'type': 'avatar_header', 'avatar_url': str, 'avatar_initials': str, 'icon': str, 'name': str, 'subtitle': str, 'badge': dict}
+  2. text_line: {'type': 'text_line', 'text': str, 'class': str}
+  3. divider: {'type': 'divider', 'margin': str}
+  4. field: {'type': 'field', 'icon': str, 'label': str, 'value': str, 'link': str}
+  5. section_header: {'type': 'section_header', 'icon': str, 'title': str, 'badge': dict}
+  6. fields_group: {'type': 'fields_group', 'fields': [field_dicts]}
+  7. table: {'type': 'table', 'title': str, 'icon': str, 'columns': [...], 'rows': [...], 'empty_message': str}
+  8. custom: {'type': 'custom', 'template': str, 'data': dict}
+
+Usage:
+  {% include "core/components/detail_layout.html" with
+      sidebar_blocks=sidebar_blocks_config
+      content_blocks=content_blocks_config
+      tabs=tabs_config
+      active_tab='info'
+  %}
+{% endcomment %}
+
+{# Statistics Cards (optional) #}
+{% if stats_cards %}
+    {% include "core/components/stats_row.html" with stats_cards=stats_cards %}
+{% endif %}
+
+{# Main Content: Two columns #}
+<div class="row mb-4">
+    {# Left Sidebar - 4 columns #}
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                {% for block in sidebar_blocks %}
+                    {% if block.type == 'avatar_header' %}
+                        {% include "core/components/blocks/avatar_header.html" with avatar_url=block.avatar_url avatar_initials=block.avatar_initials avatar_color=block.avatar_color icon=block.icon name=block.name subtitle=block.subtitle badge=block.badge %}
+
+                    {% elif block.type == 'text_line' %}
+                        {% include "core/components/blocks/text_line.html" with text=block.text class=block.class margin=block.margin align=block.align %}
+
+                    {% elif block.type == 'divider' %}
+                        {% include "core/components/blocks/divider.html" with margin=block.margin %}
+
+                    {% elif block.type == 'field' %}
+                        {% include "core/components/blocks/field.html" with icon=block.icon label=block.label value=block.value value_class=block.value_class link=block.link margin=block.margin %}
+
+                    {% elif block.type == 'section_header' %}
+                        {% include "core/components/blocks/section_header.html" with icon=block.icon title=block.title badge=block.badge margin=block.margin %}
+
+                    {% elif block.type == 'fields_group' %}
+                        {% for field in block.fields %}
+                            {% include "core/components/blocks/field.html" with icon=field.icon label=field.label value=field.value value_class=field.value_class link=field.link margin=field.margin %}
+                        {% endfor %}
+
+                    {% elif block.type == 'custom' %}
+                        {% include block.template with block_data=block.data %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {# Right Content Area - 8 columns #}
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            {% if tabs %}
+                {# Tabs navigation integrated in card header #}
+                <div class="card-header bg-white border-bottom-0 pb-0">
+                    {% include "core/components/tabs_navigation.html" with tabs=tabs active_tab=active_tab %}
+                </div>
+            {% endif %}
+
+            {# Card body with content blocks #}
+            <div class="card-body {% if tabs %}pt-3{% endif %}">
+                    {% for block in content_blocks %}
+                        {% if not block.tab or block.tab == active_tab %}
+                            {% if block.type == 'section_header' %}
+                                {% include "core/components/blocks/section_header.html" with icon=block.icon title=block.title badge=block.badge margin=block.margin %}
+
+                            {% elif block.type == 'field' %}
+                                {% include "core/components/blocks/field.html" with icon=block.icon label=block.label value=block.value value_class=block.value_class link=block.link margin=block.margin %}
+
+                            {% elif block.type == 'fields_group' %}
+                                <div class="row">
+                                    {% for field in block.fields %}
+                                        <div class="{{ field.col_class|default:'col-md-6' }}">
+                                            {% include "core/components/blocks/field.html" with icon=field.icon label=field.label value=field.value value_class=field.value_class link=field.link margin=field.margin %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                            {% elif block.type == 'divider' %}
+                                {% include "core/components/blocks/divider.html" with margin=block.margin %}
+
+                            {% elif block.type == 'text_line' %}
+                                {% include "core/components/blocks/text_line.html" with text=block.text class=block.class margin=block.margin align=block.align %}
+
+                            {% elif block.type == 'table' %}
+                                {% if block.rows %}
+                                    {% include "core/components/data_table.html" with columns=block.columns rows=block.rows %}
+                                {% else %}
+                                    <p class="text-muted mb-0">{{ block.empty_message|default:"No data available" }}</p>
+                                {% endif %}
+
+                            {% elif block.type == 'custom' %}
+                                {% include block.template with block_data=block.data %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

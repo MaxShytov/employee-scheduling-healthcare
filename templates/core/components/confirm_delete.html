@@ -1,45 +1,67 @@
 {% load i18n %}
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center p-5">
-                <span class="material-icons text-danger mb-3" style="font-size: 64px;">
-                    {{ icon|default:"warning" }}
-                </span>
-                <h3 class="mb-3">{{ title }}</h3>
-                <p class="text-muted mb-4">
-                    {{ message|safe }}
-                </p>
-                
-                {% if blocking_message %}
-                <div class="alert alert-danger text-start">
-                    <strong>{% trans "Warning" %}:</strong> {{ blocking_message|safe }}
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-danger shadow-sm">
+            {# Red header with warning icon #}
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <span class="material-icons align-middle me-2" style="font-size: 20px;">warning</span>
+                    {% trans "Confirm Delete" %}
+                </h5>
+            </div>
+
+            <div class="card-body">
+                {# Object info section #}
+                <div class="alert alert-warning mb-4">
+                    <h6 class="alert-heading d-flex align-items-center">
+                        <span class="material-icons me-2" style="font-size: 18px;">info</span>
+                        {% trans "You are about to delete:" %}
+                    </h6>
                 </div>
-                <a href="{{ cancel_url }}" class="btn btn-primary">
-                    <span class="material-icons align-middle me-2" style="font-size: 18px;">arrow_back</span>
-                    {{ back_text|default:"Go Back" }}
-                </a>
-                {% else %}
-                    {% if warning_message %}
-                    <div class="alert alert-warning text-start">
-                        <strong>{% trans "Warning" %}:</strong> {{ warning_message|safe }}
-                    </div>
-                    {% endif %}
-                    
-                    <form method="post" class="d-inline">
-                        {% csrf_token %}
-                        <a href="{{ cancel_url }}" class="btn btn-outline-secondary me-2">
-                            <span class="material-icons align-middle me-2" style="font-size: 18px;">arrow_back</span>
+
+                {# Explanation section #}
+                <div class="alert alert-info mb-4">
+                    <h6 class="alert-heading d-flex align-items-center">
+                        <span class="material-icons me-2" style="font-size: 18px;">lightbulb</span>
+                        {% trans "What happens when you delete?" %}
+                    </h6>
+                    <ul class="mb-0 mt-2">
+                        <li>{% trans "This item will be permanently removed from the database" %}</li>
+                        <li>{% trans "All associated data will be deleted" %}</li>
+                        <li>{% trans "This action cannot be undone" %}</li>
+                    </ul>
+                </div>
+
+                {% if warning_message %}
+                <div class="alert alert-warning">
+                    <strong>{% trans "Warning" %}:</strong> {{ warning_message|safe }}
+                </div>
+                {% endif %}
+
+                {# Confirmation form #}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ cancel_url }}" class="btn btn-secondary">
+                            <span class="material-icons align-middle me-1" style="font-size: 18px;">close</span>
                             {% trans "Cancel" %}
                         </a>
                         <button type="submit" class="btn btn-danger">
-                            <span class="material-icons align-middle me-2" style="font-size: 18px;">delete</span>
-                            {{ confirm_text|default:"Delete" }}
+                            <span class="material-icons align-middle me-1" style="font-size: 18px;">delete</span>
+                            {{ confirm_text|default:"Yes, Delete" }}
                         </button>
-                    </form>
-                {% endif %}
+                    </div>
+                </form>
             </div>
+        </div>
+
+        {# Warning notice #}
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                <span class="material-icons align-middle" style="font-size: 16px;">warning</span>
+                {% trans "This action is permanent and cannot be undone." %}
+            </small>
         </div>
     </div>
 </div>
