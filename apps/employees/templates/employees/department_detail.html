@@ -6,13 +6,7 @@
 
 {% block dashboard_content %}
 
-{# Breadcrumbs #}
-{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
-
-{# Page Header #}
-{% include "core/components/page_header.html" with title=page_title subtitle=page_subtitle icon="business" show_back=True back_url=back_url actions=header_actions %}
-
-{# Universal Detail Layout with Component Blocks and Tabs #}
-{% include "core/components/detail_layout.html" with sidebar_blocks=sidebar_blocks content_blocks=content_blocks tabs=tabs active_tab=active_tab stats_cards=stats_cards %}
+    {% include "core/components/detail_layout.html" with sidebar_blocks=sidebar_blocks content_blocks=content_blocks tabs=tabs active_tab=active_tab stats_cards=stats_cards %}
 
 {% endblock dashboard_content %}
+

@@ -5,8 +5,7 @@
 {% block title %}{% trans "Delete Position" %} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-{# Breadcrumbs #}
-{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
-{% include "core/components/confirm_delete.html" with has_blocking_refs=has_blocking_refs blocking_refs=blocking_refs blocking_message=blocking_message blocking_title=_("Cannot Delete Position") cancel_url=cancel_url cancel_text=_("Back to Position") confirm_text=_("Delete Position") %}
+    {% include "core/components/confirm_delete.html" with has_blocking_refs=has_blocking_refs blocking_refs=blocking_refs blocking_message=blocking_message blocking_title=_("Cannot Delete Position") cancel_url=cancel_url cancel_text=_("Back to Position") confirm_text=_("Delete Position") %}
+    
 {% endblock %}

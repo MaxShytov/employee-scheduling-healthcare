@@ -462,11 +462,116 @@ Template pattern (see department_confirm_delete.html or position_confirm_delete.
 5. Filters automatically render via filter_bar.html component
 
 ### When Creating Templates
-1. Extend from base template
-2. Use reusable components from templates/core/components/
-3. Follow Material Design 3 patterns
-4. Use Bootstrap 5.3 utility classes
-5. Pass structured data dicts to components (see existing views for examples)
+
+**CRITICAL RULE: Templates should contain MINIMAL HTML code. Use components for all HTML structures.**
+
+**General Principles:**
+1. Extend from base template (`layouts/dashboard_layout.html`)
+2. **DO NOT write HTML structures** - use reusable components from `templates/core/components/`
+3. Templates should only contain component includes with parameters
+4. All HTML structures, styling, and layout should be in components
+5. Follow Material Design 3 patterns (implemented in components)
+6. Pass structured data dicts from views to components
+7. **DO NOT include breadcrumbs** - automatically included in `dashboard_layout.html` for all views with `BreadcrumbMixin`
+8. **DO NOT include page_header** - automatically included in `dashboard_layout.html` when `page_title` or `title` is in context
+
+**Template Types and Required Structure:**
+
+**Detail Views (STRICT - NO HTML):**
+Must use component-only structure. See `department_detail.html` or `position_detail.html`:
+```django
+{% extends "layouts/dashboard_layout.html" %}
+{% load static i18n %}
+
+{% block dashboard_content %}
+{# Breadcrumbs and Page Header are auto-included via dashboard_layout.html #}
+
+{# Detail Layout #}
+{% include "core/components/detail_layout.html" with sidebar_blocks=sidebar_blocks content_blocks=content_blocks ... %}
+{% endblock %}
+```
+
+**Form Views (STRICT - NO HTML):**
+Must use `form_container.html` component. See `employee_form.html`, `department_form.html`, `position_form.html`:
+```django
+{% extends "layouts/dashboard_layout.html" %}
+{% load static i18n %}
+
+{% block dashboard_content %}
+{# Breadcrumbs and Page Header are auto-included via dashboard_layout.html #}
+
+{# Form Container - all HTML is in component #}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        {% include "core/components/form_container.html" with forms=forms sections=form_sections cancel_url=cancel_url submit_text=submit_text %}
+    </div>
+</div>
+{% endblock %}
+```
+
+**Delete Confirmation Views (STRICT - NO HTML):**
+Must use `confirm_delete.html` component. See `department_confirm_delete.html`, `position_confirm_delete.html`:
+```django
+{% extends "layouts/dashboard_layout.html" %}
+{% load static i18n %}
+
+{% block dashboard_content %}
+{# Breadcrumbs and Page Header are auto-included via dashboard_layout.html #}
+
+{# Delete Confirmation #}
+{% include "core/components/confirm_delete.html" with has_blocking_refs=has_blocking_refs blocking_refs=blocking_refs blocking_message=blocking_message blocking_title=_("Cannot Delete") cancel_url=cancel_url cancel_text=_("Back") confirm_text=_("Delete") %}
+{% endblock %}
+```
+
+**List Views:**
+Use table/filter components with minimal wrapper HTML:
+```django
+{% extends "layouts/dashboard_layout.html" %}
+
+{% block dashboard_content %}
+{# Breadcrumbs and Page Header are auto-included via dashboard_layout.html #}
+
+{# Statistics Cards #}
+{% if stats_cards %}
+    {% include "core/components/stats_row.html" with stats_cards=stats_cards %}
+{% endif %}
+
+{# Filters #}
+{% include "core/components/filter_bar.html" with filters=filters action_url=action_url %}
+
+{# Data Table #}
+{% include "core/components/data_table.html" with columns=table_columns rows=table_rows %}
+
+{# Pagination #}
+{% include "core/components/pagination.html" with page_obj=page_obj %}
+{% endblock %}
+```
+
+**When HTML is Allowed:**
+- Simple wrapper divs for layout (e.g., `<div class="row justify-content-center">`)
+- These should be candidates for future componentization
+- If you need more than 3 lines of HTML, create a component instead
+
+**Bad Example (DO NOT DO THIS):**
+```django
+{# DON'T write HTML structures in templates #}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white">
+        <h5>{{ title }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {# ... form fields ... #}
+        </form>
+    </div>
+</div>
+```
+
+**Good Example:**
+```django
+{# DO use components #}
+{% include "core/components/form_container.html" with forms=forms sections=form_sections %}
+```
 
 ### Database Migrations
 - Always run makemigrations after model changes

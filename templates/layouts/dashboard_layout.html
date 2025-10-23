@@ -127,6 +127,18 @@
         <!-- Main Content -->
         <div class="container-fluid p-4">
             {% include 'includes/messages.html' %}
+
+            {# Breadcrumbs - automatically included for all dashboard pages #}
+            {% if breadcrumb_items %}
+                {% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
+            {% endif %}
+
+            {# Page Header - automatically included for all dashboard pages #}
+            {% if page_title %}
+                {% firstof back_url cancel_url as effective_back_url %}
+                {% include "core/components/page_header.html" with title=page_title subtitle=page_subtitle icon=page_icon show_back=show_back back_url=effective_back_url actions=header_actions %}
+            {% endif %}
+
             {% block dashboard_content %}{% endblock %}
         </div>
     </div>

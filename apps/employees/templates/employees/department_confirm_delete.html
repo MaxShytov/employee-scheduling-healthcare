@@ -5,8 +5,7 @@
 {% block title %}{% trans "Delete Department" %} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-{# Breadcrumbs #}
-{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
-{% include "core/components/confirm_delete.html" with has_blocking_refs=has_blocking_refs blocking_refs=blocking_refs blocking_message=blocking_message blocking_title=_("Cannot Delete Department") cancel_url=cancel_url cancel_text=_("Back to Department") confirm_text=_("Delete Department") %}
+    {% include "core/components/confirm_delete.html" with has_blocking_refs=has_blocking_refs blocking_refs=blocking_refs blocking_message=blocking_message blocking_title=_("Cannot Delete Department") cancel_url=cancel_url cancel_text=_("Back to Department") confirm_text=_("Delete Department") %}
+    
 {% endblock %}

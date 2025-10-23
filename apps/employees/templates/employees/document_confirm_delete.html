@@ -5,8 +5,7 @@
 {% block title %}{% trans "Delete Document" %} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-{# Breadcrumbs #}
-{% include "core/components/breadcrumbs.html" with items=breadcrumb_items %}
 
-{% include "core/components/confirm_delete.html" with icon="delete_forever" title="Delete Document?" message=message_html warning_message=warning_message cancel_url=cancel_url confirm_text="Delete Document" %}
+    {% include "core/components/confirm_delete.html" with icon="delete_forever" title="Delete Document?" message=message_html warning_message=warning_message cancel_url=cancel_url confirm_text="Delete Document" %}
+    
 {% endblock %}

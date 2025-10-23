@@ -6,13 +6,6 @@
 
 {% block dashboard_content %}
 
-{# Breadcrumbs navigation #}
-{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
+    {% include "core/components/detail_layout.html" with sidebar_blocks=sidebar_blocks content_blocks=content_blocks tabs=tabs active_tab=active_tab %}
 
-{# Page header with back button and actions #}
-{% include "core/components/page_header.html" with title=employee.full_name subtitle=page_subtitle show_back=True back_url=back_url actions=header_actions %}
-
-{# Universal Detail Layout with Component Blocks and Tabs #}
-{% include "core/components/detail_layout.html" with sidebar_blocks=sidebar_blocks content_blocks=content_blocks tabs=tabs active_tab=active_tab %}
-
-{% endblock %}
+{% endblock dashboard_content %}

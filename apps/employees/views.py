@@ -114,6 +114,22 @@ class EmployeeListView(EmployeeTableMixin, FilterMixin, BreadcrumbMixin, LoginRe
 
         context['employees_create_url'] = reverse_lazy('employees:employee_create')
 
+        # English: Page header data
+        context['page_title'] = _('Employees')
+        context['page_subtitle'] = _('Manage employee records and information')
+        context['create_url'] = reverse('employees:employee_create')
+        context['back_url'] = reverse('dashboard:home')
+
+        # English: Header actions
+        context['header_actions'] = [
+            {
+                'label': _('Add Employee'),
+                'icon': 'add',
+                'href': context['create_url'],
+                'style': 'primary'
+            }
+        ]
+
         return context
 
 
@@ -308,6 +324,7 @@ class EmployeeCreateView(EmployeeFormMixin, BreadcrumbMixin, LoginRequiredMixin,
             'page_subtitle': _('Fill in the employee information below'),
             'cancel_url': reverse_lazy('employees:employee_list'),
             'submit_text': _('Create Employee'),
+            'show_back': True,
         }
 
     def forms_valid(self, form, user_form):
@@ -367,6 +384,7 @@ class EmployeeUpdateView(EmployeeFormMixin, BreadcrumbMixin, LoginRequiredMixin,
             'page_subtitle': _('Update employee information'),
             'cancel_url': reverse_lazy('employees:employee_detail', kwargs={'pk': self.object.pk}),
             'submit_text': _('Save Changes'),
+            'show_back': True,
         }
 
     def forms_valid(self, form, user_form):
@@ -640,6 +658,7 @@ class EmployeeDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
         context['active_tab'] = active_tab
 
         # English: Page header data
+        context['page_title'] = employee.full_name
         context['page_subtitle'] = f"{employee.position.title} • {employee.department.name}"
         context['back_url'] = reverse('employees:employee_list')
         context['header_actions'] = self.get_header_actions()
@@ -1538,6 +1557,7 @@ class DepartmentCreateView(DepartmentFormMixin, BreadcrumbMixin, LoginRequiredMi
             'page_subtitle': _('Add a new department to the organization'),
             'cancel_url': reverse_lazy('employees:department_list'),
             'submit_text': _('Create Department'),
+            'show_back': True,
         }
 
 
@@ -1563,6 +1583,7 @@ class DepartmentUpdateView(DepartmentFormMixin, BreadcrumbMixin, LoginRequiredMi
             'page_subtitle': _('Update department information'),
             'cancel_url': reverse_lazy('employees:department_detail', kwargs={'pk': self.object.pk}),
             'submit_text': _('Save Changes'),
+            'show_back': True,
         }
 
 
@@ -2175,6 +2196,7 @@ class PositionCreateView(PositionFormMixin, BreadcrumbMixin, LoginRequiredMixin,
             'page_subtitle': _('Add a new position to the organization'),
             'cancel_url': reverse_lazy('employees:position_list'),
             'submit_text': _('Create Position'),
+            'show_back': True,
         }
 
 
@@ -2200,6 +2222,7 @@ class PositionUpdateView(PositionFormMixin, BreadcrumbMixin, LoginRequiredMixin,
             'page_subtitle': _('Update position information'),
             'cancel_url': reverse_lazy('employees:position_detail', kwargs={'pk': self.object.pk}),
             'submit_text': _('Save Changes'),
+            'show_back': True,
         }
 
 

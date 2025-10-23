@@ -5,13 +5,7 @@
 
 {% block dashboard_content %}
 
-{% comment %} English: Breadcrumbs navigation {% endcomment %}
-{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
-
-{% comment %} English: Page header with back button {% endcomment %}
-{% include "core/components/page_header.html" with title=page_title subtitle=page_subtitle icon="work" show_back=True back_url=cancel_url %}
-
-{% comment %} English: Form container - all HTML is in component {% endcomment %}
-{% include "core/components/form_container.html" with forms=forms sections=form_sections cancel_url=cancel_url submit_text=submit_text %}
+    {% include "core/components/form_container.html" with forms=forms sections=form_sections cancel_url=cancel_url submit_text=submit_text %}
 
 {% endblock dashboard_content %}
+

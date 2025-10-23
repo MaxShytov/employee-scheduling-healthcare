@@ -6,13 +6,7 @@
 
 {% block dashboard_content %}
 
-    {# Breadcrumbs #}
-    {% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
-
-    {# Page Header #}
-    {% include "core/components/page_header.html" with title=page_title subtitle=page_subtitle icon="work" show_back=True back_url=back_url actions=header_actions only %}
-
-    {# Statistics Cards #}
+    {# Statistics #}
     {% if stats_cards %}
         {% include "core/components/stats_row.html" with stats_cards=stats_cards %}
     {% endif %}
@@ -22,7 +16,7 @@
         {% include "core/components/filter_bar.html" with filters=filters has_active=has_active_filters %}
     {% endif %}
 
-    {# Position Table #}
+    {# Table #}
     {% include "core/components/data_table.html" with columns=table_columns rows=table_rows empty_state=empty_state_config %}
 
     {# Pagination #}
@@ -31,3 +25,4 @@
     {% endif %}
 
 {% endblock dashboard_content %}
+

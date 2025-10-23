@@ -5,36 +5,33 @@
 {% block title %}{% trans "Upload Document" %} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-{# Breadcrumbs #}
-{% include "core/components/breadcrumbs.html" with items=breadcrumb_items %}
 
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        {% include "core/components/page_header.html" with title="Upload Document" subtitle=subtitle back_url=cancel_url %}
-        
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    
+
                     <div class="row">
                         {% include "core/components/form_field.html" with field=form.document_type col_class="col-12" %}
-                        
+
                         {% include "core/components/form_field.html" with field=form.title col_class="col-12" %}
-                        
+
                         {% include "core/components/form_field.html" with field=form.description col_class="col-12" %}
-                        
+
                         {% include "core/components/form_field.html" with field=form.file col_class="col-12" help_text="Accepted formats: PDF, DOCX, JPG, PNG (max 10MB)" %}
-                        
+
                         {% include "core/components/form_field.html" with field=form.issue_date col_class="col-md-6" %}
-                        
+
                         {% include "core/components/form_field.html" with field=form.expiry_date col_class="col-md-6" %}
                     </div>
-                    
+
                     {% include "core/components/action_buttons.html" with cancel_url=cancel_url submit_text="Upload Document" submit_icon="upload" %}
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}

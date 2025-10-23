@@ -5,8 +5,7 @@
 {% block title %}{% trans "Delete Employee" %} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-{# Breadcrumbs #}
-{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
-{% include "core/components/confirm_delete.html" with title="Delete Employee?" message=message_html warning_message=warning_html cancel_url=cancel_url confirm_text="Delete Employee" %}
+    {% include "core/components/confirm_delete.html" with title="Delete Employee?" message=message_html warning_message=warning_html cancel_url=cancel_url confirm_text="Delete Employee" %}
+    
 {% endblock %}
