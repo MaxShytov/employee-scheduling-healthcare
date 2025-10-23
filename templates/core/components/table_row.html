@@ -39,13 +39,13 @@ Supported cell types:
                         <span class="badge bg-{{ cell.color|default:'secondary' }} text-uppercase" style="font-size: 0.65rem; padding: 0.25rem 0.5rem;">
                             {{ cell.text }}
                         </span>
-                        
+
                         {% comment %} English: Optional label next to badge (not muted) {% endcomment %}
                         {% if cell.label %}
                             <span class="text-body">{{ cell.label }}</span>
                         {% endif %}
                     </div>
-                    
+
                     {% comment %} English: Optional subtitle below {% endcomment %}
                     {% if cell.subtitle %}
                         <small class="text-muted mt-1" style="line-height: 1.4;">{{ cell.subtitle|safe }}</small>

@@ -28,7 +28,7 @@ class FilterMixin:
     def get_context_data(self, **kwargs):
         """Add filterset to context"""
         context = super().get_context_data(**kwargs)
-        
+
         if self.filterset:
             context['filters'] = self.filterset.to_template_context()
             # English: Check if any filter has active value
@@ -40,7 +40,8 @@ class FilterMixin:
         else:
             context['filters'] = []
             context['has_active_filters'] = False
-            
+        context['action_url'] = self.request.path
+
         return context
 
 

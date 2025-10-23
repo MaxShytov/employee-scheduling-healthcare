@@ -1,110 +1,33 @@
 {% extends "layouts/dashboard_layout.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}{{ page_title }} - MedShift Scheduler{% endblock %}
+{% block title %}{% trans "Positions" %} - MedShift{% endblock %}
 
 {% block dashboard_content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 mb-0">
-            <span class="material-icons align-middle me-2" style="font-size: 32px;">work</span>
-            Positions
-        </h1>
-        <p class="text-muted">Manage job positions and roles</p>
-    </div>
-    <a href="{% url 'employees:position_create' %}" class="btn btn-primary">
-        <span class="material-icons align-middle me-2" style="font-size: 18px;">add</span>
-        Add Position
-    </a>
-</div>
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body p-0">
-        {% if positions %}
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Code</th>
-                        <th>Position Title</th>
-                        <th>Hourly Rate Range</th>
-                        <th>Certification Required</th>
-                        <th>Employees</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for position in positions %}
-                    <tr>
-                        <td>
-                            <span class="badge bg-info">{{ position.code }}</span>
-                        </td>
-                        <td>
-                            <strong>{{ position.title }}</strong>
-                            {% if position.description %}
-                            <br>
-                            <small class="text-muted">{{ position.description|truncatewords:10 }}</small>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="text-success">
-                                <strong>CHF {{ position.min_hourly_rate }}</strong>
-                                <span class="text-muted">-</span>
-                                <strong>CHF {{ position.max_hourly_rate }}</strong>
-                            </div>
-                        </td>
-                        <td>
-                            {% if position.requires_certification %}
-                                <span class="badge bg-warning">
-                                    <span class="material-icons align-middle" style="font-size: 14px;">verified</span>
-                                    Required
-                                </span>
-                            {% else %}
-                                <span class="badge bg-light text-dark">Not Required</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <strong>{{ position.emp_count }}</strong>
-                            <span class="text-muted">employees</span>
-                        </td>
-                        <td>
-                            {% if position.is_active %}
-                                <span class="badge bg-success">Active</span>
-                            {% else %}
-                                <span class="badge bg-secondary">Inactive</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <a href="{% url 'employees:position_update' position.pk %}" 
-                                   class="btn btn-outline-primary" 
-                                   title="Edit">
-                                    <span class="material-icons" style="font-size: 16px;">edit</span>
-                                </a>
-                                <a href="{% url 'employees:position_delete' position.pk %}" 
-                                   class="btn btn-outline-danger" 
-                                   title="Delete">
-                                    <span class="material-icons" style="font-size: 16px;">delete</span>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-            <span class="material-icons text-muted mb-3" style="font-size: 64px;">work_outline</span>
-            <h5 class="text-muted">No positions yet</h5>
-            <p class="text-muted">Create your first position to define job roles</p>
-            <a href="{% url 'employees:position_create' %}" class="btn btn-primary">
-                <span class="material-icons align-middle me-2" style="font-size: 18px;">add</span>
-                Add First Position
-            </a>
-        </div>
-        {% endif %}
-    </div>
-</div>
-{% endblock %}
+    {# Breadcrumbs #}
+    {% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
+
+    {# Page Header #}
+    {% include "core/components/page_header.html" with title=page_title subtitle=page_subtitle icon="work" show_back=True back_url=back_url actions=header_actions only %}
+
+    {# Statistics Cards #}
+    {% if stats_cards %}
+        {% include "core/components/stats_row.html" with stats_cards=stats_cards %}
+    {% endif %}
+
+    {# Filters #}
+    {% if filters %}
+        {% include "core/components/filter_bar.html" with filters=filters has_active=has_active_filters %}
+    {% endif %}
+
+    {# Position Table #}
+    {% include "core/components/data_table.html" with columns=table_columns rows=table_rows empty_state=empty_state_config %}
+
+    {# Pagination #}
+    {% if is_paginated %}
+        {% include "core/components/pagination.html" with page_obj=page_obj querydict=request.GET %}
+    {% endif %}
+
+{% endblock dashboard_content %}

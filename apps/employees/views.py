@@ -18,7 +18,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 
 from apps.core.views.base import BaseListView
 from apps.core.views.mixins import FilterMixin, BreadcrumbMixin, ProtectedDeleteMixin
-from apps.employees.filters import DepartmentFilterSet, EmployeeFilterSet
+from apps.employees.filters import DepartmentFilterSet, EmployeeFilterSet, PositionFilterSet
 from apps.employees.mixins import EmployeeTableMixin  # ← Добавьте эту строку
 from .models import Department, Location, Position, Employee, EmployeeDocument
 from .forms import (
@@ -92,14 +92,25 @@ class EmployeeListView(EmployeeTableMixin, FilterMixin, BreadcrumbMixin, LoginRe
         context['table_columns'] = self.get_employee_table_columns()
         context['table_rows'] = self.prepare_employee_table_rows(context['employees'])
 
-        # Empty state configuration
-        context['empty_state_config'] = {
-            'icon': 'people_outline',
-            'title': _('No employees found'),
-            'message': _('Start by adding your first employee or adjust your filters'),
-            'button_text': _('Add First Employee'),
-            'button_url': reverse('employees:employee_create')
-        }
+        # Empty state configuration - different for filtered vs unfiltered
+        if context.get('has_active_filters'):
+            # Filters are active - show "clear filters" message
+            context['empty_state_config'] = {
+                'icon': 'filter_alt_off',
+                'title': _('No employees match your filters'),
+                'message': _('Try adjusting or clearing your filters to see more results'),
+                'button_text': _('Clear Filters'),
+                'button_url': context.get('action_url', reverse('employees:employee_list'))
+            }
+        else:
+            # No filters - show "add first" message
+            context['empty_state_config'] = {
+                'icon': 'people_outline',
+                'title': _('No employees found'),
+                'message': _('Start by adding your first employee'),
+                'button_text': _('Add First Employee'),
+                'button_url': reverse('employees:employee_create')
+            }
 
         context['employees_create_url'] = reverse_lazy('employees:employee_create')
 
@@ -1171,14 +1182,25 @@ class DepartmentListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, Permi
         # English: Convert departments to table rows
         ctx['table_rows'] = self.prepare_table_rows(ctx['departments'])
 
-        # English: Empty state configuration
-        ctx['empty_state_config'] = {
-            'icon': 'business_center',
-            'title': _('No departments found'),
-            'message': _('Start by adding your first department or adjust your filters'),
-            'button_text': _('Add First Department'),
-            'button_url': ctx['create_url']
-        }
+        # English: Empty state configuration - different for filtered vs unfiltered
+        if ctx.get('has_active_filters'):
+            # Filters are active - show "clear filters" message
+            ctx['empty_state_config'] = {
+                'icon': 'filter_alt_off',
+                'title': _('No departments match your filters'),
+                'message': _('Try adjusting or clearing your filters to see more results'),
+                'button_text': _('Clear Filters'),
+                'button_url': ctx.get('action_url', reverse('employees:department_list'))
+            }
+        else:
+            # No filters - show "add first" message
+            ctx['empty_state_config'] = {
+                'icon': 'business_center',
+                'title': _('No departments found'),
+                'message': _('Start by adding your first department'),
+                'button_text': _('Add First Department'),
+                'button_url': ctx['create_url']
+            }
 
         return ctx
 
@@ -1349,7 +1371,7 @@ class DepartmentDetailView(EmployeeTableMixin, BreadcrumbMixin, LoginRequiredMix
         ).order_by('user__first_name', 'user__last_name')
 
         # English: Content blocks configuration (new component blocks system)
-        ctx['content_blocks'] = [
+        content_blocks = [
             {
                 'type': 'table',
                 'tab': 'employees',  # Belongs to employees tab
@@ -1359,35 +1381,53 @@ class DepartmentDetailView(EmployeeTableMixin, BreadcrumbMixin, LoginRequiredMix
             }
         ]
 
-        # English: Additional sections (shown below main content)
-        additional = []
-
         # English: Add validity period if present
         if dept.effective_from or dept.effective_to:
-            additional.append({
-                'title': _('Validity Period'),
+            content_blocks.append({
+                'type': 'section_header',
                 'icon': 'calendar_today',
-                'show_divider': False,
-                'items': [
-                    {'label': _('Effective From'),
-                    'value': dept.effective_from.strftime('%B %d, %Y') if dept.effective_from else '—'},
-                    {'label': _('Effective To'),
-                    'value': dept.effective_to.strftime('%B %d, %Y') if dept.effective_to else _('Ongoing')},
+                'title': _('Validity Period'),
+                'tab': 'employees'
+            })
+            content_blocks.append({
+                'type': 'fields_group',
+                'tab': 'employees',
+                'fields': [
+                    {
+                        'icon': 'event',
+                        'label': _('Effective From'),
+                        'value': dept.effective_from.strftime('%B %d, %Y') if dept.effective_from else '—'
+                    },
+                    {
+                        'icon': 'event',
+                        'label': _('Effective To'),
+                        'value': dept.effective_to.strftime('%B %d, %Y') if dept.effective_to else _('Ongoing')
+                    },
                 ]
             })
 
         # English: Add location notes if present
         if dept.location_notes:
-            additional.append({
-                'title': _('Additional Details'),
+            content_blocks.append({'type': 'divider', 'tab': 'employees'})
+            content_blocks.append({
+                'type': 'section_header',
                 'icon': 'location_on',
-                'show_divider': len(additional) > 0,
-                'items': [
-                    {'label': _('Location Notes'), 'value': dept.location_notes, 'col_class': 'col-12'},
+                'title': _('Additional Details'),
+                'tab': 'employees'
+            })
+            content_blocks.append({
+                'type': 'fields_group',
+                'tab': 'employees',
+                'fields': [
+                    {
+                        'icon': 'notes',
+                        'label': _('Location Notes'),
+                        'value': dept.location_notes
+                    }
                 ]
             })
 
-        ctx['additional_sections'] = additional if additional else None
+        ctx['content_blocks'] = content_blocks
         
         return ctx
 
@@ -1410,7 +1450,12 @@ class DepartmentFormMixin:
                 'icon': 'info',
                 'fields': [
                     {'field': form['name'], 'col_class': 'col-md-6'},
-                    {'field': form['code'], 'col_class': 'col-md-6'},
+                    {
+                        'field': form['code'],
+                        'col_class': 'col-md-6',
+                        'has_toggle': True,
+                        'toggle_field': form['is_active'],
+                    },
                     {'field': form['description'], 'col_class': 'col-12'},
                 ]
             },
@@ -1427,7 +1472,6 @@ class DepartmentFormMixin:
                 'title': _('Status & Validity'),
                 'icon': 'schedule',
                 'fields': [
-                    {'field': form['is_active'], 'col_class': 'col-md-12'},
                     {'field': form['effective_from'], 'col_class': 'col-md-6'},
                     {'field': form['effective_to'], 'col_class': 'col-md-6'},
                 ]
@@ -1627,136 +1671,637 @@ class DepartmentDeleteView(BreadcrumbMixin, LoginRequiredMixin, PermissionRequir
 # ============================================
 
 
-class PositionListView(LoginRequiredMixin, ListView):
+class PositionListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, BaseListView):
+    """Display list of positions with filtering and stats."""
+
     model = Position
     template_name = 'employees/position_list.html'
     context_object_name = 'positions'
-    paginate_by = 25
+    permission_required = 'employees.view_position'
+    filterset_class = PositionFilterSet
+
+    def get_breadcrumbs(self):
+        """Breadcrumbs for position list."""
+        return [
+            {'label': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'label': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'label': _('Positions'), 'url': None},
+        ]
 
     def get_queryset(self):
-        return Position.objects.annotate(
-            employee_count=Count(
-                'employees', filter=Q(employees__is_active=True))
-        ).order_by('name')
+        """Optimize query with annotations."""
+        queryset = super().get_queryset()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = _('Positions')
-        context['create_url'] = reverse_lazy('employees:position_create')
+        # English: Add employee counts via annotation
+        queryset = queryset.annotate(
+            total_employees=Count('employees'),
+            active_employees=Count('employees', filter=Q(employees__is_active=True)),
+            inactive_employees=Count('employees', filter=Q(employees__is_active=False))
+        )
 
-        # Breadcrumbs
-        context['breadcrumb_items'] = [
-            {'label': _('Employees'), 'url': reverse(
-                'employees:employee_list')},
-            {'label': _('Positions')},
+        return queryset.order_by('title')
+
+    def _produce_stats(self):
+        """
+        Compute heavy statistics for caching.
+        English: Called only when cache misses.
+        """
+        total = Position.objects.count()
+        active = Position.objects.filter(is_active=True).count()
+        inactive = total - active
+        requires_cert = Position.objects.filter(requires_certification=True).count()
+
+        return [
+            {
+                'title': _('Total Positions'),
+                'value': total,
+                'icon': 'work',
+                'bg_color': 'primary'
+            },
+            {
+                'title': _('Active'),
+                'value': active,
+                'icon': 'check_circle',
+                'bg_color': 'success'
+            },
+            {
+                'title': _('Inactive'),
+                'value': inactive,
+                'icon': 'cancel',
+                'bg_color': 'danger'
+            },
+            {
+                'title': _('Requires Certification'),
+                'value': requires_cert,
+                'icon': 'verified',
+                'bg_color': 'info'
+            },
         ]
 
-        return context
+    def get_statistics(self):
+        """Get cached statistics for dashboard."""
+        params_hash = make_params_hash(self.request.GET)
+        key = make_key('stats', 'employees', 'position_list', 'global', params_hash)
+        return get_or_set_stats(key, self._produce_stats)
+
+    def prepare_table_rows(self, positions):
+        """
+        Prepare table rows data for data_table component.
+        English: Convert QuerySet to structured dict with cells for templates.
+        """
+        table_rows = []
+
+        for pos in positions:
+            table_rows.append({
+                'id': pos.id,
+                'cells': [
+                    # Status badge with code as subtitle
+                    {
+                        'type': 'badge',
+                        'text': _('Active') if pos.is_active else _('Inactive'),
+                        'color': 'success' if pos.is_active else 'secondary',
+                        'subtitle': pos.code
+                    },
+                    # Position title with description
+                    {
+                        'type': 'text',
+                        'value': pos.title,
+                        'subtitle': pos.description[:50] + '...' if pos.description and len(pos.description) > 50 else pos.description or '',
+                        'class': 'fw-bold'
+                    },
+                    # Hourly rate range
+                    {
+                        'type': 'text',
+                        'value': pos.rate_range_display
+                    },
+                    # Certification required badge
+                    {
+                        'type': 'badge',
+                        'text': _('Required') if pos.requires_certification else _('Not Required'),
+                        'color': 'warning' if pos.requires_certification else 'secondary'
+                    },
+                    # Employee count (only active)
+                    {
+                        'type': 'text',
+                        'value': f"{pos.active_employees} employees",
+                        'class': 'text-center'
+                    },
+                    # Actions
+                    {
+                        'type': 'actions',
+                        'actions': [
+                            {
+                                'type': 'link',
+                                'url': pos.get_absolute_url(),
+                                'icon': 'visibility',
+                                'title': _('View'),
+                                'color': 'primary'
+                            },
+                            {
+                                'type': 'link',
+                                'url': pos.get_edit_url(),
+                                'icon': 'edit',
+                                'title': _('Edit'),
+                                'color': 'secondary'
+                            }
+                        ]
+                    }
+                ]
+            })
+
+        return table_rows
+
+    def get_context_data(self, **kwargs):
+        """Add extra context for template."""
+        ctx = super().get_context_data(**kwargs)
+
+        # English: Page header data
+        ctx['page_title'] = _('Positions')
+        ctx['page_subtitle'] = _('Manage job positions and roles')
+        ctx['create_url'] = reverse('employees:position_create')
+        ctx['back_url'] = reverse('employees:employee_list')
+
+        # English: Header actions
+        ctx['header_actions'] = [
+            {
+                'label': _('Add Position'),
+                'icon': 'add',
+                'href': ctx['create_url'],
+                'style': 'primary'
+            }
+        ]
+
+        # English: Statistics cards
+        ctx['stats_cards'] = self.get_statistics()
+
+        # English: Table configuration
+        ctx['table_columns'] = [
+            {'title': _('Status'), 'width': '10%'},
+            {'title': _('Position Title'), 'width': '25%'},
+            {'title': _('Hourly Rate Range'), 'width': '15%'},
+            {'title': _('Certification Required'), 'width': '15%'},
+            {'title': _('Employees'), 'align': 'center', 'width': '10%'},
+            {'title': _('Actions'), 'width': '15%'},
+        ]
+
+        # English: Convert positions to table rows
+        ctx['table_rows'] = self.prepare_table_rows(ctx['positions'])
+
+        # English: Empty state configuration - different for filtered vs unfiltered
+        if ctx.get('has_active_filters'):
+            # Filters are active - show "clear filters" message
+            ctx['empty_state_config'] = {
+                'icon': 'filter_alt_off',
+                'title': _('No positions match your filters'),
+                'message': _('Try adjusting or clearing your filters to see more results'),
+                'button_text': _('Clear Filters'),
+                'button_url': ctx.get('action_url', reverse('employees:position_list'))
+            }
+        else:
+            # No filters - show "add first" message
+            ctx['empty_state_config'] = {
+                'icon': 'work_outline',
+                'title': _('No positions found'),
+                'message': _('Start by adding your first position'),
+                'button_text': _('Add First Position'),
+                'button_url': ctx['create_url']
+            }
+
+        return ctx
 
 
-class PositionCreateView(LoginRequiredMixin, CreateView):
+class PositionDetailView(EmployeeTableMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    """Display position details with employees listing."""
+
+    model = Position
+    template_name = 'employees/position_detail.html'
+    context_object_name = 'position'
+    permission_required = 'employees.view_position'
+
+    def get_breadcrumbs(self):
+        """Breadcrumbs for position detail."""
+        return [
+            {'label': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'label': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'label': _('Positions'), 'url': reverse('employees:position_list')},
+            {'label': self.object.title, 'url': None},
+        ]
+
+    def get_header_actions(self):
+        """Prepare header actions for page_header component."""
+        return [
+            {
+                'label': _('Edit'),
+                'icon': 'edit',
+                'href': self.object.get_edit_url(),
+                'style': 'secondary'
+            },
+            {
+                'label': _('Delete'),
+                'icon': 'delete',
+                'href': self.object.get_delete_url(),
+                'style': 'danger'
+            }
+        ]
+
+    def get_queryset(self):
+        """Optimize query."""
+        return super().get_queryset().annotate(
+            total_employees=Count('employees'),
+            active_employees=Count('employees', filter=Q(employees__is_active=True))
+        )
+
+    def get_context_data(self, **kwargs):
+        """Prepare context for detail view."""
+        ctx = super().get_context_data(**kwargs)
+        pos = self.object
+
+        # English: Page header
+        ctx['page_title'] = pos.title
+        ctx['page_subtitle'] = _('Position Code: %(code)s') % {'code': pos.code}
+        ctx['header_actions'] = self.get_header_actions()
+        ctx['back_url'] = reverse('employees:position_list')
+
+        # English: Statistics cards
+        ctx['stats_cards'] = [
+            {
+                'title': _('Total Employees'),
+                'value': pos.employee_count,
+                'icon': 'people',
+                'bg_color': 'primary'
+            },
+            {
+                'title': _('Active Employees'),
+                'value': pos.active_employee_count,
+                'icon': 'check_circle',
+                'bg_color': 'success'
+            },
+            {
+                'title': _('Inactive Employees'),
+                'value': pos.inactive_employee_count,
+                'icon': 'cancel',
+                'bg_color': 'secondary'
+            },
+        ]
+
+        # English: Status badge
+        status_badge = {
+            'text': _('Active') if pos.is_active else _('Inactive'),
+            'class': 'bg-success' if pos.is_active else 'bg-secondary'
+        }
+
+        # English: Sidebar blocks configuration (new component blocks system)
+        sidebar_blocks = [
+            # Position title as text (no avatar for positions)
+            {
+                'type': 'text_line',
+                'text': pos.title,
+                'class': 'h5 fw-bold text-center',
+                'margin': 'mb-1'
+            },
+            {
+                'type': 'text_line',
+                'text': f"{_('Code')}: {pos.code}",
+                'class': 'text-muted text-center',
+                'margin': 'mb-2'
+            },
+        ]
+
+        # Add badge if present
+        if status_badge:
+            sidebar_blocks.append({
+                'type': 'custom',
+                'template': 'core/components/blocks/badge.html',
+                'data': {'badge': status_badge, 'align': 'center'}
+            })
+
+        sidebar_blocks.extend([
+            {'type': 'divider'},
+            # Basic Information section
+            {
+                'type': 'section_header',
+                'icon': 'info',
+                'title': _('Basic Information')
+            },
+        ])
+
+        # Add description if present
+        if pos.description:
+            sidebar_blocks.append({
+                'type': 'field',
+                'label': _('Description'),
+                'value': pos.description
+            })
+
+        # Compensation section
+        sidebar_blocks.extend([
+            {'type': 'divider'},
+            {
+                'type': 'section_header',
+                'icon': 'payments',
+                'title': _('Compensation')
+            },
+            {
+                'type': 'field',
+                'icon': 'attach_money',
+                'label': _('Rate Range'),
+                'value': pos.rate_range_display
+            },
+            {
+                'type': 'field',
+                'icon': 'trending_up',
+                'label': _('Min Rate'),
+                'value': f"CHF {pos.min_hourly_rate:.2f}/hr"
+            },
+            {
+                'type': 'field',
+                'icon': 'trending_down',
+                'label': _('Max Rate'),
+                'value': f"CHF {pos.max_hourly_rate:.2f}/hr"
+            }
+        ])
+
+        # Requirements section
+        sidebar_blocks.extend([
+            {'type': 'divider'},
+            {
+                'type': 'section_header',
+                'icon': 'verified',
+                'title': _('Requirements')
+            },
+            {
+                'type': 'field',
+                'icon': 'verified_user',
+                'label': _('Certification Required'),
+                'value': _('Yes') if pos.requires_certification else _('No')
+            }
+        ])
+
+        ctx['sidebar_blocks'] = sidebar_blocks
+
+        # English: Tabs configuration
+        ctx['tabs'] = [
+            {
+                'id': 'employees',
+                'label': _('Employees in this Position'),
+                'icon': 'people',
+                'url': f"{self.request.path}?tab=employees",
+                'active': True
+            }
+        ]
+        ctx['active_tab'] = self.request.GET.get('tab', 'employees')
+
+        # English: Employees list (main content - right column)
+        employees = pos.employees.select_related(
+            'user', 'department', 'location'
+        ).order_by('user__first_name', 'user__last_name')
+
+        # English: Content blocks configuration (new component blocks system)
+        ctx['content_blocks'] = [
+            {
+                'type': 'table',
+                'tab': 'employees',  # Belongs to employees tab
+                'columns': self.get_employee_table_columns(exclude=['position', 'id']),
+                'rows': self.prepare_employee_table_rows(employees, exclude_columns=['position', 'id']),
+                'empty_message': _('No employees assigned to this position')
+            }
+        ]
+
+        return ctx
+
+
+class PositionFormMixin:
+    """Shared create/update form behavior for Position views."""
+
     model = Position
     form_class = PositionForm
     template_name = 'employees/position_form.html'
-    success_url = reverse_lazy('employees:position_list')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = _('Add Position')
-        context['cancel_url'] = reverse_lazy('employees:position_list')
+    def get_page_metadata(self):
+        """Return dict: page_title, page_subtitle, cancel_url, submit_text."""
+        raise NotImplementedError("Implement get_page_metadata()")
 
-        # Breadcrumbs
-        context['breadcrumb_items'] = [
-            {'label': _('Employees'), 'url': reverse(
-                'employees:employee_list')},
-            {'label': _('Positions'), 'url': reverse(
-                'employees:position_list')},
-            {'label': _('Create')},
+    def get_form_sections(self, form):
+        """Return list of sections for component-based rendering."""
+        return [
+            {
+                'title': _('Basic Information'),
+                'icon': 'info',
+                'fields': [
+                    {'field': form['title'], 'col_class': 'col-md-6'},
+                    {
+                        'field': form['code'],
+                        'col_class': 'col-md-6',
+                        'has_toggle': True,
+                        'toggle_field': form['is_active'],
+                    },
+                    {'field': form['description'], 'col_class': 'col-12'},
+                ]
+            },
+            {
+                'title': _('Requirements'),
+                'icon': 'verified',
+                'fields': [
+                    {'field': form['requires_certification'], 'col_class': 'col-md-12'},
+                ]
+            },
+            {
+                'title': _('Compensation Range'),
+                'icon': 'payments',
+                'fields': [
+                    {'field': form['min_hourly_rate'], 'col_class': 'col-md-6'},
+                    {'field': form['max_hourly_rate'], 'col_class': 'col-md-6'},
+                ]
+            }
         ]
 
-        return context
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        meta = self.get_page_metadata()
+        ctx.update(meta)
+        form = ctx.get('form') or self.get_form()
+        ctx['forms'] = [form]
+        ctx['form_sections'] = self.get_form_sections(form)
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        if 'pk' in kwargs:
+            self.object = self.get_object()
+        else:
+            self.object = None
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
 
     def form_valid(self, form):
-        messages.success(self.request, _('Position created successfully.'))
+        """Default save + success message."""
+        self.object = form.save()
+        messages.success(self.request, _('Position saved successfully.'))
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        messages.error(self.request, _('Please correct the errors below.'))
+        return self.render_to_response(self.get_context_data(form=form))
 
-class PositionUpdateView(LoginRequiredMixin, UpdateView):
-    model = Position
-    form_class = PositionForm
-    template_name = 'employees/position_form.html'
-    success_url = reverse_lazy('employees:position_list')
+    def get_success_url(self):
+        if getattr(self, 'object', None):
+            return reverse('employees:position_detail', kwargs={'pk': self.object.pk})
+        return reverse('employees:position_list')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = _('Edit Position')
-        context['cancel_url'] = reverse_lazy('employees:position_list')
 
-        # Breadcrumbs
-        context['breadcrumb_items'] = [
-            {'label': _('Employees'), 'url': reverse(
-                'employees:employee_list')},
-            {'label': _('Positions'), 'url': reverse(
-                'employees:position_list')},
-            {'label': self.object.name},
+# ============================================
+# Position Create / Update Views
+# ============================================
+
+class PositionCreateView(PositionFormMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    """Create new position."""
+
+    permission_required = 'employees.add_position'
+
+    def get_breadcrumbs(self):
+        """Breadcrumbs for position create."""
+        return [
+            {'label': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'label': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'label': _('Positions'), 'url': reverse('employees:position_list')},
+            {'label': _('Create'), 'url': None},
         ]
 
-        return context
+    def get_page_metadata(self):
+        """Page metadata for create view."""
+        return {
+            'page_title': _('Create Position'),
+            'page_subtitle': _('Add a new position to the organization'),
+            'cancel_url': reverse_lazy('employees:position_list'),
+            'submit_text': _('Create Position'),
+        }
 
-    def form_valid(self, form):
-        messages.success(self.request, _('Position updated successfully.'))
-        return super().form_valid(form)
+
+class PositionUpdateView(PositionFormMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """Update existing position."""
+
+    permission_required = 'employees.change_position'
+
+    def get_breadcrumbs(self):
+        """Breadcrumbs for position update."""
+        return [
+            {'label': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'label': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'label': _('Positions'), 'url': reverse('employees:position_list')},
+            {'label': self.object.title, 'url': reverse('employees:position_detail', kwargs={'pk': self.object.pk})},
+            {'label': _('Edit'), 'url': None},
+        ]
+
+    def get_page_metadata(self):
+        """Page metadata for update view."""
+        return {
+            'page_title': _('Edit Position'),
+            'page_subtitle': _('Update position information'),
+            'cancel_url': reverse_lazy('employees:position_detail', kwargs={'pk': self.object.pk}),
+            'submit_text': _('Save Changes'),
+        }
 
 
-class PositionDeleteView(LoginRequiredMixin, DeleteView):
+# ============================================
+# Position Delete View
+# ============================================
+
+class PositionDeleteView(BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, ProtectedDeleteMixin, DeleteView):
+    """Delete position with validation."""
+
     model = Position
     template_name = 'employees/position_confirm_delete.html'
     success_url = reverse_lazy('employees:position_list')
+    permission_required = 'employees.delete_position'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        emp_count = self.object.employees.filter(is_active=True).count()
-        context['emp_count'] = emp_count
-        context['list_url'] = reverse_lazy('employees:position_list')
-
-        # Prepare HTML messages
-        context['message_html'] = mark_safe(
-            f'{_("Are you sure you want to delete")} <strong>{self.object.name}</strong>?<br>'
-            f'{_("This action cannot be undone.")}'
-        )
-
-        if emp_count > 0:
-            context['blocking_html'] = mark_safe(
-                f'{_("This position has")} <strong>{emp_count}</strong> {_("active employee(s).")} '
-                f'{_("You cannot delete a position with active employees. Please reassign them first.")}'
-            )
-
-        # Breadcrumbs
-        context['breadcrumb_items'] = [
-            {'label': _('Employees'), 'url': reverse(
-                'employees:employee_list')},
-            {'label': _('Positions'), 'url': reverse(
-                'employees:position_list')},
-            {'label': self.object.name, 'url': None},
-            {'label': _('Delete')},
+    def get_breadcrumbs(self):
+        """Breadcrumbs for position delete."""
+        return [
+            {'label': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'label': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'label': _('Positions'), 'url': reverse('employees:position_list')},
+            {'label': self.object.title, 'url': reverse('employees:position_detail', kwargs={'pk': self.object.pk})},
+            {'label': _('Delete'), 'url': None},
         ]
 
-        return context
+    def get_blocking_references(self):
+        """
+        Check for blocking references.
+        English: Returns list of blocking issues preventing deletion.
+        """
+        pos = self.object
+        blocking = []
+
+        # English: Check for active employees
+        active_count = pos.employees.filter(is_active=True).count()
+        if active_count > 0:
+            blocking.append({
+                'type': 'active_employees',
+                'count': active_count,
+                'message': _('%(count)d active employee(s) assigned') % {'count': active_count}
+            })
+
+        # English: Check for any employees (active or inactive)
+        total_count = pos.employees.count()
+        if total_count > 0 and active_count == 0:
+            blocking.append({
+                'type': 'employees_history',
+                'count': total_count,
+                'message': _('%(count)d employee(s) in history') % {'count': total_count}
+            })
+
+        return blocking
+
+    def get_context_data(self, **kwargs):
+        """Add delete confirmation context."""
+        ctx = super().get_context_data(**kwargs)
+        pos = self.object
+
+        # English: Cancel URL
+        ctx['cancel_url'] = reverse('employees:position_detail', kwargs={'pk': pos.pk})
+
+        # English: Confirmation messages
+        ctx['object_name'] = pos.title
+        ctx['confirmation_message'] = _('Are you sure you want to delete this position?')
+        ctx['warning_message'] = _('This action cannot be undone.')
+
+        # English: Check for blocking references
+        blocking_refs = self.get_blocking_references()
+        ctx['has_blocking_refs'] = len(blocking_refs) > 0
+        ctx['blocking_refs'] = blocking_refs
+
+        if ctx['has_blocking_refs']:
+            ctx['blocking_message'] = _(
+                'Cannot delete this position. Please resolve the following issues first:'
+            )
+
+        return ctx
 
     def post(self, request, *args, **kwargs):
+        """Handle POST with validation."""
         self.object = self.get_object()
-        emp_count = self.object.employees.filter(is_active=True).count()
 
-        if emp_count > 0:
-            messages.error(
-                request,
-                _('Cannot delete position with %(count)d active employee(s).') % {
-                    'count': emp_count}
-            )
-            return redirect('employees:position_list')
+        # English: Check for blocking references
+        blocking_refs = self.get_blocking_references()
 
-        messages.success(request, _('Position deleted successfully.'))
+        if blocking_refs:
+            messages_list = [ref['message'] for ref in blocking_refs]
+            error_msg = _('Cannot delete position: ') + '; '.join(messages_list)
+            messages.error(request, error_msg)
+            return redirect('employees:position_detail', pk=self.object.pk)
+
+        # English: Safe to delete
         return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        """Handle successful deletion."""
+        pos_title = self.object.title
+        messages.success(
+            self.request,
+            _('Position "%(title)s" has been deleted successfully.') % {'title': pos_title}
+        )
+        return super().form_valid(form)
 
 # ============================================
 # Document Views

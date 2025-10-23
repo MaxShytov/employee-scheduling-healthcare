@@ -50,20 +50,27 @@ class EmployeeFilterSet(FilterSet):
 class PositionFilterSet(FilterSet):
     """Filters for Position list"""
 
+    is_active = BooleanFilter(
+        field_name='is_active',
+        label=_('Status'),
+        as_buttons=True
+    )
+
     search = TextFilter(
-        field_name='title',  # ИСПРАВЛЕНО: Position uses 'title'
+        field_name='title',
         label=_('Search'),
-        placeholder=_('Search positions...')
+        placeholder=_('Search by title or code...'),
+        search_fields=['title', 'code', 'description']
     )
 
     requires_certification = BooleanFilter(
         field_name='requires_certification',
-        label=_('Requires certification')
-    )
-
-    is_active = BooleanFilter(
-        field_name='is_active',
-        label=_('Active only')
+        label=_('Certification'),
+        as_buttons=True,
+        true_label=_('Required'),
+        false_label=_('Not Required'),
+        true_color='warning',
+        false_color='secondary'
     )
 
 

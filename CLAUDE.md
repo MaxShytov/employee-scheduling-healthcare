@@ -314,11 +314,135 @@ sidebar_blocks = [
 ]
 ```
 
-**Delete Views:**
-1. Use ProtectedDeleteMixin for DeleteView to prevent orphaned records
-2. Use confirm_delete.html component (warns about permanent deletion)
-3. Add BreadcrumbMixin and implement get_breadcrumbs()
-4. For soft delete, override form_valid() to set is_active=False instead of deleting
+**Form Views (Create/Update):**
+1. **IMPORTANT:** For models with `is_active` field, always use Active/Inactive toggle buttons
+2. Implement `get_form_sections()` to return structured form data
+3. Place toggle buttons next to the main identifier field (e.g., code, employee_id)
+4. Use `has_toggle: True` and `toggle_field: form['is_active']` in field config
+5. Templates must check `field_data.has_toggle` and use appropriate component
+
+**Active/Inactive Toggle Pattern (REQUIRED for models with is_active field):**
+```python
+def get_form_sections(self, form):
+    return [
+        {
+            'title': _('Basic Information'),
+            'icon': 'info',
+            'fields': [
+                {'field': form['name'], 'col_class': 'col-md-6'},
+                {
+                    'field': form['code'],  # Main identifier field
+                    'col_class': 'col-md-6',
+                    'has_toggle': True,  # Enable toggle buttons
+                    'toggle_field': form['is_active'],  # Link to is_active field
+                },
+                {'field': form['description'], 'col_class': 'col-12'},
+            ]
+        }
+    ]
+```
+
+Template pattern (see department_form.html or position_form.html):
+```django
+{% for field_data in section.fields %}
+    {% if field_data.has_toggle %}
+        {# Field with Active/Inactive toggle buttons #}
+        {% include "core/components/form_field_with_toggle.html" with field=field_data.field toggle_field=field_data.toggle_field col_class=field_data.col_class|default:'col-md-6' %}
+    {% else %}
+        {# Regular form field #}
+        {% include "core/components/form_field.html" with field=field_data.field col_class=field_data.col_class|default:'col-md-6' %}
+    {% endif %}
+{% endfor %}
+```
+
+**Why:** This provides consistent UX across all forms and makes status changes more visible than a checkbox. Toggle buttons are placed next to the identifier field (code/ID) for quick visual reference.
+
+**Delete Views with Protection (REQUIRED for models with on_delete=PROTECT):**
+1. **Always implement get_blocking_references()** for models that have ForeignKey relationships with on_delete=PROTECT
+2. Check for active related objects (e.g., employees assigned to a position/department)
+3. Return list of dicts with 'type', 'count', 'message' keys for each blocking issue
+4. Template must handle two states:
+   - `has_blocking_refs=True`: Show warning card (yellow bg-warning) with blocking issues list
+   - `has_blocking_refs=False`: Show confirm_delete.html component for normal deletion
+5. Override post() to check blocking_refs and redirect with error message if blocked
+
+Example implementation (see DepartmentDeleteView or PositionDeleteView):
+```python
+def get_blocking_references(self):
+    """Check for blocking references."""
+    blocking = []
+
+    # Check for active employees
+    active_count = self.object.employees.filter(is_active=True).count()
+    if active_count > 0:
+        blocking.append({
+            'type': 'active_employees',
+            'count': active_count,
+            'message': _('%(count)d active employee(s) assigned') % {'count': active_count}
+        })
+
+    return blocking
+
+def get_context_data(self, **kwargs):
+    ctx = super().get_context_data(**kwargs)
+    blocking_refs = self.get_blocking_references()
+    ctx['has_blocking_refs'] = len(blocking_refs) > 0
+    ctx['blocking_refs'] = blocking_refs
+    ctx['cancel_url'] = reverse('app:detail', kwargs={'pk': self.object.pk})
+
+    if ctx['has_blocking_refs']:
+        ctx['blocking_message'] = _('Cannot delete. Resolve issues first.')
+
+    return ctx
+
+def post(self, request, *args, **kwargs):
+    self.object = self.get_object()
+    blocking_refs = self.get_blocking_references()
+
+    if blocking_refs:
+        messages_list = [ref['message'] for ref in blocking_refs]
+        messages.error(request, _('Cannot delete: ') + '; '.join(messages_list))
+        return redirect('app:detail', pk=self.object.pk)
+
+    return super().post(request, *args, **kwargs)
+```
+
+Template pattern (see department_confirm_delete.html or position_confirm_delete.html):
+```django
+{% if has_blocking_refs %}
+    {# Yellow warning card with blocking issues list #}
+    <div class="card border-warning shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+                <span class="material-icons">warning</span>
+                {% trans "Cannot Delete Object" %}
+            </h5>
+        </div>
+        <div class="card-body">
+            <p>{{ blocking_message }}</p>
+            <div class="alert alert-danger">
+                <h6>{% trans "Blocking Issues" %}</h6>
+                <ul>
+                    {% for ref in blocking_refs %}
+                        <li>{{ ref.message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <a href="{{ cancel_url }}" class="btn btn-primary">
+                {% trans "Back" %}
+            </a>
+        </div>
+    </div>
+{% else %}
+    {# Normal delete confirmation #}
+    {% include "core/components/confirm_delete.html" with cancel_url=cancel_url confirm_text="Delete Object" %}
+{% endif %}
+```
+
+**Other Delete Views:**
+1. Use confirm_delete.html component for simple deletions (warns about permanent deletion)
+2. Add BreadcrumbMixin and implement get_breadcrumbs()
+3. For soft delete, override form_valid() to set is_active=False instead of deleting
 
 ### When Creating New Models
 1. Inherit from TimeStampedModel (provides created_at/updated_at)
@@ -328,6 +452,7 @@ sidebar_blocks = [
 5. Implement __str__() method
 6. Use settings.AUTH_USER_MODEL for ForeignKey to User (not direct import)
 7. Add get_absolute_url() for detail views
+8. If model has `is_active` field, ensure forms use Active/Inactive toggle buttons (see "Form Views" section above)
 
 ### When Creating New Filters
 1. Create FilterSet subclass in app's filters.py
@@ -351,6 +476,8 @@ sidebar_blocks = [
 
 ### Foreign Key Patterns
 - Use PROTECT for critical relationships (Department, Position, Location)
+  - **IMPORTANT:** When using PROTECT, you MUST implement get_blocking_references() in DeleteView
+  - See "Delete Views with Protection" section above for required implementation
 - Use CASCADE for dependent objects (EmployeeDocument)
 - Use SET_NULL for optional relationships (managers)
 - Always add related_name for reverse lookups

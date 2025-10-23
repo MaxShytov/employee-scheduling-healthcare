@@ -1,46 +1,12 @@
-{% extends 'core/layouts/delete_confirm.html' %}
+{% extends "layouts/dashboard_layout.html" %}
+{% load static %}
 {% load i18n %}
-{% load ui_components %}
 
-{% block title %}{% trans "Delete Location" %} - {{ block.super }}{% endblock %}
+{% block title %}{% trans "Delete Position" %} - MedShift Scheduler{% endblock %}
 
-{% block confirm_title %}{% trans "Confirm Delete Location" %}{% endblock %}
+{% block dashboard_content %}
+{# Breadcrumbs #}
+{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
-{% block object_info %}
-<p class="mb-0">
-    <strong>{% trans "Name:" %}</strong> {{ location.name }}<br>
-    <strong>{% trans "Address:" %}</strong> {{ location.full_address }}
-</p>
+{% include "core/components/confirm_delete.html" with has_blocking_refs=has_blocking_refs blocking_refs=blocking_refs blocking_message=blocking_message blocking_title=_("Cannot Delete Position") cancel_url=cancel_url cancel_text=_("Back to Position") confirm_text=_("Delete Position") %}
 {% endblock %}
-
-{% block custom_warnings %}
-{% if employee_count > 0 %}
-<div class="alert alert-danger">
-    <h6 class="alert-heading">
-        {% icon 'warning' size=18 %}
-        {% trans "Warning!" %}
-    </h6>
-    <p class="mb-0">
-        {% blocktrans count counter=employee_count %}
-            This location has <strong>{{ counter }} active employee</strong>.
-            Deleting this location will affect scheduling and records.
-        {% plural %}
-            This location has <strong>{{ counter }} active employees</strong>.
-            Deleting this location will affect scheduling and records.
-        {% endblocktrans %}
-    </p>
-</div>
-{% endif %}
-{% endblock %}
-
-{% block delete_consequences %}
-<li>{% trans "The location will be marked as inactive" %}</li>
-<li>{% trans "It will not appear in active location lists" %}</li>
-<li>{% trans "Historical data will be preserved" %}</li>
-<li>{% trans "Employees assigned to this location will keep their records" %}</li>
-<li>{% trans "You can reactivate the location later if needed" %}</li>
-{% endblock %}
-
-{% block cancel_url %}{% url 'employees:location_detail' location.pk %}{% endblock %}
-
-{% block delete_button_text %}{% trans "Yes, Delete Location" %}{% endblock %}

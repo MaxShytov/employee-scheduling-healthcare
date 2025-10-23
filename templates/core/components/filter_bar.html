@@ -43,11 +43,11 @@
             <label class="form-label small text-muted mb-1 d-block">{{ filter.label }}</label>
             <input type="hidden" id="id_{{ filter.name }}" name="{{ filter.name }}" value="{% if filter.value == True %}true{% elif filter.value == False %}false{% endif %}" class="toggle-value-input">
             <div class="btn-group btn-group-sm" role="group" data-toggle-group="{{ filter.name }}">
-              <button type="button" class="btn btn-outline-success toggle-filter-btn {% if filter.value == True %}active{% endif %}" data-value="true">
-                {% trans "Active" %}
+              <button type="button" class="btn btn-outline-{{ filter.true_color }} toggle-filter-btn {% if filter.value == True %}active{% endif %}" data-value="true">
+                {{ filter.true_label }}
               </button>
-              <button type="button" class="btn btn-outline-danger toggle-filter-btn {% if filter.value == False %}active{% endif %}" data-value="false">
-                {% trans "Inactive" %}
+              <button type="button" class="btn btn-outline-{{ filter.false_color }} toggle-filter-btn {% if filter.value == False %}active{% endif %}" data-value="false">
+                {{ filter.false_label }}
               </button>
             </div>
             {% if filter.help_text %}<small class="form-text text-muted d-block mt-1">{{ filter.help_text }}</small>{% endif %}

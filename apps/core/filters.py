@@ -153,9 +153,23 @@ class ChoiceFilter(BaseFilter):
 
 class BooleanFilter(BaseFilter):
     """Filter for boolean/checkbox"""
-    
-    def __init__(self, field_name: str, label: str, as_buttons: bool = False, **kwargs):
-        self.as_buttons = as_buttons  # ← Новый параметр
+
+    def __init__(
+        self,
+        field_name: str,
+        label: str,
+        as_buttons: bool = False,
+        true_label: str = None,
+        false_label: str = None,
+        true_color: str = 'success',
+        false_color: str = 'danger',
+        **kwargs
+    ):
+        self.as_buttons = as_buttons
+        self.true_label = true_label or _('Active')
+        self.false_label = false_label or _('Inactive')
+        self.true_color = true_color
+        self.false_color = false_color
         super().__init__(field_name, label, lookup='exact', **kwargs)
 
     def clean(self, value: Any) -> Optional[bool]:
@@ -178,6 +192,10 @@ class BooleanFilter(BaseFilter):
                 'name': self.filter_name or self.field_name,
                 'label': self.label,
                 'value': self.value,  # None / True / False
+                'true_label': self.true_label,
+                'false_label': self.false_label,
+                'true_color': self.true_color,
+                'false_color': self.false_color,
                 'help_text': self.help_text,
             }
         else:
@@ -329,6 +347,10 @@ class FilterSet:
                 filter_obj.field_name,
                 filter_obj.label,
                 as_buttons=filter_obj.as_buttons,
+                true_label=filter_obj.true_label,
+                false_label=filter_obj.false_label,
+                true_color=filter_obj.true_color,
+                false_color=filter_obj.false_color,
                 **base_kwargs
             )
         

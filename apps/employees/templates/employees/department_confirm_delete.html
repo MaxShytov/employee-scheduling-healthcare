@@ -2,52 +2,11 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% trans "Delete Department" %} - MedShift{% endblock %}
+{% block title %}{% trans "Delete Department" %} - MedShift Scheduler{% endblock %}
 
 {% block dashboard_content %}
-    {# Breadcrumbs #}
-    {% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
+{# Breadcrumbs #}
+{% include "core/components/breadcrumbs.html" with breadcrumb_items=breadcrumb_items %}
 
-    {% if has_blocking_refs %}
-        {# Show blocking message when deletion is not allowed #}
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card border-warning shadow-sm">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0">
-                            <span class="material-icons align-middle me-2" style="font-size: 20px;">warning</span>
-                            {% trans "Cannot Delete Department" %}
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-3">{{ blocking_message }}</p>
-
-                        <div class="alert alert-danger">
-                            <h6 class="alert-heading d-flex align-items-center">
-                                <span class="material-icons me-2" style="font-size: 18px;">error</span>
-                                {% trans "Blocking Issues" %}
-                            </h6>
-                            <ul class="mb-0 mt-2">
-                                {% for ref in blocking_refs %}
-                                    <li>{{ ref.message }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-
-                        <div class="text-muted mb-3">
-                            <small>{% trans "Please reassign or remove the blocking items first." %}</small>
-                        </div>
-
-                        <a href="{{ cancel_url }}" class="btn btn-primary">
-                            <span class="material-icons align-middle me-2" style="font-size: 18px;">arrow_back</span>
-                            {% trans "Back to Department" %}
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% else %}
-        {# Show delete confirmation when deletion is allowed #}
-        {% include "core/components/confirm_delete.html" with cancel_url=cancel_url confirm_text="Delete Department" %}
-    {% endif %}
+{% include "core/components/confirm_delete.html" with has_blocking_refs=has_blocking_refs blocking_refs=blocking_refs blocking_message=blocking_message blocking_title=_("Cannot Delete Department") cancel_url=cancel_url cancel_text=_("Back to Department") confirm_text=_("Delete Department") %}
 {% endblock %}

@@ -193,31 +193,36 @@ class Position(TimeStampedModel):
     Job position/role for employees.
     Examples: Registered Nurse, Doctor, Physician Assistant, etc.
     """
-    
+
+    # English: Core fields
     title = models.CharField(
         _('position title'),
         max_length=100,
-        unique=True
+        unique=True,
+        help_text=_('Full position title')
     )
-    
+
     code = models.CharField(
         _('position code'),
         max_length=20,
         unique=True,
         help_text=_('Short code for the position (e.g., RN, MD, PA)')
     )
-    
+
     description = models.TextField(
         _('description'),
-        blank=True
+        blank=True,
+        help_text=_('Detailed position description')
     )
-    
+
+    # English: Requirements
     requires_certification = models.BooleanField(
         _('requires certification'),
         default=False,
         help_text=_('Does this position require medical certification?')
     )
-    
+
+    # English: Compensation range
     min_hourly_rate = models.DecimalField(
         _('minimum hourly rate (CHF)'),
         max_digits=8,
@@ -225,7 +230,7 @@ class Position(TimeStampedModel):
         validators=[MinValueValidator(Decimal('0.01'))],
         help_text=_('Minimum hourly rate in Swiss Francs')
     )
-    
+
     max_hourly_rate = models.DecimalField(
         _('maximum hourly rate (CHF)'),
         max_digits=8,
@@ -233,24 +238,68 @@ class Position(TimeStampedModel):
         validators=[MinValueValidator(Decimal('0.01'))],
         help_text=_('Maximum hourly rate in Swiss Francs')
     )
-    
+
+    # English: Status
     is_active = models.BooleanField(
         _('is active'),
-        default=True
+        default=True,
+        help_text=_('Whether this position is currently in use')
     )
-    
+
     class Meta:
         verbose_name = _('position')
         verbose_name_plural = _('positions')
         ordering = ['title']
-    
+        indexes = [
+            models.Index(fields=['code']),
+            models.Index(fields=['is_active']),
+        ]
+
     def __str__(self):
         return f"{self.code} - {self.title}"
-    
+
+    # ========================================
+    # Properties
+    # ========================================
+
     @property
     def employee_count(self):
-        """Return number of employees with this position."""
+        """Return total number of employees with this position."""
+        return self.employees.count()
+
+    @property
+    def active_employee_count(self):
+        """Return number of active employees with this position."""
         return self.employees.filter(is_active=True).count()
+
+    @property
+    def inactive_employee_count(self):
+        """Return number of inactive employees with this position."""
+        return self.employees.filter(is_active=False).count()
+
+    @property
+    def rate_range_display(self):
+        """Return formatted hourly rate range."""
+        return f"CHF {self.min_hourly_rate:.2f} - {self.max_hourly_rate:.2f}"
+
+    # ========================================
+    # URL helpers
+    # ========================================
+
+    def get_absolute_url(self):
+        """Return URL for position detail view."""
+        from django.urls import reverse
+        return reverse('employees:position_detail', kwargs={'pk': self.pk})
+
+    def get_edit_url(self):
+        """Return URL for position edit view."""
+        from django.urls import reverse
+        return reverse('employees:position_update', kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        """Return URL for position delete view."""
+        from django.urls import reverse
+        return reverse('employees:position_delete', kwargs={'pk': self.pk})
 
 
 class EmploymentType(models.TextChoices):

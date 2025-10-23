@@ -1,67 +1,131 @@
 {% load i18n %}
 
+{% comment %}
+Component: Confirm Delete
+Description: Universal delete confirmation dialog with support for blocking references
+
+Props:
+  - has_blocking_refs: bool (optional) - Whether deletion is blocked
+  - blocking_refs: list[dict] (optional) - List of blocking references
+  - blocking_message: str (optional) - Message explaining why deletion is blocked
+  - blocking_title: str (optional) - Title for blocked state (e.g., "Cannot Delete Department")
+  - cancel_url: str (required) - URL to return to
+  - cancel_text: str (optional) - Text for cancel/back button
+  - confirm_text: str (optional) - Text for delete button
+  - title: str (optional) - Custom title for confirm dialog
+  - message: str (optional) - Custom message
+  - warning_message: str (optional) - Additional warning
+
+Usage:
+  {% include "core/components/confirm_delete.html" with has_blocking_refs=has_blocking_refs blocking_refs=blocking_refs blocking_message=blocking_message cancel_url=cancel_url confirm_text="Delete Item" %}
+{% endcomment %}
+
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
-        <div class="card border-danger shadow-sm">
-            {# Red header with warning icon #}
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0">
-                    <span class="material-icons align-middle me-2" style="font-size: 20px;">warning</span>
-                    {% trans "Confirm Delete" %}
-                </h5>
-            </div>
-
-            <div class="card-body">
-                {# Object info section #}
-                <div class="alert alert-warning mb-4">
-                    <h6 class="alert-heading d-flex align-items-center">
-                        <span class="material-icons me-2" style="font-size: 18px;">info</span>
-                        {% trans "You are about to delete:" %}
-                    </h6>
+        {% if has_blocking_refs %}
+            {# BLOCKED STATE: Show yellow warning card #}
+            <div class="card border-warning shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <span class="material-icons align-middle me-2" style="font-size: 20px;">warning</span>
+                        {{ blocking_title|default:_("Cannot Delete") }}
+                    </h5>
                 </div>
+                <div class="card-body">
+                    {# Main blocking message #}
+                    <p class="mb-3">{{ blocking_message }}</p>
 
-                {# Explanation section #}
-                <div class="alert alert-info mb-4">
-                    <h6 class="alert-heading d-flex align-items-center">
-                        <span class="material-icons me-2" style="font-size: 18px;">lightbulb</span>
-                        {% trans "What happens when you delete?" %}
-                    </h6>
-                    <ul class="mb-0 mt-2">
-                        <li>{% trans "This item will be permanently removed from the database" %}</li>
-                        <li>{% trans "All associated data will be deleted" %}</li>
-                        <li>{% trans "This action cannot be undone" %}</li>
-                    </ul>
-                </div>
-
-                {% if warning_message %}
-                <div class="alert alert-warning">
-                    <strong>{% trans "Warning" %}:</strong> {{ warning_message|safe }}
-                </div>
-                {% endif %}
-
-                {# Confirmation form #}
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{{ cancel_url }}" class="btn btn-secondary">
-                            <span class="material-icons align-middle me-1" style="font-size: 18px;">close</span>
-                            {% trans "Cancel" %}
-                        </a>
-                        <button type="submit" class="btn btn-danger">
-                            <span class="material-icons align-middle me-1" style="font-size: 18px;">delete</span>
-                            {{ confirm_text|default:"Yes, Delete" }}
-                        </button>
+                    {# Blocking issues list #}
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading d-flex align-items-center">
+                            <span class="material-icons me-2" style="font-size: 18px;">error</span>
+                            {% trans "Blocking Issues" %}
+                        </h6>
+                        <ul class="mb-0 mt-2">
+                            {% for ref in blocking_refs %}
+                                <li>{{ ref.message }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                </form>
-            </div>
-        </div>
 
-        {# Warning notice #}
-        <div class="text-center mt-3">
-            <small class="text-muted">
-                <span class="material-icons align-middle" style="font-size: 16px;">warning</span>
-                {% trans "This action is permanent and cannot be undone." %}
-            </small>
-        </div>
+                    {# Help text #}
+                    <div class="text-muted mb-3">
+                        <small>{% trans "Please reassign or remove the blocking items first." %}</small>
+                    </div>
+
+                    {# Back button #}
+                    <a href="{{ cancel_url }}" class="btn btn-primary">
+                        <span class="material-icons align-middle me-2" style="font-size: 18px;">arrow_back</span>
+                        {{ cancel_text|default:_("Back") }}
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            {# NORMAL STATE: Show red delete confirmation #}
+            <div class="card border-danger shadow-sm">
+                {# Red header with warning icon #}
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <span class="material-icons align-middle me-2" style="font-size: 20px;">warning</span>
+                        {{ title|default:_("Confirm Delete") }}
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    {# Object info section #}
+                    {% if message %}
+                        <div class="alert alert-warning mb-4">
+                            <h6 class="alert-heading d-flex align-items-center">
+                                <span class="material-icons me-2" style="font-size: 18px;">info</span>
+                                {% trans "You are about to delete:" %}
+                            </h6>
+                            <p class="mb-0 mt-2">{{ message|safe }}</p>
+                        </div>
+                    {% endif %}
+
+                    {# Explanation section #}
+                    <div class="alert alert-info mb-4">
+                        <h6 class="alert-heading d-flex align-items-center">
+                            <span class="material-icons me-2" style="font-size: 18px;">lightbulb</span>
+                            {% trans "What happens when you delete?" %}
+                        </h6>
+                        <ul class="mb-0 mt-2">
+                            <li>{% trans "This item will be permanently removed from the database" %}</li>
+                            <li>{% trans "All associated data will be deleted" %}</li>
+                            <li>{% trans "This action cannot be undone" %}</li>
+                        </ul>
+                    </div>
+
+                    {% if warning_message %}
+                    <div class="alert alert-warning">
+                        <strong>{% trans "Warning" %}:</strong> {{ warning_message|safe }}
+                    </div>
+                    {% endif %}
+
+                    {# Confirmation form #}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ cancel_url }}" class="btn btn-secondary">
+                                <span class="material-icons align-middle me-1" style="font-size: 18px;">close</span>
+                                {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <span class="material-icons align-middle me-1" style="font-size: 18px;">delete</span>
+                                {{ confirm_text|default:_("Yes, Delete") }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {# Warning notice #}
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <span class="material-icons align-middle" style="font-size: 16px;">warning</span>
+                    {% trans "This action is permanent and cannot be undone." %}
+                </small>
+            </div>
+        {% endif %}
     </div>
 </div>
