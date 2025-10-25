@@ -83,6 +83,13 @@ class User(AbstractUser):
         return self.email[0].upper()
 
     @property
+    def country_with_flag(self):
+        """Return country name with flag emoji."""
+        if self.country:
+            return f"{self.country.flag} {self.country.name}"
+        return ''
+
+    @property
     def profile_picture_url(self):
         """
         Get profile picture URL safely.

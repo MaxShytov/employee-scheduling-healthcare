@@ -167,6 +167,13 @@ The project uses Redis caching with utility functions:
 - `get_or_set_stats()` - Cache statistics with TTL
 - Cache timeouts defined in CACHE_TIMEOUTS dict in settings
 
+**Statistics and Filters:**
+- Statistics cards on list views (Employee, Department, Position, Location) are dynamically calculated based on active filters
+- The `_produce_stats()` method in each ListView uses the filtered queryset (via `self.filterset.qs`)
+- When filters are applied, statistics reflect only the filtered results
+- Cache keys include params_hash to maintain separate cache entries for different filter combinations
+- This ensures users see accurate counts that match what's displayed in the table
+
 #### Table Rendering System
 Custom table rendering with mixins (e.g., EmployeeTableMixin in apps/employees/mixins.py):
 - `get_employee_table_columns()` - Define column configuration
@@ -254,6 +261,33 @@ Note: Use `'label'` for text in breadcrumbs/actions for consistency.
 - Employee (1) → (N) EmployeeDocument - ForeignKey with CASCADE
 - Department/Location (N) → (0..1) User - Manager relationship (SET_NULL)
 
+### Location Address Format
+Addresses are always displayed in a single line with the following format:
+```
+[Street Address], [Address Line 2], [City] [Postal Code], [State/Province/Canton], [Country Code]
+```
+
+**Examples:**
+- Switzerland: `Avenue de la Gare 12, Lausanne 1003, VD, CH`
+- Canada: `350 Bay Street, Suite 1200, Toronto M5H 2S6, ON, CA`
+- Luxembourg: `12 Rue de la Gare, Luxembourg L-1611, LU` (no state/province)
+
+**Fields:**
+- `address` - Street address (required)
+- `address_line_2` - Apartment, suite, floor, etc. (optional)
+- `city` - City name (required)
+- `postal_code` - Postal/ZIP code (required)
+- `state_province` - Administrative level 1 code: Canton (CH), Province (CA), State (US), etc. (optional)
+- `country` - Country code (required): CH, CA, LU, MC
+
+**Display Rules:**
+- Include `address_line_2` if present
+- Always show `city` with `postal_code`
+- Include `state_province` only if present
+- Always end with `country` code (not full name)
+- Separate components with commas
+- Use country flag emoji separately when needed (not in address string)
+
 ### URL Structure
 - / → Redirects to /accounts/login/
 - /admin/ → Django admin
@@ -294,6 +328,32 @@ Key settings:
 3. Add BreadcrumbMixin and implement get_breadcrumbs()
 4. Add permission_required for all views
 5. Use select_related()/prefetch_related() in get_queryset() to optimize queries
+6. **REQUIRED:** Statistics must recalculate based on active filters - get full queryset BEFORE pagination
+
+**Statistics Pattern (REQUIRED for List Views with stats_cards):**
+Statistics cards must reflect the filtered queryset, not all records. Always follow this pattern:
+
+```python
+def get_context_data(self, **kwargs):
+    """Add statistics and context."""
+    # STEP 1: Get full filtered queryset BEFORE pagination for statistics
+    full_queryset = self.get_queryset()
+
+    # STEP 2: Now call super() which will paginate the queryset
+    context = super().get_context_data(**kwargs)
+
+    # STEP 3: Calculate statistics on full filtered queryset (before pagination)
+    context['stats_cards'] = self.get_statistics(full_queryset)
+
+    # ... rest of context setup
+    return context
+```
+
+**Why this works:**
+- `self.get_queryset()` returns the filtered queryset (FilterMixin already applied filters)
+- Calling it BEFORE `super().get_context_data()` gives us the full queryset before pagination
+- Django querysets are lazy - no extra database queries until statistics are calculated
+- Cache keys include filter params hash, so different filters get different cached stats
 
 **Detail Views (NEW BLOCK SYSTEM):**
 1. Use **detail_layout.html** with atomic component blocks

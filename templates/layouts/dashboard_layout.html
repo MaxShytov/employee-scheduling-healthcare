@@ -18,17 +18,21 @@
                 <span class="material-icons align-middle me-2" style="font-size: 20px;">dashboard</span>
                 Dashboard
             </a>
-            <a href="{% url 'employees:employee_list' %}" class="list-group-item list-group-item-action {% if 'employees' in request.path %}active{% endif %}">
+            <a href="{% url 'employees:employee_list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'employee_list' or request.resolver_match.url_name == 'employee_detail' or request.resolver_match.url_name == 'employee_create' or request.resolver_match.url_name == 'employee_update' %}active{% endif %}">
                 <span class="material-icons align-middle me-2" style="font-size: 20px;">people</span>
                 Employees
             </a>
-            <a href="{% url 'employees:department_list' %}" class="list-group-item list-group-item-action">
+            <a href="{% url 'employees:department_list' %}" class="list-group-item list-group-item-action {% if 'department' in request.resolver_match.url_name %}active{% endif %}">
                 <span class="material-icons align-middle me-2" style="font-size: 20px;">apartment</span>
                 Departments
             </a>
-            <a href="{% url 'employees:position_list' %}" class="list-group-item list-group-item-action">
+            <a href="{% url 'employees:position_list' %}" class="list-group-item list-group-item-action {% if 'position' in request.resolver_match.url_name %}active{% endif %}">
                 <span class="material-icons align-middle me-2" style="font-size: 20px;">work</span>
                 Positions
+            </a>
+            <a href="{% url 'employees:location_list' %}" class="list-group-item list-group-item-action {% if 'location' in request.resolver_match.url_name %}active{% endif %}">
+                <span class="material-icons align-middle me-2" style="font-size: 20px;">location_on</span>
+                Locations
             </a>
             <a href="{% url 'core:help' %}" class="list-group-item list-group-item-action">
                 <span class="material-icons align-middle me-2" style="font-size: 20px;">help</span>

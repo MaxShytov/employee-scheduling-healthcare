@@ -10,7 +10,7 @@ Supported cell types:
   - text: Simple text
   - strong: Bold text
   - avatar: Avatar with name and subtitle (uses avatar_with_info component)
-  - badge: Badge with optional subtitle
+  - badge: Badge with optional name (displayed next to badge) and subtitle (displayed below)
   - badges: Multiple badges
   - status: Boolean status badge
   - currency: Currency value with optional subtitle
@@ -32,6 +32,8 @@ Supported cell types:
             {% else %}
                 {% include "core/components/avatar_with_info.html" with name=cell.name subtitle=cell.subtitle %}
             {% endif %}
+        {% elif cell.type == "icon" %}
+            {% include "core/components/icon_with_info.html" with icon=cell.icon name=cell.name subtitle=cell.subtitle %}
             {% elif cell.type == "badge" %}
                 <div class="d-flex flex-column">
                     <div class="d-flex align-items-center gap-2">
@@ -40,9 +42,9 @@ Supported cell types:
                             {{ cell.text }}
                         </span>
 
-                        {% comment %} English: Optional label next to badge (not muted) {% endcomment %}
-                        {% if cell.label %}
-                            <span class="text-body">{{ cell.label }}</span>
+                        {% comment %} English: Optional name next to badge (not muted) {% endcomment %}
+                        {% if cell.name %}
+                            <span class="text-body">{{ cell.name }}</span>
                         {% endif %}
                     </div>
 

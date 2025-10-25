@@ -9,7 +9,7 @@ Props:
   - label: str (required) - Field label
   - value: str (required) - Field value
   - value_class: str (optional) - Additional classes for value
-  - link: str (optional) - If provided, value becomes a link
+  - link: str (optional) - If provided, value becomes a link (opens in new tab)
   - margin: str (optional) - Margin class (default: 'mb-2')
 
 Usage:
@@ -28,7 +28,7 @@ Usage:
     <div class="flex-grow-1">
         <small class="text-muted d-block">{{ label }}</small>
         {% if link %}
-            <a href="{{ link }}" class="{{ value_class }}">{{ value }}</a>
+            <a href="{{ link }}" class="{{ value_class }}" target="_blank" rel="noopener noreferrer">{{ value }}</a>
         {% else %}
             <span class="{{ value_class }}">{{ value }}</span>
         {% endif %}

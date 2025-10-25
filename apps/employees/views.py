@@ -18,7 +18,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 
 from apps.core.views.base import BaseListView
 from apps.core.views.mixins import FilterMixin, BreadcrumbMixin, ProtectedDeleteMixin
-from apps.employees.filters import DepartmentFilterSet, EmployeeFilterSet, PositionFilterSet
+from apps.employees.filters import DepartmentFilterSet, EmployeeFilterSet, PositionFilterSet, LocationFilterSet
 from apps.employees.mixins import EmployeeTableMixin  # ← Добавьте эту строку
 from .models import Department, Location, Position, Employee, EmployeeDocument
 from .forms import (
@@ -58,12 +58,19 @@ class EmployeeListView(EmployeeTableMixin, FilterMixin, BreadcrumbMixin, LoginRe
         )
         return queryset.order_by('user__first_name', 'user__last_name')
 
-    def _produce_stats(self):
-        # English: Heavy aggregates computed once per TTL
-        total = Employee.objects.count()
-        active = Employee.objects.filter(is_active=True).count()
+    def _produce_stats(self, queryset):
+        """
+        Compute statistics based on filtered queryset.
+        English: Uses the filtered queryset passed as parameter.
+        """
+        # Calculate stats on filtered queryset
+        total = queryset.count()
+        active = queryset.filter(is_active=True).count()
         inactive = total - active
-        dept_count = Department.objects.filter(is_active=True).count()
+
+        # Department count from filtered employees
+        dept_count = queryset.values('department').distinct().count()
+
         return [
             {'title': _('Total Employees'), 'value': total,
              'icon': 'people', 'bg_color': 'primary'},
@@ -75,18 +82,23 @@ class EmployeeListView(EmployeeTableMixin, FilterMixin, BreadcrumbMixin, LoginRe
              'icon': 'business', 'bg_color': 'info'},
         ]
 
-    def get_statistics(self):
+    def get_statistics(self, queryset):
+        """Get statistics with caching based on filtered queryset."""
         params_hash = make_params_hash(self.request.GET)
         key = make_key('stats', 'employees', 'employee_list',
                        'global', params_hash)
-        return get_or_set_stats(key, self._produce_stats)
+        return get_or_set_stats(key, lambda: self._produce_stats(queryset))
 
     def get_context_data(self, **kwargs):
         """Add statistics and context."""
+        # Get full filtered queryset BEFORE pagination for statistics
+        full_queryset = self.get_queryset()
+
+        # Now call super() which will paginate the queryset
         context = super().get_context_data(**kwargs)
 
-        # Statistics cards
-        context['stats_cards'] = self.get_statistics()
+        # Statistics cards based on full filtered queryset (before pagination)
+        context['stats_cards'] = self.get_statistics(full_queryset)
 
         # English: Use mixin for table configuration
         context['table_columns'] = self.get_employee_table_columns()
@@ -493,7 +505,7 @@ class EmployeeDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
                     {'label': _('Date of Birth'), 'value': employee.user.date_of_birth or '—'},
                     {
                         'label': _('Country'),
-                        'value': employee.user.country.name if employee.user.country else '—'
+                        'value': employee.user.country_with_flag or '—'
                     },
                 ]
             },
@@ -733,7 +745,7 @@ class EmployeeDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
                 'tab': 'personal',
                 'fields': [
                     {'label': _('Date of Birth'), 'value': employee.user.date_of_birth or '—', 'col_class': 'col-md-6'},
-                    {'label': _('Country'), 'value': employee.user.country.name if employee.user.country else '—', 'col_class': 'col-md-6'},
+                    {'label': _('Country'), 'value': employee.user.country_with_flag or '—', 'col_class': 'col-md-6'},
                 ]
             })
 
@@ -1061,15 +1073,16 @@ class DepartmentListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, Permi
 
         return queryset.order_by('name')
 
-    def _produce_stats(self):
+    def _produce_stats(self, queryset):
         """
-        Compute heavy statistics for caching.
-        English: Called only when cache misses.
+        Compute statistics based on filtered queryset.
+        English: Uses the filtered queryset passed as parameter.
         """
-        total = Department.objects.count()
-        active = Department.objects.filter(is_active=True).count()
+        # Calculate stats on filtered queryset
+        total = queryset.count()
+        active = queryset.filter(is_active=True).count()
         inactive = total - active
-        with_manager = Department.objects.filter(manager__isnull=False).count()
+        with_manager = queryset.filter(manager__isnull=False).count()
 
         return [
             {
@@ -1098,12 +1111,12 @@ class DepartmentListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, Permi
             },
         ]
 
-    def get_statistics(self):
-        """Get cached statistics for dashboard."""
+    def get_statistics(self, queryset):
+        """Get statistics with caching based on filtered queryset."""
         params_hash = make_params_hash(self.request.GET)
         key = make_key('stats', 'employees', 'department_list',
                        'global', params_hash)
-        return get_or_set_stats(key, self._produce_stats)
+        return get_or_set_stats(key, lambda: self._produce_stats(queryset))
 
     def prepare_table_rows(self, departments):
         """
@@ -1166,6 +1179,10 @@ class DepartmentListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, Permi
 
     def get_context_data(self, **kwargs):
         """Add extra context for template."""
+        # Get full filtered queryset BEFORE pagination for statistics
+        full_queryset = self.get_queryset()
+
+        # Now call super() which will paginate the queryset
         ctx = super().get_context_data(**kwargs)
 
         # English: Page header data
@@ -1184,8 +1201,8 @@ class DepartmentListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, Permi
             }
         ]
 
-        # English: Statistics cards
-        ctx['stats_cards'] = self.get_statistics()
+        # English: Statistics cards based on full filtered queryset (before pagination)
+        ctx['stats_cards'] = self.get_statistics(full_queryset)
 
         # English: Table configuration
         ctx['table_columns'] = [
@@ -1722,15 +1739,16 @@ class PositionListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, Permiss
 
         return queryset.order_by('title')
 
-    def _produce_stats(self):
+    def _produce_stats(self, queryset):
         """
-        Compute heavy statistics for caching.
-        English: Called only when cache misses.
+        Compute statistics based on filtered queryset.
+        English: Uses the filtered queryset passed as parameter.
         """
-        total = Position.objects.count()
-        active = Position.objects.filter(is_active=True).count()
+        # Calculate stats on filtered queryset
+        total = queryset.count()
+        active = queryset.filter(is_active=True).count()
         inactive = total - active
-        requires_cert = Position.objects.filter(requires_certification=True).count()
+        requires_cert = queryset.filter(requires_certification=True).count()
 
         return [
             {
@@ -1759,11 +1777,11 @@ class PositionListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, Permiss
             },
         ]
 
-    def get_statistics(self):
-        """Get cached statistics for dashboard."""
+    def get_statistics(self, queryset):
+        """Get statistics with caching based on filtered queryset."""
         params_hash = make_params_hash(self.request.GET)
         key = make_key('stats', 'employees', 'position_list', 'global', params_hash)
-        return get_or_set_stats(key, self._produce_stats)
+        return get_or_set_stats(key, lambda: self._produce_stats(queryset))
 
     def prepare_table_rows(self, positions):
         """
@@ -1834,6 +1852,10 @@ class PositionListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, Permiss
 
     def get_context_data(self, **kwargs):
         """Add extra context for template."""
+        # Get full filtered queryset BEFORE pagination for statistics
+        full_queryset = self.get_queryset()
+
+        # Now call super() which will paginate the queryset
         ctx = super().get_context_data(**kwargs)
 
         # English: Page header data
@@ -1852,8 +1874,8 @@ class PositionListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, Permiss
             }
         ]
 
-        # English: Statistics cards
-        ctx['stats_cards'] = self.get_statistics()
+        # English: Statistics cards based on full filtered queryset (before pagination)
+        ctx['stats_cards'] = self.get_statistics(full_queryset)
 
         # English: Table configuration
         ctx['table_columns'] = [
@@ -2395,143 +2417,650 @@ def employee_document_delete(request, pk, doc_pk):
 # ============================================
 
 
-class LocationListView(LoginRequiredMixin, ListView):
-    """List all locations with search and filters."""
+class LocationListView(FilterMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, BaseListView):
+    """Display list of locations with filtering and stats."""
 
     model = Location
     template_name = 'employees/location_list.html'
     context_object_name = 'locations'
-    paginate_by = 25
+    permission_required = 'employees.view_location'
+    filterset_class = LocationFilterSet
+
+    def get_breadcrumbs(self):
+        """Breadcrumbs for location list."""
+        return [
+            {'label': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'label': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'label': _('Locations'), 'url': None},
+        ]
 
     def get_queryset(self):
-        # Use emp_count instead of employee_count to avoid conflict with property
-        queryset = Location.objects.annotate(
-            emp_count=Count('employees', filter=Q(employees__is_active=True))
-        ).all()
+        """Optimize query with annotations and relations."""
+        queryset = super().get_queryset()
 
-        # Get filter parameters
-        search = self.request.GET.get('search', '')
-        country = self.request.GET.get('country', '')
-        is_active = self.request.GET.get('is_active', '')
+        # English: Add employee counts via annotation
+        queryset = queryset.annotate(
+            total_employees=Count('employees'),
+            active_employees=Count('employees', filter=Q(employees__is_active=True)),
+            inactive_employees=Count('employees', filter=Q(employees__is_active=False))
+        )
 
-        # Apply search
-        if search:
-            queryset = queryset.filter(
-                Q(name__icontains=search) |
-                Q(city__icontains=search) |
-                Q(address__icontains=search)
-            )
-
-        # Apply filters
-        if country:
-            queryset = queryset.filter(country=country)
-
-        if is_active == 'true':
-            queryset = queryset.filter(is_active=True)
-        elif is_active == 'false':
-            queryset = queryset.filter(is_active=False)
+        # English: Optimize manager lookup
+        queryset = queryset.select_related('manager')
 
         return queryset.order_by('name')
 
+    def _produce_stats(self, queryset):
+        """
+        Compute statistics based on filtered queryset.
+        English: Uses the filtered queryset passed as parameter.
+        """
+        # Calculate stats on filtered queryset
+        total = queryset.count()
+        active = queryset.filter(is_active=True).count()
+        inactive = total - active
+        with_manager = queryset.filter(manager__isnull=False).count()
+
+        return [
+            {
+                'title': _('Total Locations'),
+                'value': total,
+                'icon': 'location_on',
+                'bg_color': 'primary'
+            },
+            {
+                'title': _('Active'),
+                'value': active,
+                'icon': 'check_circle',
+                'bg_color': 'success'
+            },
+            {
+                'title': _('Inactive'),
+                'value': inactive,
+                'icon': 'cancel',
+                'bg_color': 'danger'
+            },
+            {
+                'title': _('With Manager'),
+                'value': with_manager,
+                'icon': 'person',
+                'bg_color': 'info'
+            },
+        ]
+
+    def get_statistics(self, queryset):
+        """Get statistics with caching based on filtered queryset."""
+        params_hash = make_params_hash(self.request.GET)
+        key = make_key('stats', 'employees', 'location_list', 'global', params_hash)
+        return get_or_set_stats(key, lambda: self._produce_stats(queryset))
+
+    def prepare_table_rows(self, locations):
+        """
+        Prepare table rows data for data_table component.
+        English: Convert QuerySet to structured dict with cells for templates.
+        """
+        table_rows = []
+
+        for loc in locations:
+            manager_display = loc.manager.get_full_name() if loc.manager else '—'
+
+            # Build address for badge name: address, address_line_2, postal_code
+            address_parts = []
+            if loc.address:
+                address_parts.append(loc.address)
+            if loc.address_line_2:
+                address_parts.append(loc.address_line_2)
+            if loc.postal_code:
+                address_parts.append(loc.postal_code)
+
+            address_display = ", ".join(address_parts) if address_parts else "—"
+
+            # Build subtitle: state, country
+            subtitle_parts = []
+            if loc.state_province:
+                subtitle_parts.append(loc.state_province)
+            if loc.country:
+                subtitle_parts.append(loc.get_country_display())
+
+            address_subtitle = ", ".join(subtitle_parts) if subtitle_parts else ""
+
+            table_rows.append({
+                'id': loc.id,
+                'cells': [
+                    {
+                        'type': 'badge',
+                        'text': _('Active') if loc.is_active else _('Inactive'),
+                        'color': 'success' if loc.is_active else 'secondary',
+                        'subtitle': loc.code
+                    },
+                    {
+                        'type': 'text',
+                        'value': loc.name,
+                        'subtitle': loc.city,
+                        'class': 'fw-bold'
+                    },
+                    {
+                        'type': 'icon',
+                        'icon': loc.country_flag or '🌍',
+                        'name': address_display,
+                        'subtitle': address_subtitle
+                    },
+                    {
+                        'type': 'text',
+                        'value': manager_display
+                    },
+                    {
+                        'type': 'text',
+                        'value': loc.active_employees,
+                        'class': 'text-center'
+                    },
+                    {
+                        'type': 'text',
+                        'value': loc.total_employees,
+                        'class': 'text-center'
+                    },
+                    {
+                        'type': 'actions',
+                        'actions': [
+                            {
+                                'type': 'link',
+                                'url': loc.get_absolute_url(),
+                                'icon': 'visibility',
+                                'title': _('View'),
+                                'color': 'primary'
+                            },
+                            {
+                                'type': 'link',
+                                'url': loc.get_edit_url(),
+                                'icon': 'edit',
+                                'title': _('Edit'),
+                                'color': 'secondary'
+                            }
+                        ]
+                    }
+                ]
+            })
+
+        return table_rows
+
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['search_form'] = LocationSearchForm(self.request.GET)
-        context['total_locations'] = Location.objects.filter(
-            is_active=True).count()
-        context['page_title'] = _('Locations')
-        return context
+        """Add extra context for template."""
+        # Get full filtered queryset BEFORE pagination for statistics
+        full_queryset = self.get_queryset()
+
+        # Now call super() which will paginate the queryset
+        ctx = super().get_context_data(**kwargs)
+
+        # English: Page header data
+        ctx['page_title'] = _('Locations')
+        ctx['page_subtitle'] = _('Manage clinic and office locations')
+        ctx['create_url'] = reverse('employees:location_create')
+        ctx['back_url'] = reverse('employees:employee_list')
+
+        # English: Header actions
+        ctx['header_actions'] = [
+            {
+                'label': _('Add Location'),
+                'icon': 'add',
+                'href': ctx['create_url'],
+                'style': 'primary'
+            }
+        ]
+
+        # English: Statistics cards based on full filtered queryset (before pagination)
+        ctx['stats_cards'] = self.get_statistics(full_queryset)
+
+        # English: Table configuration
+        ctx['table_columns'] = [
+            {'title': _('Status'), 'width': '10%'},
+            {'title': _('Name'), 'width': '20%'},
+            {'title': _('Address'), 'width': '25%'},
+            {'title': _('Manager'), 'width': '15%'},
+            {'title': _('Active employees'), 'align': 'center', 'width': '10%'},
+            {'title': _('Total employees'), 'align': 'center', 'width': '10%'},
+            {'title': _('Actions'), 'width': '10%'}
+        ]
+        ctx['table_rows'] = self.prepare_table_rows(ctx['locations'])
+
+        # English: Empty state config
+        if ctx.get('has_active_filters'):
+            ctx['empty_state_config'] = {
+                'icon': 'filter_alt_off',
+                'title': _('No locations match your filters'),
+                'message': _('Try adjusting or clearing your filters to see more results'),
+                'button_text': _('Clear Filters'),
+                'button_url': ctx.get('action_url', reverse('employees:location_list'))
+            }
+        else:
+            ctx['empty_state_config'] = {
+                'icon': 'location_on',
+                'title': _('No locations found'),
+                'message': _('Start by adding your first clinic location'),
+                'button_text': _('Add First Location'),
+                'button_url': reverse('employees:location_create')
+            }
+
+        return ctx
 
 
-class LocationDetailView(LoginRequiredMixin, DetailView):
-    """View location details."""
+class LocationDetailView(EmployeeTableMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    """Display location details with employees listing."""
 
     model = Location
     template_name = 'employees/location_detail.html'
     context_object_name = 'location'
+    permission_required = 'employees.view_location'
+
+    def get_breadcrumbs(self):
+        """Breadcrumbs for location detail."""
+        return [
+            {'label': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'label': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'label': _('Locations'), 'url': reverse('employees:location_list')},
+            {'label': self.object.name, 'url': None},
+        ]
+
+    def get_header_actions(self):
+        """Prepare header actions for page_header component."""
+        return [
+            {
+                'label': _('Edit'),
+                'icon': 'edit',
+                'href': self.object.get_edit_url(),
+                'style': 'secondary'
+            },
+            {
+                'label': _('Delete'),
+                'icon': 'delete',
+                'href': self.object.get_delete_url(),
+                'style': 'danger'
+            }
+        ]
+
+    def get_queryset(self):
+        """Optimize query."""
+        return super().get_queryset().select_related('manager').annotate(
+            total_employees=Count('employees'),
+            active_employees=Count('employees', filter=Q(employees__is_active=True))
+        )
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        """Prepare context for detail view."""
+        ctx = super().get_context_data(**kwargs)
+        loc = self.object
 
-        # Get employees at this location
-        context['employees'] = self.object.employees.filter(
-            is_active=True
-        ).select_related('user')
+        # English: Page header
+        ctx['page_title'] = loc.name
+        ctx['page_subtitle'] = _('Location Code: %(code)s') % {'code': loc.code}
+        ctx['header_actions'] = self.get_header_actions()
+        ctx['back_url'] = reverse('employees:location_list')
 
-        # Get recent shifts at this location (if schedules app exists)
-        try:
-            from apps.schedules.models import Shift
-            context['recent_shifts'] = Shift.objects.filter(
-                location=self.object
-            ).select_related('employee__user', 'position').order_by('-start_datetime')[:10]
-        except ImportError:
-            context['recent_shifts'] = None
+        # English: Statistics cards
+        ctx['stats_cards'] = [
+            {
+                'title': _('Total Employees'),
+                'value': loc.employee_count,
+                'icon': 'people',
+                'bg_color': 'primary'
+            },
+            {
+                'title': _('Active Employees'),
+                'value': loc.active_employee_count,
+                'icon': 'check_circle',
+                'bg_color': 'success'
+            },
+            {
+                'title': _('Inactive Employees'),
+                'value': loc.inactive_employee_count,
+                'icon': 'cancel',
+                'bg_color': 'secondary'
+            },
+        ]
 
-        context['page_title'] = self.object.name
-        return context
+        # English: Status badge
+        status_badge = {
+            'text': _('Active') if loc.is_active else _('Inactive'),
+            'class': 'bg-success' if loc.is_active else 'bg-secondary'
+        }
+
+        # English: Sidebar blocks configuration (new component blocks system)
+        sidebar_blocks = [
+            # Location name as text
+            {
+                'type': 'text_line',
+                'text': loc.name,
+                'class': 'h5 fw-bold text-center',
+                'margin': 'mb-1'
+            },
+            {
+                'type': 'text_line',
+                'text': f"{_('Code')}: {loc.code}",
+                'class': 'text-muted text-center',
+                'margin': 'mb-2'
+            },
+        ]
+
+        # Add badge if present
+        if status_badge:
+            sidebar_blocks.append({
+                'type': 'custom',
+                'template': 'core/components/blocks/badge.html',
+                'data': {'badge': status_badge, 'align': 'center'}
+            })
+
+        sidebar_blocks.extend([
+            {'type': 'divider'},
+            # Location section
+            {
+                'type': 'section_header',
+                'icon': 'location_on',
+                'title': _('Location')
+            },
+        ])
+
+        # Build full address in one line: Street, City PostalCode, StateProvince, CountryCode
+        address_parts = []
+
+        # Add street address (line 1 and line 2 if present)
+        if loc.address:
+            street = loc.address
+            if loc.address_line_2:
+                street = f"{street}, {loc.address_line_2}"
+            address_parts.append(street)
+
+        # Add city with postal code
+        if loc.city:
+            city_part = f"{loc.city} {loc.postal_code}" if loc.postal_code else loc.city
+            address_parts.append(city_part)
+
+        # Add state/province if present
+        if loc.state_province:
+            address_parts.append(loc.state_province)
+
+        # Add country code only (no flag in address line)
+        if loc.country:
+            address_parts.append(loc.country)
+
+        if address_parts:
+            full_address = ", ".join(address_parts)
+            sidebar_blocks.append({
+                'type': 'field',
+                'icon': 'place',
+                'label': _('Address'),
+                'value': full_address
+            })
+
+        # Add geolocation if present
+        if loc.latitude and loc.longitude:
+            geo_url = f"https://www.google.com/maps?q={loc.latitude},{loc.longitude}"
+            sidebar_blocks.append({
+                'type': 'field',
+                'icon': 'map',
+                'label': _('Geo'),
+                'value': f"{loc.latitude}, {loc.longitude}",
+                'link': geo_url
+            })
+
+        # Contact section
+        sidebar_blocks.extend([
+            {'type': 'divider'},
+            {
+                'type': 'section_header',
+                'icon': 'contact_phone',
+                'title': _('Contact')
+            },
+        ])
+
+        if loc.phone:
+            sidebar_blocks.append({
+                'type': 'field',
+                'icon': 'phone',
+                'label': _('Phone'),
+                'value': loc.phone
+            })
+
+        if loc.email:
+            sidebar_blocks.append({
+                'type': 'field',
+                'icon': 'email',
+                'label': _('Email'),
+                'value': loc.email
+            })
+
+        # Management section
+        sidebar_blocks.extend([
+            {'type': 'divider'},
+            {
+                'type': 'section_header',
+                'icon': 'person',
+                'title': _('Management')
+            },
+            {
+                'type': 'field',
+                'icon': 'person',
+                'label': _('Manager'),
+                'value': loc.manager.get_full_name() if loc.manager else '—'
+            },
+            {
+                'type': 'field',
+                'icon': 'account_balance_wallet',
+                'label': _('Labor Budget'),
+                'value': f"CHF {loc.labor_budget:,.2f}" if loc.labor_budget else '—'
+            }
+        ])
+
+        # English: Add notes if present
+        if loc.notes:
+            sidebar_blocks.extend([
+                {'type': 'divider'},
+                {
+                    'type': 'section_header',
+                    'icon': 'notes',
+                    'title': _('Additional Notes')
+                },
+                {
+                    'type': 'field',
+                    'icon': 'notes',
+                    'label': _('Notes'),
+                    'value': loc.notes
+                }
+            ])
+
+        ctx['sidebar_blocks'] = sidebar_blocks
+
+        # English: Tabs configuration
+        ctx['tabs'] = [
+            {
+                'id': 'employees',
+                'label': _('Location Employees'),
+                'icon': 'people',
+                'url': f"{self.request.path}?tab=employees",
+                'active': True
+            }
+        ]
+        ctx['active_tab'] = self.request.GET.get('tab', 'employees')
+
+        # English: Employees list (main content - right column)
+        employees = loc.employees.select_related(
+            'user', 'position', 'department'
+        ).order_by('user__first_name', 'user__last_name')
+
+        # English: Content blocks configuration (new component blocks system)
+        content_blocks = [
+            {
+                'type': 'table',
+                'tab': 'employees',  # Belongs to employees tab
+                'columns': self.get_employee_table_columns(exclude=['location', 'id']),
+                'rows': self.prepare_employee_table_rows(employees, exclude_columns=['location', 'id']),
+                'empty_message': _('No employees assigned to this location')
+            }
+        ]
+
+        ctx['content_blocks'] = content_blocks
+
+        return ctx
 
 
-class LocationCreateView(LoginRequiredMixin, CreateView):
+class LocationFormMixin:
+    """Shared create/update form behavior for Location views."""
+
+    model = Location
+    form_class = LocationForm
+    template_name = 'employees/location_form.html'
+
+    def get_page_metadata(self):
+        """Return dict: page_title, page_subtitle, cancel_url, submit_text."""
+        raise NotImplementedError("Implement get_page_metadata()")
+
+    def get_form_sections(self, form):
+        """Return list of sections for component-based rendering."""
+        return [
+            {
+                'title': _('Basic Information'),
+                'icon': 'info',
+                'fields': [
+                    {'field': form['name'], 'col_class': 'col-md-6'},
+                    {
+                        'field': form['code'],
+                        'col_class': 'col-md-6',
+                        'has_toggle': True,
+                        'toggle_field': form['is_active'],
+                    },
+                ]
+            },
+            {
+                'title': _('Address'),
+                'icon': 'location_on',
+                'fields': [
+                    {'field': form['address'], 'col_class': 'col-12'},
+                    {'field': form['address_line_2'], 'col_class': 'col-12'},
+                    {'field': form['city'], 'col_class': 'col-md-4'},
+                    {'field': form['postal_code'], 'col_class': 'col-md-3'},
+                    {'field': form['state_province'], 'col_class': 'col-md-2'},
+                    {'field': form['country'], 'col_class': 'col-md-3'},
+                ]
+            },
+            {
+                'title': _('Contact Information'),
+                'icon': 'contact_phone',
+                'fields': [
+                    {'field': form['phone'], 'col_class': 'col-md-6'},
+                    {'field': form['email'], 'col_class': 'col-md-6'},
+                ]
+            },
+            {
+                'title': _('Management'),
+                'icon': 'admin_panel_settings',
+                'fields': [
+                    {'field': form['manager'], 'col_class': 'col-md-6'},
+                    {'field': form['labor_budget'], 'col_class': 'col-md-6'},
+                ]
+            },
+            {
+                'title': _('Geolocation (Optional)'),
+                'icon': 'map',
+                'fields': [
+                    {'field': form['latitude'], 'col_class': 'col-md-6'},
+                    {'field': form['longitude'], 'col_class': 'col-md-6'},
+                ]
+            },
+            {
+                'title': _('Additional Notes'),
+                'icon': 'notes',
+                'fields': [
+                    {'field': form['notes'], 'col_class': 'col-12'},
+                ]
+            }
+        ]
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        meta = self.get_page_metadata()
+        ctx.update(meta)
+        form = ctx.get('form') or self.get_form()
+        ctx['forms'] = [form]
+        ctx['form_sections'] = self.get_form_sections(form)
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        if 'pk' in kwargs:
+            self.object = self.get_object()
+        else:
+            self.object = None
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
+    def form_valid(self, form):
+        """Default save + success message."""
+        self.object = form.save()
+        messages.success(self.request, _('Location saved successfully.'))
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('Please correct the errors below.'))
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        if getattr(self, 'object', None):
+            return reverse('employees:location_detail', kwargs={'pk': self.object.pk})
+        return reverse('employees:location_list')
+
+
+# ============================================
+# Location Create / Update Views
+# ============================================
+
+class LocationCreateView(LocationFormMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """Create new location."""
 
-    model = Location
-    form_class = LocationForm
-    template_name = 'employees/location_form.html'
+    permission_required = 'employees.add_location'
 
-    def form_valid(self, form):
-        messages.success(
-            self.request,
-            _('Location "{}" has been created successfully.').format(
-                form.instance.name)
-        )
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('employees:location_detail', kwargs={'pk': self.object.pk})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = _('Create New Location')
-        context['form_action'] = _('Create Location')
-        # Breadcrumbs
-        context['breadcrumb_items'] = [
-            {'label': _('Locations'), 'url': reverse(
-                'employees:location_list')},
-            {'label': _('Create')},
+    def get_breadcrumbs(self):
+        """Breadcrumbs for location create."""
+        return [
+            {'label': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'label': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'label': _('Locations'), 'url': reverse('employees:location_list')},
+            {'label': _('Create'), 'url': None},
         ]
-        return context
+
+    def get_page_metadata(self):
+        """Page metadata for create view."""
+        return {
+            'page_title': _('Create Location'),
+            'page_subtitle': _('Add a new location to the organization'),
+            'cancel_url': reverse_lazy('employees:location_list'),
+            'submit_text': _('Create Location'),
+            'show_back': True,
+        }
 
 
-class LocationUpdateView(LoginRequiredMixin, UpdateView):
+class LocationUpdateView(LocationFormMixin, BreadcrumbMixin, LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """Update existing location."""
 
-    model = Location
-    form_class = LocationForm
-    template_name = 'employees/location_form.html'
+    permission_required = 'employees.change_location'
 
-    def form_valid(self, form):
-        messages.success(
-            self.request,
-            _('Location "{}" has been updated successfully.').format(
-                form.instance.name)
-        )
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('employees:location_detail', kwargs={'pk': self.object.pk})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = _(f'Edit {self.object.name}')
-        context['form_action'] = _('Update Location')
-
-        # Breadcrumbs
-        context['breadcrumb_items'] = [
-            {'label': _('Locations'), 'url': reverse(
-                'employees:location_list')},
-            {'label': self.object.name, 'url': self.object.get_absolute_url()},
-            {'label': _('Edit')},
+    def get_breadcrumbs(self):
+        """Breadcrumbs for location update."""
+        return [
+            {'label': _('Dashboard'), 'url': reverse('dashboard:home')},
+            {'label': _('Employees'), 'url': reverse('employees:employee_list')},
+            {'label': _('Locations'), 'url': reverse('employees:location_list')},
+            {'label': self.object.name, 'url': reverse('employees:location_detail', kwargs={'pk': self.object.pk})},
+            {'label': _('Edit'), 'url': None},
         ]
-        return context
+
+    def get_page_metadata(self):
+        """Page metadata for update view."""
+        return {
+            'page_title': _('Edit Location'),
+            'page_subtitle': _('Update location information'),
+            'cancel_url': reverse_lazy('employees:location_detail', kwargs={'pk': self.object.pk}),
+            'submit_text': _('Save Changes'),
+            'show_back': True,
+        }
 
 
 class LocationDeleteView(LoginRequiredMixin, DeleteView):

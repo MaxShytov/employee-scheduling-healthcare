@@ -95,13 +95,16 @@ class Command(BaseCommand):
             '  sophie.bernard@clinique-alpes.ch'))
 
     def create_locations(self):
-        """Create clinic locations in Switzerland."""
+        """Create clinic locations in Switzerland, Canada, Luxembourg, and Monaco."""
         locations_data = [
+            # Switzerland locations
             {
                 'name': 'Clinique des Alpes - Genève',
+                'code': 'GVA',
                 'address': 'Rue du Rhône 45',
                 'city': 'Genève',
                 'postal_code': '1204',
+                'state_province': 'GE',  # Geneva canton
                 'country': 'CH',
                 'phone': '+41 22 123 45 67',
                 'email': 'info@clinique-alpes.ch',
@@ -112,9 +115,11 @@ class Command(BaseCommand):
             },
             {
                 'name': 'Clinique des Alpes - Lausanne',
+                'code': 'LAU',
                 'address': 'Avenue de la Gare 12',
                 'city': 'Lausanne',
                 'postal_code': '1003',
+                'state_province': 'VD',  # Vaud canton
                 'country': 'CH',
                 'phone': '+41 21 987 65 43',
                 'email': 'lausanne@clinique-alpes.ch',
@@ -125,9 +130,11 @@ class Command(BaseCommand):
             },
             {
                 'name': 'Clinique des Alpes - Bern',
+                'code': 'BRN',
                 'address': 'Spitalstrasse 1',
                 'city': 'Bern',
                 'postal_code': '3010',
+                'state_province': 'BE',  # Bern canton
                 'country': 'CH',
                 'phone': '+41 31 456 78 90',
                 'email': 'bern@clinique-alpes.ch',
@@ -136,11 +143,95 @@ class Command(BaseCommand):
                 'longitude': Decimal('7.447396'),
                 'notes': 'Branch office in Bern'
             },
+            # Canada locations - Toronto Dental Clinics
+            {
+                'name': 'Toronto Smile Dental Clinic',
+                'code': 'TOR1',
+                'address': '350 Bay Street, Suite 1200',
+                'city': 'Toronto',
+                'postal_code': 'M5H 2S6',
+                'state_province': 'ON',  # Ontario province
+                'country': 'CA',
+                'phone': '+1 416 555 0101',
+                'email': 'info@torontosmile.ca',
+                'labor_budget': Decimal('120000.00'),
+                'latitude': Decimal('43.651070'),
+                'longitude': Decimal('-79.381786'),
+                'notes': 'Downtown Toronto dental clinic specializing in cosmetic dentistry'
+            },
+            {
+                'name': 'North York Dental Care',
+                'code': 'TOR2',
+                'address': '5650 Yonge Street, Suite 102',
+                'city': 'Toronto',
+                'postal_code': 'M2M 4G3',
+                'state_province': 'ON',  # Ontario province
+                'country': 'CA',
+                'phone': '+1 416 555 0202',
+                'email': 'info@northyorkdental.ca',
+                'labor_budget': Decimal('95000.00'),
+                'latitude': Decimal('43.777111'),
+                'longitude': Decimal('-79.417297'),
+                'notes': 'Family dental practice in North York area'
+            },
+            # Luxembourg - Family Doctor
+            {
+                'name': 'Cabinet Médical Dr. Schneider',
+                'code': 'LUX',
+                'address': '12 Rue de la Gare',
+                'city': 'Luxembourg',
+                'postal_code': 'L-1611',
+                'state_province': '',  # Luxembourg has no states/provinces
+                'country': 'LU',
+                'phone': '+352 26 12 34 56',
+                'email': 'contact@drschneider.lu',
+                'labor_budget': Decimal('80000.00'),
+                'latitude': Decimal('49.611622'),
+                'longitude': Decimal('6.131935'),
+                'notes': 'Family medicine practice in Luxembourg City center'
+            },
+            # Monaco - ENT Specialist
+            {
+                'name': 'Cabinet ORL Dr. Moretti',
+                'code': 'MCO',
+                'address': '7 Avenue Prince Héréditaire Albert',
+                'city': 'Monte-Carlo',
+                'postal_code': '98000',
+                'state_province': '',  # Monaco has no states/provinces
+                'country': 'MC',
+                'phone': '+377 93 50 12 34',
+                'email': 'secretariat@orlmoretti.mc',
+                'labor_budget': Decimal('150000.00'),
+                'latitude': Decimal('43.738418'),
+                'longitude': Decimal('7.424616'),
+                'notes': 'ENT (Ear, Nose, Throat) specialist clinic in Monte-Carlo'
+            },
         ]
+
+        from apps.core.models import Address
 
         locations = []
         for data in locations_data:
-            location = Location.objects.create(**data)
+            # Extract address fields
+            address_data = {
+                'address': data.pop('address'),
+                'address_line_2': data.pop('address_line_2', ''),
+                'city': data.pop('city'),
+                'postal_code': data.pop('postal_code'),
+                'state_province': data.pop('state_province', ''),
+                'country': data.pop('country'),
+                'latitude': data.pop('latitude', None),
+                'longitude': data.pop('longitude', None),
+            }
+
+            # Create Address record
+            address = Address.objects.create(**address_data)
+
+            # Create Location with reference to Address
+            location = Location.objects.create(
+                address_detail=address,
+                **data  # remaining fields (name, code, phone, email, etc.)
+            )
             locations.append(location)
 
         return locations
@@ -403,10 +494,11 @@ class Command(BaseCommand):
                 department = next(
                     d for d in departments if d.name == dept_name)
 
-                # Randomly assign location (70% Geneva, 20% Lausanne, 10% Bern)
+                # Randomly assign location with weighted distribution
+                # Geneva: 40%, Lausanne: 25%, Bern: 20%, Toronto clinics: 10%, Luxembourg: 3%, Monaco: 2%
                 location = random.choices(
                     locations,
-                    weights=[0.7, 0.2, 0.1]
+                    weights=[0.40, 0.25, 0.20, 0.05, 0.05, 0.03, 0.02]
                 )[0]
 
                 # Generate hire date (between 6 months and 10 years ago)

@@ -486,9 +486,12 @@ class LocationForm(forms.ModelForm):
         model = Location
         fields = [
             'name',
+            'code',
             'address',
+            'address_line_2',
             'city',
             'postal_code',
+            'state_province',
             'country',
             'phone',
             'email',
@@ -504,9 +507,17 @@ class LocationForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': _('e.g., Toronto Clinic #1')
             }),
+            'code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('e.g., TOR1, GVA, LAU')
+            }),
             'address': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': _('Street address')
+            }),
+            'address_line_2': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('Apartment, suite, unit, floor (optional)')
             }),
             'city': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -515,6 +526,10 @@ class LocationForm(forms.ModelForm):
             'postal_code': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': _('Postal/ZIP code')
+            }),
+            'state_province': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('State/Province/Canton code (e.g., VD, QC, NY)')
             }),
             'country': forms.Select(attrs={
                 'class': 'form-select'
@@ -566,6 +581,60 @@ class LocationForm(forms.ModelForm):
         self.fields['latitude'].required = False
         self.fields['longitude'].required = False
         self.fields['notes'].required = False
+
+        # If editing existing location with address_detail, populate address fields from it
+        if self.instance and self.instance.pk and self.instance.address_detail:
+            addr = self.instance.address_detail
+            self.initial['address'] = addr.address
+            self.initial['address_line_2'] = addr.address_line_2
+            self.initial['city'] = addr.city
+            self.initial['postal_code'] = addr.postal_code
+            self.initial['state_province'] = addr.state_province
+            self.initial['country'] = addr.country
+            self.initial['latitude'] = addr.latitude
+            self.initial['longitude'] = addr.longitude
+
+    def save(self, commit=True):
+        """
+        Save Location and automatically create/update Address record.
+        This maintains backward compatibility with the old address fields.
+        """
+        from apps.core.models import Address
+
+        location = super().save(commit=False)
+
+        # Create or update Address record from form data
+        if location.address_detail_id:
+            # Update existing address
+            address = location.address_detail
+            address.address = self.cleaned_data.get('address', '')
+            address.address_line_2 = self.cleaned_data.get('address_line_2', '')
+            address.city = self.cleaned_data.get('city', '')
+            address.postal_code = self.cleaned_data.get('postal_code', '')
+            address.state_province = self.cleaned_data.get('state_province', '')
+            address.country = self.cleaned_data.get('country', 'CH')
+            address.latitude = self.cleaned_data.get('latitude')
+            address.longitude = self.cleaned_data.get('longitude')
+            if commit:
+                address.save()
+        else:
+            # Create new address
+            address = Address.objects.create(
+                address=self.cleaned_data.get('address', ''),
+                address_line_2=self.cleaned_data.get('address_line_2', ''),
+                city=self.cleaned_data.get('city', ''),
+                postal_code=self.cleaned_data.get('postal_code', ''),
+                state_province=self.cleaned_data.get('state_province', ''),
+                country=self.cleaned_data.get('country', 'CH'),
+                latitude=self.cleaned_data.get('latitude'),
+                longitude=self.cleaned_data.get('longitude'),
+            )
+            location.address_detail = address
+
+        if commit:
+            location.save()
+
+        return location
 
 
 class LocationSearchForm(forms.Form):

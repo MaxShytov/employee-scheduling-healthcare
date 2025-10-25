@@ -99,7 +99,7 @@ class EmployeeTableMixin:
                     'name': employee.department.name if employee.department else None,
                     'subtitle': employee.location.name if employee.location else None
                 }
-            
+
             # Position cell
             if 'position' not in exclude_columns:
                 cells_dict['position'] = {

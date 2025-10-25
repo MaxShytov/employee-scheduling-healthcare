@@ -150,5 +150,75 @@ class DepartmentFilterSet(FilterSet):
                 queryset = queryset.filter(manager__isnull=False)
             elif has_manager_filter.value == 'no':
                 queryset = queryset.filter(manager__isnull=True)
-        
+
+        return queryset
+
+
+class LocationFilterSet(FilterSet):
+    """Filters for Location list"""
+
+    is_active = BooleanFilter(
+        field_name='is_active',
+        label=_('Status'),
+        as_buttons=True
+    )
+
+    search = TextFilter(
+        field_name='name',
+        label=_('Search'),
+        placeholder=_('Search by name, city, or address...'),
+        search_fields=['name', 'code', 'city', 'address']
+    )
+
+    country = ChoiceFilter(
+        field_name='country',
+        label=_('Country'),
+        choices=[
+            ('', _('All Countries')),
+            ('CH', _('Switzerland')),
+            ('CA', _('Canada')),
+            ('LU', _('Luxembourg')),
+            ('MC', _('Monaco'))
+        ],
+        empty_label=None
+    )
+
+    has_manager = ChoiceFilter(
+        field_name='manager',
+        label=_('Manager'),
+        choices=[
+            ('', _('All')),
+            ('yes', _('Has Manager')),
+            ('no', _('No Manager'))
+        ],
+        empty_label=None,
+        lookup='isnull'
+    )
+
+    def apply_filters(self, queryset):
+        """
+        Apply filters to queryset.
+        English: Override to handle special 'has_manager' filter logic.
+        """
+        # English: First apply standard filters from parent
+        for name, filter_obj in self.filters.items():
+            # Skip has_manager, we'll handle it separately
+            if name == 'has_manager':
+                continue
+
+            filter_kwargs = filter_obj.get_filter_kwargs()
+            if filter_kwargs:
+                if '__q' in filter_kwargs:
+                    queryset = queryset.filter(filter_kwargs['__q'])
+                else:
+                    queryset = queryset.filter(**filter_kwargs)
+
+        # English: Handle has_manager special logic
+        has_manager_filter = self.filters.get('has_manager')
+        if has_manager_filter and has_manager_filter.value:
+            if has_manager_filter.value == 'yes':
+                queryset = queryset.filter(manager__isnull=False)
+            elif has_manager_filter.value == 'no':
+                queryset = queryset.filter(manager__isnull=True)
+
         return queryset

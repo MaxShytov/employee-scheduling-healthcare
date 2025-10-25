@@ -1,107 +1,27 @@
-{% extends 'core/layouts/list_page.html' %}
+{% extends "layouts/dashboard_layout.html" %}
+{% load static %}
 {% load i18n %}
-{% load ui_components %}
 
-{% block page_title %}{% trans "Locations" %}{% endblock %}
-{% block page_subtitle %}{% trans "Manage clinic and office locations" %}{% endblock %}
+{% block title %}{% trans "Locations" %} - MedShift{% endblock %}
 
-{% block page_actions %}
-<a href="{% url 'employees:location_create' %}" class="btn btn-primary">
-    <span class="material-icons" style="font-size: 16px; vertical-align: middle;">add</span>
-    {% trans "Add Location" %}
-</a>
-{% endblock %}
+{% block dashboard_content %}
 
-{% block stats %}
-<div class="row mb-4">
-    <div class="col-md-4">
-        {% stat_card title='Total Locations' value=total_locations icon='business' color='primary' %}
-    </div>
-</div>
-{% endblock %}
+    {# Statistics Cards #}
+    {% if stats_cards %}
+        {% include "core/components/stats_row.html" with stats_cards=stats_cards %}
+    {% endif %}
 
-{% block filters %}
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="get" class="row g-3">
-            <div class="col-md-5">
-                {{ search_form.search }}
-            </div>
-            <div class="col-md-3">
-                {{ search_form.country }}
-            </div>
-            <div class="col-md-2">
-                {{ search_form.is_active }}
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-outline-primary w-100">
-                    <span class="material-icons" style="font-size: 16px; vertical-align: middle;">search</span>
-                    {% trans "Search" %}
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-{% endblock %}
+    {# Filters #}
+    {% if filters %}
+        {% include "core/components/filter_bar.html" with filters=filters has_active=has_active_filters %}
+    {% endif %}
 
-{% block table_content %}
-{% if page_obj %}
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>{% trans "Name" %}</th>
-                    <th>{% trans "City" %}</th>
-                    <th>{% trans "Country" %}</th>
-                    <th>{% trans "Manager" %}</th>
-                    <th class="text-center">{% trans "Employees" %}</th>
-                    <th class="text-center">{% trans "Status" %}</th>
-                    <th class="text-end">{% trans "Actions" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for location in page_obj %}
-                <tr>
-                    <td>
-                        <strong>{{ location.name }}</strong><br>
-                        <small class="text-muted">{{ location.address }}</small>
-                    </td>
-                    <td>{{ location.city }}</td>
-                    <td>
-                        {% if location.country == 'CA' %}
-                            {% icon 'flag' size=18 %} {% trans "Canada" %}
-                        {% elif location.country == 'CH' %}
-                            {% icon 'flag' size=18 %} {% trans "Switzerland" %}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if location.manager %}
-                            {{ location.manager.get_full_name }}
-                        {% else %}
-                            <span class="text-muted">—</span>
-                        {% endif %}
-                    </td>
-                    <td class="text-center">
-                        {% badge location.emp_count color='primary' pill=True %}
-                    </td>
-                    <td class="text-center">
-                        {% status_badge location.is_active %}
-                    </td>
-                    <td class="text-end">
-                        {% action_buttons obj=location %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% else %}
-    {% empty_state 
-        icon='business' 
-        title='No locations found' 
-        message='Create your first clinic location to get started'
-        button_text='Add Location'
-        button_url=create_url
-    %}
-{% endif %}
-{% endblock %}
+    {# Location Table #}
+    {% include "core/components/data_table.html" with columns=table_columns rows=table_rows empty_state=empty_state_config %}
+
+    {# Pagination #}
+    {% if is_paginated %}
+        {% include "core/components/pagination.html" with page_obj=page_obj querydict=request.GET %}
+    {% endif %}
+
+{% endblock dashboard_content %}
