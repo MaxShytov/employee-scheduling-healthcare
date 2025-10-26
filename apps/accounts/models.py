@@ -84,9 +84,9 @@ class User(AbstractUser):
 
     @property
     def country_with_flag(self):
-        """Return country name with flag emoji."""
+        """Return country name only (without flag path)."""
         if self.country:
-            return f"{self.country.flag} {self.country.name}"
+            return self.country.name
         return ''
 
     @property

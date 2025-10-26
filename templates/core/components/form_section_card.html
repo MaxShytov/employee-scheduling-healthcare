@@ -34,8 +34,10 @@ Usage:
                     {# Field with toggle buttons (e.g., Employee ID with Active/Inactive) #}
                     {% include "core/components/form_field_with_toggle.html" with field=field_config.field toggle_field=field_config.toggle_field col_class=field_config.col_class|default:'col-12' %}
                 {% elif field_config.is_image %}
-                    {# Image upload field #}
-                    {% include "core/components/profile_picture_field.html" with field=field_config.field current_image_url=field_config.current_image_url col_class=field_config.col_class|default:'col-12' help_text=field_config.help_text %}
+                    {# Image upload field with preview - uses custom_image_input component #}
+                    <div class="{{ field_config.col_class|default:'col-12' }}">
+                        {% include "core/components/custom_image_input.html" with field=field_config.field current_image_url=field_config.current_image_url upload_url=field_config.upload_url ajax_delete_url=field_config.ajax_delete_url %}
+                    </div>
                 {% else %}
                     {# Regular form field #}
                     {% include "core/components/form_field.html" with field=field_config.field col_class=field_config.col_class|default:'col-12' help_text=field_config.help_text %}

@@ -10,12 +10,13 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('apps.accounts.urls')), 
+    path('i18n/', include('django.conf.urls.i18n')),  # Language switching
+    path('accounts/', include('apps.accounts.urls')),
     path('dashboard/', include('apps.dashboard.urls')),
     path('employees/', include('apps.employees.urls')),
     path('help/', include('apps.core.urls')),
     path('', RedirectView.as_view(url='/accounts/login/', permanent=False)),
-    
+
 ]
 
 # Serve media files in development

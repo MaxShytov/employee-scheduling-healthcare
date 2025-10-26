@@ -1,0 +1,334 @@
+{% load i18n %}
+{% comment %}
+Component: Custom File Input with Translatable Labels (Universal Atomic Component)
+Description: Universal file upload component that replaces browser-default buttons with translatable ones
+
+Features:
+- Translatable button text ("Choose file" → "Choisir un fichier", "Choose another file" → "Choisir un autre fichier")
+- Shows current file as clickable link (if exists)
+- Shows newly selected file name in highlighted box
+- Optional image preview for profile pictures/avatars
+- Optional delete button for existing files
+- Custom help text support
+- File type filtering
+- Works for any file type: documents, images, PDFs, etc.
+
+UX Behavior:
+- No file: Shows "No file chosen" + "Choose file" button
+- File exists: Shows file name as link + "Choose another file" button + optional "Delete file" button
+- File selected: Shows new file name in blue alert box + "Choose another file" button
+
+Props:
+  - field: form field (required) - Django form FileField/ImageField
+  - col_class: str (optional, default='col-12') - Column CSS class
+  - help_text: str (optional) - Custom help text
+  - button_text: str (optional) - Custom button text (auto-changes based on file state)
+  - no_file_text: str (optional) - Text when no file selected (default: "No file chosen")
+  - accept: str (optional) - File type filter (e.g., "image/*", ".pdf,.docx")
+  - current_image_url: str (optional) - URL of current image (shows preview for images)
+  - current_file_url: str (optional) - URL of current file (shows as clickable link)
+  - current_file_name: str (optional) - Name of current file to display
+  - delete_url: str (optional) - URL for delete action (shows "Delete file" button)
+  - upload_url: str (optional) - AJAX URL for instant upload (if not provided, works as normal form field)
+  - ajax_delete_url: str (optional) - AJAX URL for instant deletion
+  - object_pk: int (optional) - Object ID for AJAX operations
+  - hide_label: bool (optional) - Hide field label
+  - hide_no_file_message: bool (optional) - Hide "No file chosen" message
+
+Usage Examples:
+  {# For new document upload (no existing file) #}
+  {% include "core/components/custom_file_input.html" with field=form.file help_text=_("Accepted formats: PDF, DOCX") accept=".pdf,.docx" %}
+
+  {# For existing document with edit/delete #}
+  {% include "core/components/custom_file_input.html" with field=form.file current_file_url=document.file.url current_file_name=document.title delete_url=delete_url accept=".pdf,.docx" %}
+
+  {# For profile picture with preview #}
+  {% include "core/components/custom_file_input.html" with field=form.profile_picture current_image_url=user.profile_picture.url current_file_url=user.profile_picture.url accept="image/*" %}
+{% endcomment %}
+
+<div class="{{ col_class|default:'col-12' }} mb-3">
+    {% if not hide_label %}
+    <label for="{{ field.id_for_label }}" class="form-label">
+        {{ field.label }}
+        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+    {% endif %}
+
+    {% comment %} Show current image preview if exists (for profile pictures, avatars) {% endcomment %}
+    {% if current_image_url %}
+    <div class="mb-2">
+        <img src="{{ current_image_url }}"
+             class="rounded-circle"
+             style="width: 80px; height: 80px; object-fit: cover;"
+             alt="{% trans 'Current photo' %}">
+        <p class="text-muted small mt-1">{% trans "Current photo" %}</p>
+    </div>
+    {% endif %}
+
+    <div class="custom-file-input-wrapper">
+        {# Hidden native file input #}
+        <input type="file"
+               class="d-none"
+               name="{{ field.name }}"
+               id="{{ field.id_for_label }}"
+               {% if accept %}accept="{{ accept }}"{% endif %}
+               {% if field.field.required %}required{% endif %}>
+
+        {# Show current file info or placeholder #}
+        <div class="mb-2" id="{{ field.id_for_label }}_file_info">
+            {% if current_file_url %}
+                {# File exists - show as link #}
+                <div class="d-flex align-items-center">
+                    <span class="material-icons text-primary me-2" style="font-size: 20px;">description</span>
+                    <a href="{{ current_file_url }}" target="_blank" class="text-decoration-none">
+                        {{ current_file_name|default:_("Current file") }}
+                    </a>
+                </div>
+            {% elif not hide_no_file_message %}
+                {# No file - show placeholder #}
+                <span class="text-muted" id="{{ field.id_for_label }}_no_file">
+                    <span class="material-icons align-middle me-1" style="font-size: 18px;">info</span>
+                    {{ no_file_text|default:_("No file chosen") }}
+                </span>
+            {% endif %}
+        </div>
+
+        {# New file selection display (shown after user selects a file) #}
+        <div class="alert alert-info mb-2 d-none" id="{{ field.id_for_label }}_new_file" role="alert">
+            <div class="d-flex align-items-center">
+                <span class="material-icons text-primary me-2" style="font-size: 20px;">attach_file</span>
+                <span id="{{ field.id_for_label }}_new_file_name"></span>
+            </div>
+        </div>
+
+        {# Action buttons #}
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <button class="btn btn-outline-primary"
+                    type="button"
+                    id="{{ field.id_for_label }}_btn"
+                    onclick="document.getElementById('{{ field.id_for_label }}').click()">
+                <span class="material-icons align-middle me-1" style="font-size: 18px;">upload</span>
+                {% if current_file_url %}
+                    {{ button_text|default:_("Choose another file") }}
+                {% else %}
+                    {{ button_text|default:_("Choose file") }}
+                {% endif %}
+            </button>
+
+            {% if current_file_url %}
+                {# Delete button - AJAX or form-based depending on ajax_delete_url #}
+                <button class="btn btn-outline-danger"
+                        type="button"
+                        id="{{ field.id_for_label }}_delete_btn"
+                        {% if ajax_delete_url %}
+                        onclick="deleteFileAjax_{{ field.id_for_label }}()"
+                        {% endif %}>
+                    <span class="material-icons align-middle me-1" style="font-size: 18px;">delete</span>
+                    {% trans "Delete file" %}
+                </button>
+
+                {% if not ajax_delete_url %}
+                    {# Fallback: hidden checkbox for Django ClearableFileInput #}
+                    <input type="checkbox" name="{{ field.name }}-clear" id="{{ field.id_for_label }}-clear" class="d-none">
+                {% endif %}
+            {% endif %}
+
+            {# Loading spinner (hidden by default) #}
+            <div class="spinner-border spinner-border-sm text-primary d-none" id="{{ field.id_for_label }}_spinner" role="status">
+                <span class="visually-hidden">{% trans "Loading..." %}</span>
+            </div>
+        </div>
+    </div>
+
+    {# Help text #}
+    {% if help_text or field.help_text %}
+    <small class="form-text text-muted d-block mt-1">
+        {{ help_text|default:field.help_text }}
+    </small>
+    {% endif %}
+
+    {# Field errors #}
+    {% if field.errors %}
+        <div class="invalid-feedback d-block">{{ field.errors.0 }}</div>
+    {% endif %}
+</div>
+
+<script>
+// File upload component with AJAX support
+(function() {
+    const fileInput = document.getElementById('{{ field.id_for_label }}');
+    const newFileDisplay = document.getElementById('{{ field.id_for_label }}_new_file');
+    const newFileNameSpan = document.getElementById('{{ field.id_for_label }}_new_file_name');
+    const noFileSpan = document.getElementById('{{ field.id_for_label }}_no_file');
+    const fileInfoDiv = document.getElementById('{{ field.id_for_label }}_file_info');
+    const spinner = document.getElementById('{{ field.id_for_label }}_spinner');
+    const uploadBtn = document.getElementById('{{ field.id_for_label }}_btn');
+    const deleteBtn = document.getElementById('{{ field.id_for_label }}_delete_btn');
+
+    {% if upload_url %}
+    // AJAX upload mode
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            const fileName = file.name;
+
+            // Show loading state
+            spinner.classList.remove('d-none');
+            uploadBtn.disabled = true;
+
+            // Create FormData
+            const formData = new FormData();
+            formData.append('profile_picture', file);
+
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Upload via AJAX
+            fetch('{{ upload_url }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI with new file info
+                    const imageUrl = data.image_url;
+                    const displayName = data.file_name || fileName;
+
+                    // Update file info display
+                    fileInfoDiv.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <span class="material-icons text-primary me-2" style="font-size: 20px;">description</span>
+                            <a href="${imageUrl}" target="_blank" class="text-decoration-none">${displayName}</a>
+                        </div>
+                    `;
+
+                    // Update image preview if exists
+                    {% if current_image_url %}
+                    const imgPreview = fileInfoDiv.previousElementSibling.querySelector('img');
+                    if (imgPreview) {
+                        imgPreview.src = imageUrl;
+                    }
+                    {% endif %}
+
+                    // Update button text
+                    uploadBtn.innerHTML = '<span class="material-icons align-middle me-1" style="font-size: 18px;">upload</span> {% trans "Choose another file" %}';
+
+                    // Show delete button if not visible
+                    if (deleteBtn) {
+                        deleteBtn.classList.remove('d-none');
+                    }
+
+                    // Show success message
+                    showMessage('success', data.message);
+
+                    // Reload page after short delay to refresh all data
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showMessage('error', data.error);
+                }
+            })
+            .catch(error => {
+                showMessage('error', '{% trans "Error uploading file" %}');
+                console.error('Upload error:', error);
+            })
+            .finally(() => {
+                spinner.classList.add('d-none');
+                uploadBtn.disabled = false;
+                // Clear file input
+                fileInput.value = '';
+            });
+        }
+    });
+    {% else %}
+    // Normal form mode - replace current file display
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            const fileName = e.target.files[0].name;
+
+            // Replace current file info with new file
+            fileInfoDiv.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <span class="material-icons text-primary me-2" style="font-size: 20px;">attach_file</span>
+                    <span class="fw-medium">${fileName}</span>
+                    <small class="text-muted ms-2">({% trans "new file selected" %})</small>
+                </div>
+            `;
+
+            // Update button text to "Change" if there was a file
+            {% if current_file_url %}
+            uploadBtn.innerHTML = '<span class="material-icons align-middle me-1" style="font-size: 18px;">upload</span> {{ button_text|default:_("Change") }}';
+            {% endif %}
+        }
+    });
+    {% endif %}
+
+    {% if ajax_delete_url %}
+    // AJAX delete function
+    window.deleteFileAjax_{{ field.id_for_label }} = function() {
+        if (!confirm('{% trans "Are you sure you want to delete this file?" %}')) {
+            return;
+        }
+
+        // Show loading state
+        spinner.classList.remove('d-none');
+        deleteBtn.disabled = true;
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Delete via AJAX
+        fetch('{{ ajax_delete_url }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('success', data.message);
+                // Reload page after short delay
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showMessage('error', data.error);
+                spinner.classList.add('d-none');
+                deleteBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            showMessage('error', '{% trans "Error deleting file" %}');
+            console.error('Delete error:', error);
+            spinner.classList.add('d-none');
+            deleteBtn.disabled = false;
+        });
+    };
+    {% endif %}
+
+    // Helper function to show messages
+    function showMessage(type, message) {
+        // Use Django messages framework style
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+
+        // Find or create messages container
+        let messagesContainer = document.querySelector('.messages');
+        if (!messagesContainer) {
+            messagesContainer = document.createElement('div');
+            messagesContainer.className = 'messages';
+            document.querySelector('.container, .container-fluid').prepend(messagesContainer);
+        }
+
+        messagesContainer.insertAdjacentHTML('beforeend', alertHtml);
+    }
+})();
+</script>

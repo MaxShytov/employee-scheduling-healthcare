@@ -13,11 +13,11 @@
     {% endif %}
     
     <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
-        {{ cancel_text|default:"Cancel" }}
+        {% if cancel_text %}{{ cancel_text }}{% else %}{% trans "Cancel" %}{% endif %}
     </a>
-    
+
     <button type="submit" class="btn btn-primary">
         <span class="material-icons align-middle me-2" style="font-size: 18px;">{{ submit_icon|default:"save" }}</span>
-        {{ submit_text|default:"Save" }}
+        {% if submit_text %}{{ submit_text }}{% else %}{% trans "Save" %}{% endif %}
     </button>
 </div>

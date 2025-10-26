@@ -1,0 +1,238 @@
+{% load i18n %}
+{% load static %}
+
+{% comment %}
+Custom Image Input Component - Специальный компонент для работы с изображениями профиля
+
+Props:
+   - field: Django form field (ImageField)
+   - current_image_url: URL текущего изображения (optional)
+   - upload_url: AJAX URL для загрузки (optional)
+   - ajax_delete_url: AJAX URL для удаления (optional)
+{% endcomment %}
+
+<div class="mb-3">
+    {# Label #}
+    {% if field.label %}
+        <label class="form-label fw-medium">
+            {{ field.label }}
+            {% if field.field.required %}
+                <span class="text-danger">*</span>
+            {% endif %}
+        </label>
+    {% endif %}
+
+    {# Image Preview #}
+    {% if current_image_url %}
+        <div class="mb-3">
+            <img src="{{ current_image_url }}"
+                 alt="{% trans 'Current photo' %}"
+                 class="rounded border"
+                 style="max-width: 200px; max-height: 200px; object-fit: cover;"
+                 id="image-preview-{{ field.id_for_label }}">
+        </div>
+    {% else %}
+        <div class="mb-3" id="image-preview-container-{{ field.id_for_label }}" style="display: none;">
+            <img src=""
+                 alt="{% trans 'Image preview' %}"
+                 class="rounded border"
+                 style="max-width: 200px; max-height: 200px; object-fit: cover;"
+                 id="image-preview-{{ field.id_for_label }}">
+        </div>
+    {% endif %}
+
+    {# Hidden file input #}
+    <input type="file"
+           name="{{ field.name }}"
+           id="{{ field.id_for_label }}"
+           accept="image/*"
+           style="display: none;"
+           {% if field.field.required and not current_image_url %}required{% endif %}>
+
+    {# Action Buttons #}
+    <div class="d-flex gap-2 align-items-center">
+        {# Upload/Change Image Button #}
+        <button type="button"
+                class="btn btn-primary btn-sm"
+                id="upload-btn-{{ field.id_for_label }}"
+                onclick="document.getElementById('{{ field.id_for_label }}').click()">
+            <span class="material-icons" style="font-size: 18px; vertical-align: middle;">upload</span>
+            {% if current_image_url %}
+                {% trans "Change Image" %}
+            {% else %}
+                {% trans "Upload Image" %}
+            {% endif %}
+        </button>
+
+        {# Delete Button - только если есть изображение #}
+        {% if current_image_url %}
+            <button type="button"
+                    class="btn btn-outline-danger btn-sm"
+                    id="delete-btn-{{ field.id_for_label }}">
+                <span class="material-icons" style="font-size: 18px; vertical-align: middle;">delete</span>
+                {% trans "Delete image" %}
+            </button>
+        {% endif %}
+
+        {# Preview Button - только если есть изображение #}
+        {% if current_image_url %}
+            <a href="{{ current_image_url }}"
+               target="_blank"
+               class="btn btn-outline-secondary btn-sm"
+               id="preview-btn-{{ field.id_for_label }}">
+                <span class="material-icons" style="font-size: 18px; vertical-align: middle;">visibility</span>
+                {% trans "Preview" %}
+            </a>
+        {% endif %}
+
+        {# Loading spinner #}
+        <div class="spinner-border spinner-border-sm text-primary"
+             role="status"
+             id="loading-{{ field.id_for_label }}"
+             style="display: none;">
+            <span class="visually-hidden">{% trans "Loading..." %}</span>
+        </div>
+    </div>
+
+    {# Help text #}
+    {% if field.help_text %}
+        <div class="form-text mt-2">{{ field.help_text }}</div>
+    {% endif %}
+
+    {# Errors #}
+    {% if field.errors %}
+        <div class="invalid-feedback d-block">
+            {{ field.errors }}
+        </div>
+    {% endif %}
+</div>
+
+{# AJAX functionality if upload_url provided #}
+{% if upload_url %}
+<script>
+(function() {
+    const fileInput = document.getElementById('{{ field.id_for_label }}');
+    const uploadBtn = document.getElementById('upload-btn-{{ field.id_for_label }}');
+    const deleteBtn = document.getElementById('delete-btn-{{ field.id_for_label }}');
+    const previewBtn = document.getElementById('preview-btn-{{ field.id_for_label }}');
+    const imagePreview = document.getElementById('image-preview-{{ field.id_for_label }}');
+    const imagePreviewContainer = document.getElementById('image-preview-container-{{ field.id_for_label }}');
+    const loadingSpinner = document.getElementById('loading-{{ field.id_for_label }}');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+    // File selection handler - instant upload
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('{% trans "Please select an image file" %}');
+            return;
+        }
+
+        // Show loading spinner
+        loadingSpinner.style.display = 'inline-block';
+        uploadBtn.disabled = true;
+
+        // Prepare form data
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+
+        // Upload via AJAX
+        fetch('{{ upload_url }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingSpinner.style.display = 'none';
+            uploadBtn.disabled = false;
+
+            if (data.success) {
+                // Show success message
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'alert alert-success alert-dismissible fade show mt-2';
+                messageDiv.innerHTML = `
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                fileInput.parentElement.appendChild(messageDiv);
+
+                // Reload page after 1 second to show updated image everywhere
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                // Show error message
+                alert('{% trans "Error uploading file" %}: ' + (data.error || '{% trans "Unknown error" %}'));
+            }
+        })
+        .catch(error => {
+            loadingSpinner.style.display = 'none';
+            uploadBtn.disabled = false;
+            console.error('Upload error:', error);
+            alert('{% trans "Error uploading file" %}');
+        });
+    });
+
+    // Delete button handler
+    {% if ajax_delete_url %}
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            if (!confirm('{% trans "Are you sure you want to delete this image?" %}')) {
+                return;
+            }
+
+            // Show loading spinner
+            loadingSpinner.style.display = 'inline-block';
+            deleteBtn.disabled = true;
+            uploadBtn.disabled = true;
+
+            // Delete via AJAX
+            fetch('{{ ajax_delete_url }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingSpinner.style.display = 'none';
+
+                if (data.success) {
+                    // Show success message
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'alert alert-success alert-dismissible fade show mt-2';
+                    messageDiv.innerHTML = `
+                        ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    fileInput.parentElement.appendChild(messageDiv);
+
+                    // Reload page after 1 second
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    deleteBtn.disabled = false;
+                    uploadBtn.disabled = false;
+                    alert('{% trans "Error deleting file" %}: ' + (data.error || '{% trans "Unknown error" %}'));
+                }
+            })
+            .catch(error => {
+                loadingSpinner.style.display = 'none';
+                deleteBtn.disabled = false;
+                uploadBtn.disabled = false;
+                console.error('Delete error:', error);
+                alert('{% trans "Error deleting file" %}');
+            });
+        });
+    }
+    {% endif %}
+})();
+</script>
+{% endif %}

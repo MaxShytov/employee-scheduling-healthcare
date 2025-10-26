@@ -174,14 +174,16 @@ class PositionForm(forms.ModelForm):
 
 
 class EmployeeUserForm(forms.ModelForm):
-    """Form for employee user information."""
+    """
+    Form for employee user information.
+    Note: Profile picture editing is handled on employee detail page, not in this form.
+    """
 
     class Meta:
         model = User
         fields = (
             'first_name', 'last_name', 'email',
-            'phone', 'country', 'date_of_birth',
-            'profile_picture'  # ← Добавить
+            'phone', 'country', 'date_of_birth'
         )
         widgets = {
             'first_name': forms.TextInput(attrs={
@@ -207,9 +209,6 @@ class EmployeeUserForm(forms.ModelForm):
                 'class': 'form-control',
                 'type': 'date'
             }),
-            'profile_picture': forms.FileInput(attrs={  # ← Добавить
-                'class': 'form-control'
-            }),
         }
 
 
@@ -224,7 +223,7 @@ class EmployeeForm(forms.ModelForm):
             'hourly_rate', 'weekly_hours',
             'emergency_contact_name', 'emergency_contact_phone',
             'emergency_contact_relationship',
-            'notes', 'is_active'
+            'description', 'is_active'
         )
         widgets = {
             'employee_id': forms.TextInput(attrs={
@@ -273,10 +272,10 @@ class EmployeeForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': _('Relationship (spouse, parent, etc.)')
             }),
-            'notes': forms.Textarea(attrs={
+            'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': _('Internal notes')
+                'placeholder': _('Additional information and notes')
             }),
             'is_active': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
@@ -414,6 +413,12 @@ class EmployeeDocumentForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make file field optional when editing existing document
+        if self.instance and self.instance.pk:
+            self.fields['file'].required = False
+
     def clean(self):
         cleaned_data = super().clean()
         issue_date = cleaned_data.get('issue_date')
@@ -500,7 +505,7 @@ class LocationForm(forms.ModelForm):
             'latitude',
             'longitude',
             'is_active',
-            'notes',
+            'description',
         ]
         widgets = {
             'name': forms.TextInput(attrs={
@@ -563,10 +568,10 @@ class LocationForm(forms.ModelForm):
             'is_active': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
             }),
-            'notes': forms.Textarea(attrs={
+            'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': _('Internal notes about this location...')
+                'placeholder': _('Additional information and notes about this location...')
             }),
         }
 
@@ -580,7 +585,7 @@ class LocationForm(forms.ModelForm):
         self.fields['manager'].empty_label = _('-- No manager assigned --')
         self.fields['latitude'].required = False
         self.fields['longitude'].required = False
-        self.fields['notes'].required = False
+        self.fields['description'].required = False
 
         # If editing existing location with address_detail, populate address fields from it
         if self.instance and self.instance.pk and self.instance.address_detail:

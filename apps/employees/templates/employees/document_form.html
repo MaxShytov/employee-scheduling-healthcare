@@ -1,0 +1,56 @@
+{% extends "layouts/dashboard_layout.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page_title }} - MedShift Scheduler{% endblock %}
+
+{% block dashboard_content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        {% include "core/components/form_field.html" with field=form.document_type col_class="col-12" %}
+
+                        {% include "core/components/form_field.html" with field=form.title col_class="col-12" %}
+
+                        {% include "core/components/form_field.html" with field=form.description col_class="col-12" %}
+
+                        {# File upload field - show current file if editing #}
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-medium">{% trans "File" %}</label>
+                            {% if is_edit and document.file %}
+                                <div class="alert alert-info d-flex align-items-center gap-2 mb-2">
+                                    <span class="material-icons">description</span>
+                                    <a href="{{ document.file.url }}" target="_blank" class="alert-link">
+                                        {{ document.file.name|slice:"19:" }}
+                                    </a>
+                                    <small class="text-muted ms-auto">{% trans "Uploaded" %}: {{ document.created_at|date:"Y-m-d" }}</small>
+                                </div>
+                                {% include "core/components/custom_file_input.html" with field=form.file help_text=file_help_text accept=".pdf,.docx,.jpg,.jpeg,.png" hide_label=True hide_no_file_message=True button_text=_("Change") %}
+                            {% else %}
+                                {% include "core/components/custom_file_input.html" with field=form.file help_text=file_help_text accept=".pdf,.docx,.jpg,.jpeg,.png" hide_label=True button_text=_("Upload") %}
+                            {% endif %}
+                        </div>
+
+                        {% include "core/components/form_field.html" with field=form.issue_date col_class="col-md-6" %}
+
+                        {% include "core/components/form_field.html" with field=form.expiry_date col_class="col-md-6" %}
+                    </div>
+
+                    {% if is_edit %}
+                        {% include "core/components/action_buttons.html" with cancel_url=cancel_url submit_text=submit_text submit_icon="save" %}
+                    {% else %}
+                        {% include "core/components/action_buttons.html" with cancel_url=cancel_url submit_text=submit_text submit_icon="upload" %}
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

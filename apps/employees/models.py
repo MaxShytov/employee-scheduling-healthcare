@@ -422,10 +422,10 @@ class Employee(TimeStampedModel):
     )
     
     # Additional Information
-    notes = models.TextField(
-        _('notes'),
+    description = models.TextField(
+        _('description'),
         blank=True,
-        help_text=_('Internal notes about the employee')
+        help_text=_('Additional information and notes about the employee')
     )
     
     class Meta:
@@ -536,7 +536,8 @@ class EmployeeDocument(TimeStampedModel):
     issue_date = models.DateField(
         _('issue date'),
         null=True,
-        blank=True
+        blank=True,
+        help_text=_('When was this document issued?')
     )
     
     expiry_date = models.DateField(
@@ -695,11 +696,11 @@ class Location(TimeStampedModel):
         help_text=_('Whether this location is currently operational')
     )
 
-    # English: Additional metadata
-    notes = models.TextField(
-        _('notes'),
+    # Additional metadata
+    description = models.TextField(
+        _('description'),
         blank=True,
-        help_text=_('Internal notes about this location')
+        help_text=_('Additional information and notes about this location')
     )
 
     labor_budget = models.DecimalField(

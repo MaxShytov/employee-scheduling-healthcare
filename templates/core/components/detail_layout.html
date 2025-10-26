@@ -43,7 +43,13 @@ Usage:
             <div class="card-body">
                 {% for block in sidebar_blocks %}
                     {% if block.type == 'avatar_header' %}
-                        {% include "core/components/blocks/avatar_header.html" with avatar_url=block.avatar_url avatar_initials=block.avatar_initials avatar_color=block.avatar_color icon=block.icon name=block.name subtitle=block.subtitle badge=block.badge %}
+                        {% if block.upload_url %}
+                            {# Avatar with edit menu (for employee detail page) #}
+                            {% include "core/components/blocks/avatar_with_edit.html" with block=block %}
+                        {% else %}
+                            {# Regular avatar header (read-only) #}
+                            {% include "core/components/blocks/avatar_header.html" with avatar_url=block.avatar_url avatar_initials=block.avatar_initials avatar_color=block.avatar_color icon=block.icon name=block.name subtitle=block.subtitle badge=block.badge %}
+                        {% endif %}
 
                     {% elif block.type == 'text_line' %}
                         {% include "core/components/blocks/text_line.html" with text=block.text class=block.class margin=block.margin align=block.align %}

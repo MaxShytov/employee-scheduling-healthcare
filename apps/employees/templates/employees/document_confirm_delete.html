@@ -6,6 +6,6 @@
 
 {% block dashboard_content %}
 
-    {% include "core/components/confirm_delete.html" with icon="delete_forever" title="Delete Document?" message=message_html warning_message=warning_message cancel_url=cancel_url confirm_text="Delete Document" %}
-    
+    {% include "core/components/confirm_delete.html" with icon="delete_forever" title=delete_title message=message_html warning_message=warning_message cancel_url=cancel_url confirm_text=confirm_text %}
+
 {% endblock %}

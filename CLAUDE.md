@@ -212,10 +212,31 @@ These are the building blocks for `detail_layout.html`:
 - **confirm_delete.html** - Delete confirmation dialog
 - **tabs_navigation.html** - Tab navigation (used within detail_layout)
 
+**File Upload Components (REQUIRED for all file inputs):**
+- **custom_image_input.html** ⭐ Specialized component for profile pictures and images
+  - 3 buttons: "Upload Image"/"Change Image", "Delete image", "Preview"
+  - Shows image preview thumbnail
+  - AJAX instant upload/delete (when upload_url provided)
+  - Preview button opens image in new tab
+  - Auto page reload after successful upload/delete
+  - Use for: profile pictures, employee photos
+
+- **custom_file_input.html** ⭐ Universal component for document uploads
+  - Replaces browser-default "Choose file" button with translatable version
+  - Shows file name as clickable link
+  - Delete button instead of checkbox
+  - Supports AJAX instant upload (when upload_url provided)
+  - Use for: documents, PDFs, contracts, certificates
+
+**IMPORTANT:** Never use browser-default `<input type="file">` directly in templates. Always use the appropriate component:
+- Images → `custom_image_input.html`
+- Documents → `custom_file_input.html`
+
 **Legacy/Deprecated:**
 - **profile_card.html** - Use avatar_header block instead
 - **info_section.html** - Use section_header + field blocks instead
 - **department_card.html** - Not used (was for grid view)
+- **profile_picture_field.html** - Use custom_file_input.html instead (non-translatable browser buttons)
 
 **Component API:**
 
@@ -250,6 +271,39 @@ content_blocks = [
 tabs = [{'id': str, 'label': str, 'icon': str, 'active': bool}]
 content_blocks = [...] # each block can have 'tab': 'tab_id' to show only in that tab
 ```
+
+**custom_image_input.html (Image Upload - Profile Pictures):**
+```django
+{# For new employee (no profile picture yet) #}
+{% include "core/components/custom_image_input.html" with field=user_form.profile_picture %}
+
+{# For existing employee with AJAX instant upload/delete #}
+{% include "core/components/custom_image_input.html" with
+   field=user_form.profile_picture
+   current_image_url=employee.user.profile_picture.url
+   upload_url=upload_url
+   ajax_delete_url=delete_url %}
+```
+
+**UX Behavior:**
+- **No image:** Shows "Upload Image" button only
+- **Image exists (no AJAX):** Shows thumbnail + "Change Image" + "Delete image" + "Preview" buttons
+- **Image exists (with AJAX):** Same as above, but instant upload/delete without form submission
+- **Preview button:** Opens full-size image in new browser tab
+
+**custom_file_input.html (Document Upload - PDFs, Contracts, etc.):**
+```django
+{# For new document upload (no existing file) #}
+{% include "core/components/custom_file_input.html" with field=form.file help_text=_("Accepted formats: PDF, DOCX") accept=".pdf,.docx" %}
+
+{# For existing document with edit/delete #}
+{% include "core/components/custom_file_input.html" with field=form.file current_file_url=document.file.url current_file_name=document.title accept=".pdf,.docx" %}
+```
+
+**UX Behavior:**
+- **No file:** Shows "No file chosen" + "Choose file" button
+- **File exists:** Shows file name as clickable link + "Choose another file" button + "Delete file" button
+- **File selected:** Shows new file name in blue alert box below existing file info
 
 Note: Use `'label'` for text in breadcrumbs/actions for consistency.
 
@@ -317,6 +371,71 @@ Key settings:
 - FMH medical certifications tracking
 - TARMED billing code integration (planned)
 - KVG/LAMal compliance requirements
+
+## Internationalization & Localization
+
+### Supported Languages
+The application supports 5 languages for the Swiss healthcare market:
+- English (en) - default
+- Français (fr)
+- Deutsch (de)
+- Italiano (it)
+- Español (es)
+
+### Translation Guidelines
+
+**IMPORTANT: Field Name Consistency**
+All field names MUST be translated consistently throughout the application. For example:
+- "Phone" / "phone number" / "Contact Phone" → Use ONE consistent translation per language
+  - FR: Always "Téléphone" (not "Numéro de téléphone" in some places)
+  - DE: Always "Telefon"
+  - IT: Always "Telefono"
+  - ES: Always "Teléfono"
+
+**Translation Workflow:**
+1. Wrap all user-facing strings with `_()` for translation:
+   ```python
+   from django.utils.translation import gettext_lazy as _
+
+   verbose_name = _('phone number')
+   help_text = _('Main phone number for this location')
+   ```
+
+2. Extract translatable strings:
+   ```bash
+   python manage.py makemessages -l fr -l de -l it -l es
+   ```
+
+3. Add translations to `translate_basic.py` script (maintains consistency)
+
+4. Apply translations:
+   ```bash
+   python3 translate_basic.py
+   ```
+
+5. Compile messages:
+   ```bash
+   python manage.py compilemessages
+   ```
+
+**Translation Coverage:**
+ALL user-facing text must be translated, including:
+- Model field labels (verbose_name)
+- Help texts (help_text)
+- Form field labels and placeholders
+- Template strings
+- Error messages
+- Buttons and action labels
+- Section headers
+- Breadcrumbs
+- Empty state messages
+
+**Template Usage:**
+Always load i18n in templates:
+```django
+{% load i18n %}
+<h1>{% trans "Dashboard" %}</h1>
+```
 
 ## Development Guidelines
 

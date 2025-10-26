@@ -1,0 +1,4487 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-26 14:46+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/accounts/admin.py:34 apps/employees/views.py:453
+msgid "Personal Info"
+msgstr "Persönliche Info"
+
+#: apps/accounts/admin.py:37 apps/employees/views.py:3081
+msgid "Contact Information"
+msgstr "Kontaktinformationen"
+
+#: apps/accounts/admin.py:40
+msgid "Permissions"
+msgstr ""
+
+#: apps/accounts/admin.py:43
+msgid "Important Dates"
+msgstr ""
+
+#: apps/accounts/admin.py:77
+msgid "Picture"
+msgstr ""
+
+#: apps/accounts/admin.py:99 apps/employees/admin.py:88
+#: apps/employees/admin.py:218 apps/employees/admin.py:290
+#: apps/employees/admin.py:364 apps/employees/filters.py:13
+#: apps/employees/filters.py:55 apps/employees/filters.py:105
+#: apps/employees/filters.py:162 apps/employees/forms.py:369
+#: apps/employees/views.py:1887 apps/employees/views.py:2752
+#: apps/schedules/admin.py:82 apps/schedules/admin.py:230
+#: apps/schedules/admin.py:258 apps/schedules/models.py:68
+#: apps/schedules/models.py:377
+msgid "Status"
+msgstr "Status"
+
+#: apps/accounts/forms.py:22 apps/accounts/forms.py:128
+#: apps/accounts/templates/accounts/login.html:17
+#: apps/accounts/templates/accounts/signup.html:35 apps/employees/views.py:2963
+msgid "Email"
+msgstr "E-Mail"
+
+#: apps/accounts/forms.py:25 apps/accounts/forms.py:64
+#: apps/employees/forms.py:199
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1905
+msgid "Email address"
+msgstr "E-Mail-Adresse"
+
+#: apps/accounts/forms.py:31 apps/accounts/forms.py:34
+#: apps/accounts/forms.py:87 apps/accounts/forms.py:90
+#: apps/accounts/templates/accounts/login.html:28
+#: apps/accounts/templates/accounts/signup.html:44
+msgid "Password"
+msgstr ""
+
+#: apps/accounts/forms.py:44 apps/accounts/templates/accounts/login.html:42
+msgid "Remember me"
+msgstr "Angemeldet bleiben"
+
+#: apps/accounts/forms.py:49
+msgid ""
+"Please enter a correct email and password. Note that both fields may be case-"
+"sensitive."
+msgstr ""
+
+#: apps/accounts/forms.py:52
+msgid "This account is inactive."
+msgstr ""
+
+#: apps/accounts/forms.py:73 apps/employees/forms.py:191
+msgid "First name"
+msgstr "Vorname"
+
+#: apps/accounts/forms.py:82 apps/employees/forms.py:195
+msgid "Last name"
+msgstr "Nachname"
+
+#: apps/accounts/forms.py:95 apps/accounts/forms.py:98
+msgid "Confirm password"
+msgstr ""
+
+#: apps/accounts/forms.py:107
+msgid "I accept the Terms and Conditions"
+msgstr ""
+
+#: apps/accounts/forms.py:132
+msgid "Enter your email address"
+msgstr ""
+
+#: apps/accounts/forms.py:143 apps/accounts/forms.py:146
+msgid "New password"
+msgstr ""
+
+#: apps/accounts/forms.py:153 apps/accounts/forms.py:157
+msgid "Confirm new password"
+msgstr ""
+
+#: apps/accounts/models.py:22
+msgid "email address"
+msgstr ""
+
+#: apps/accounts/models.py:25
+msgid "A user with that email already exists."
+msgstr ""
+
+#: apps/accounts/models.py:31 apps/employees/models.py:669
+msgid "phone number"
+msgstr "Telefonnummer"
+
+#: apps/accounts/models.py:35
+msgid "Swiss phone format: +41 XX XXX XX XX or 0XX XXX XX XX"
+msgstr "Schweizer Telefonformat: +41 XX XXX XX XX oder 0XX XXX XX XX"
+
+#: apps/accounts/models.py:39 apps/core/models.py:125
+#: apps/employees/models.py:654
+msgid "country"
+msgstr "Land"
+
+#: apps/accounts/models.py:41
+msgid "Select country"
+msgstr ""
+
+#: apps/accounts/models.py:45
+msgid "date of birth"
+msgstr "Geburtsdatum"
+
+#: apps/accounts/models.py:51
+msgid "profile picture"
+msgstr "Profilbild"
+
+#: apps/accounts/models.py:62 apps/accounts/models.py:176
+msgid "user"
+msgstr ""
+
+#: apps/accounts/models.py:63
+msgid "users"
+msgstr ""
+
+#: apps/accounts/models.py:180
+msgid "token"
+msgstr ""
+
+#: apps/accounts/models.py:186
+msgid "is used"
+msgstr ""
+
+#: apps/accounts/models.py:191
+msgid "expires at"
+msgstr ""
+
+#: apps/accounts/models.py:195
+msgid "password reset token"
+msgstr ""
+
+#: apps/accounts/models.py:196
+msgid "password reset tokens"
+msgstr ""
+
+#: apps/accounts/templates/accounts/forgot_password.html:4
+msgid "Forgot Password"
+msgstr "Passwort vergessen"
+
+#: apps/accounts/templates/accounts/forgot_password.html:9
+msgid "Forgot Password?"
+msgstr "Passwort vergessen?"
+
+#: apps/accounts/templates/accounts/forgot_password.html:10
+msgid "Enter your email to receive reset instructions"
+msgstr "Geben Sie Ihre E-Mail ein, um Anweisungen zu erhalten"
+
+#: apps/accounts/templates/accounts/forgot_password.html:18
+#: apps/employees/views.py:491
+msgid "Email Address"
+msgstr "E-Mail-Adresse"
+
+#: apps/accounts/templates/accounts/forgot_password.html:28
+msgid "Send Reset Link"
+msgstr "Link senden"
+
+#: apps/accounts/templates/accounts/forgot_password.html:35
+#: apps/accounts/templates/accounts/password_reset_done.html:23
+msgid "Back to Login"
+msgstr "Zurück zur Anmeldung"
+
+#: apps/accounts/templates/accounts/login.html:4
+msgid "Login"
+msgstr "Anmeldung"
+
+#: apps/accounts/templates/accounts/login.html:8
+msgid "Welcome Back"
+msgstr "Willkommen zurück"
+
+#: apps/accounts/templates/accounts/login.html:9
+msgid "Sign in to your account"
+msgstr "Melden Sie sich bei Ihrem Konto an"
+
+#: apps/accounts/templates/accounts/login.html:46
+msgid "Forgot password?"
+msgstr "Passwort vergessen?"
+
+#: apps/accounts/templates/accounts/login.html:60
+msgid "Sign In"
+msgstr "Anmelden"
+
+#: apps/accounts/templates/accounts/login.html:65
+msgid "Don't have an account?"
+msgstr "Haben Sie kein Konto?"
+
+#: apps/accounts/templates/accounts/login.html:66
+msgid "Sign up"
+msgstr "Registrieren"
+
+#: apps/accounts/templates/accounts/password_reset_complete.html:4
+msgid "Password Reset Complete"
+msgstr "Zurücksetzung abgeschlossen"
+
+#: apps/accounts/templates/accounts/password_reset_complete.html:9
+msgid "Password Reset Complete!"
+msgstr "Zurücksetzung abgeschlossen!"
+
+#: apps/accounts/templates/accounts/password_reset_complete.html:11
+msgid "Your password has been successfully reset."
+msgstr "Ihr Passwort wurde zurückgesetzt."
+
+#: apps/accounts/templates/accounts/password_reset_complete.html:12
+msgid "You can now log in with your new password."
+msgstr "Sie können sich jetzt mit Ihrem neuen Passwort anmelden."
+
+#: apps/accounts/templates/accounts/password_reset_complete.html:17
+msgid "Go to Login"
+msgstr "Zur Anmeldung"
+
+#: apps/accounts/templates/accounts/password_reset_done.html:4
+#: apps/accounts/templates/accounts/password_reset_done.html:9
+msgid "Check Your Email"
+msgstr "Überprüfen Sie Ihre E-Mail"
+
+#: apps/accounts/templates/accounts/password_reset_done.html:11
+msgid "We've sent password reset instructions to your email address."
+msgstr "Wir haben Anweisungen an Ihre E-Mail-Adresse gesendet."
+
+#: apps/accounts/templates/accounts/password_reset_done.html:12
+msgid "Please check your inbox and follow the link to reset your password."
+msgstr "Bitte überprüfen Sie Ihren Posteingang und folgen Sie dem Link."
+
+#: apps/accounts/templates/accounts/password_reset_done.html:17
+msgid "Didn't receive the email? Check your spam folder or"
+msgstr "E-Mail nicht erhalten? Prüfen Sie Ihren Spam-Ordner oder"
+
+#: apps/accounts/templates/accounts/password_reset_done.html:18
+msgid "try again"
+msgstr "versuchen Sie es erneut"
+
+#: apps/accounts/templates/accounts/reset_password.html:4
+#: apps/accounts/templates/accounts/reset_password.html:41
+msgid "Reset Password"
+msgstr "Passwort zurücksetzen"
+
+#: apps/accounts/templates/accounts/reset_password.html:9
+msgid "Reset Your Password"
+msgstr "Setzen Sie Ihr Passwort zurück"
+
+#: apps/accounts/templates/accounts/reset_password.html:10
+msgid "Enter your new password below"
+msgstr "Geben Sie Ihr neues Passwort unten ein"
+
+#: apps/accounts/templates/accounts/reset_password.html:19
+msgid "New Password"
+msgstr "Neues Passwort"
+
+#: apps/accounts/templates/accounts/reset_password.html:22
+#: apps/accounts/templates/accounts/signup.html:47
+msgid "At least 8 characters. Not entirely numeric."
+msgstr "Mindestens 8 Zeichen. Nicht nur numerisch."
+
+#: apps/accounts/templates/accounts/reset_password.html:31
+msgid "Confirm New Password"
+msgstr "Neues Passwort bestätigen"
+
+#: apps/accounts/templates/accounts/reset_password.html:47
+msgid "Invalid Reset Link"
+msgstr "Ungültiger Reset-Link"
+
+#: apps/accounts/templates/accounts/reset_password.html:49
+msgid "This password reset link is invalid or has expired."
+msgstr "Dieser Link ist ungültig oder abgelaufen."
+
+#: apps/accounts/templates/accounts/reset_password.html:50
+#, fuzzy
+#| msgid "Please select an image file"
+msgid "Please request a new one."
+msgstr "Bitte wählen Sie eine Bilddatei aus"
+
+#: apps/accounts/templates/accounts/reset_password.html:55
+msgid "Request New Reset Link"
+msgstr "Neuen Link anfordern"
+
+#: apps/accounts/templates/accounts/signup.html:4
+msgid "Sign Up"
+msgstr "Registrieren"
+
+#: apps/accounts/templates/accounts/signup.html:8
+#: apps/accounts/templates/accounts/signup.html:79
+#, fuzzy
+#| msgid "Create"
+msgid "Create Account"
+msgstr "Erstellen"
+
+#: apps/accounts/templates/accounts/signup.html:9
+msgid "Join MedShift Scheduler today"
+msgstr "Treten Sie MedShift Scheduler bei"
+
+#: apps/accounts/templates/accounts/signup.html:17 apps/employees/views.py:489
+msgid "First Name"
+msgstr "Vorname"
+
+#: apps/accounts/templates/accounts/signup.html:26 apps/employees/views.py:490
+msgid "Last Name"
+msgstr "Nachname"
+
+#: apps/accounts/templates/accounts/signup.html:56
+msgid "Confirm Password"
+msgstr "Passwort bestätigen"
+
+#: apps/accounts/templates/accounts/signup.html:68
+msgid "I accept the"
+msgstr "Ich akzeptiere die"
+
+#: apps/accounts/templates/accounts/signup.html:68
+msgid "Terms and Conditions"
+msgstr "Allgemeinen Geschäftsbedingungen"
+
+#: apps/accounts/templates/accounts/signup.html:84
+msgid "Already have an account?"
+msgstr "Haben Sie bereits ein Konto?"
+
+#: apps/accounts/templates/accounts/signup.html:85
+msgid "Sign in"
+msgstr "Anmelden"
+
+#: apps/accounts/views.py:68
+msgid "Invalid email or password."
+msgstr ""
+
+#: apps/accounts/views.py:92
+msgid "Account created successfully! Please log in."
+msgstr ""
+
+#: apps/accounts/views.py:115
+msgid "Password reset instructions have been sent to your email."
+msgstr ""
+
+#: apps/accounts/views.py:138
+msgid "Your password has been reset successfully! You can now log in."
+msgstr ""
+
+#: apps/accounts/views.py:156
+msgid "You have been logged out successfully."
+msgstr ""
+
+#: apps/core/filters.py:169 apps/employees/forms.py:83
+#: apps/employees/forms.py:363 apps/employees/forms.py:478
+#: apps/employees/forms.py:669 apps/employees/mixins.py:80
+#: apps/employees/models.py:476 apps/employees/views.py:79
+#: apps/employees/views.py:1100 apps/employees/views.py:1139
+#: apps/employees/views.py:1326 apps/employees/views.py:1766
+#: apps/employees/views.py:1805 apps/employees/views.py:1997
+#: apps/employees/views.py:2609 apps/employees/views.py:2669
+#: apps/employees/views.py:2859 apps/schedules/models.py:302
+#: templates/core/components/form_field_with_toggle.html:42
+#: templates/core/components/status_badge.html:4
+msgid "Active"
+msgstr "Aktiv"
+
+#: apps/core/filters.py:170 apps/employees/forms.py:364
+#: apps/employees/forms.py:479 apps/employees/forms.py:670
+#: apps/employees/mixins.py:80 apps/employees/models.py:473
+#: apps/employees/views.py:81 apps/employees/views.py:689
+#: apps/employees/views.py:1106 apps/employees/views.py:1139
+#: apps/employees/views.py:1326 apps/employees/views.py:1772
+#: apps/employees/views.py:1805 apps/employees/views.py:1997
+#: apps/employees/views.py:2615 apps/employees/views.py:2669
+#: apps/employees/views.py:2859
+#: templates/core/components/department_card.html:18
+#: templates/core/components/form_field_with_toggle.html:51
+#: templates/core/components/status_badge.html:7
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: apps/core/models.py:15
+msgid "created at"
+msgstr ""
+
+#: apps/core/models.py:17
+msgid "Date and time when the record was created"
+msgstr ""
+
+#: apps/core/models.py:20
+msgid "updated at"
+msgstr ""
+
+#: apps/core/models.py:22
+msgid "Date and time when the record was last updated"
+msgstr ""
+
+#: apps/core/models.py:43
+msgid "active"
+msgstr "aktiv"
+
+#: apps/core/models.py:45
+msgid "Designates whether this record should be treated as active."
+msgstr ""
+
+#: apps/core/models.py:48
+msgid "deleted at"
+msgstr ""
+
+#: apps/core/models.py:51
+msgid "Date and time when the record was soft deleted"
+msgstr ""
+
+#: apps/core/models.py:86 apps/employees/filters.py:178
+#: apps/employees/models.py:658
+msgid "Switzerland"
+msgstr "Schweiz"
+
+#: apps/core/models.py:87 apps/employees/filters.py:179
+#: apps/employees/models.py:657
+msgid "Canada"
+msgstr "Kanada"
+
+#: apps/core/models.py:88 apps/employees/filters.py:180
+#: apps/employees/models.py:659
+msgid "Luxembourg"
+msgstr "Luxemburg"
+
+#: apps/core/models.py:89 apps/employees/filters.py:181
+#: apps/employees/models.py:660
+msgid "Monaco"
+msgstr "Monaco"
+
+#: apps/core/models.py:94
+msgid "street address"
+msgstr ""
+
+#: apps/core/models.py:96
+msgid "Street name and number"
+msgstr ""
+
+#: apps/core/models.py:99 apps/employees/models.py:626
+msgid "address line 2"
+msgstr "Adresszeile 2"
+
+#: apps/core/models.py:102
+msgid "Apartment, suite, unit, building, floor, etc. (optional)"
+msgstr ""
+
+#: apps/core/models.py:107 apps/employees/models.py:633
+msgid "city"
+msgstr "Stadt"
+
+#: apps/core/models.py:111 apps/employees/models.py:640
+msgid "postal code"
+msgstr "Postleitzahl"
+
+#: apps/core/models.py:117 apps/employees/models.py:647
+msgid "state/province/canton"
+msgstr "Bundesland/Kanton"
+
+#: apps/core/models.py:120
+msgid "Administrative level 1: State/Province/Canton code (e.g., VD, QC, NY)"
+msgstr ""
+
+#: apps/core/models.py:133 apps/employees/models.py:716
+msgid "latitude"
+msgstr ""
+
+#: apps/core/models.py:138
+msgid "Latitude coordinate for map display"
+msgstr ""
+
+#: apps/core/models.py:141 apps/employees/models.py:725
+msgid "longitude"
+msgstr ""
+
+#: apps/core/models.py:146
+msgid "Longitude coordinate for map display"
+msgstr ""
+
+#: apps/core/models.py:150 apps/employees/models.py:611
+#: apps/employees/models.py:619
+msgid "address"
+msgstr "Adresse"
+
+#: apps/core/models.py:151
+msgid "addresses"
+msgstr ""
+
+#: apps/core/validators.py:26
+msgid ""
+"Enter a valid Swiss phone number (e.g., +41 XX XXX XX XX or 0XX XXX XX XX)"
+msgstr ""
+
+#: apps/core/validators.py:37
+msgid "Swiss postal code must be exactly 4 digits"
+msgstr ""
+
+#: apps/core/views/mixins.py:112
+msgid "Cannot delete: "
+msgstr ""
+
+#: apps/core/views/mixins.py:116
+msgid "Deleted successfully."
+msgstr ""
+
+#: apps/dashboard/templates/dashboard/home.html:4 apps/dashboard/views.py:31
+#: apps/employees/views.py:48 apps/employees/views.py:320
+#: apps/employees/views.py:368 apps/employees/views.py:407
+#: apps/employees/views.py:842 apps/employees/views.py:1057
+#: apps/employees/views.py:1261 apps/employees/views.py:1569
+#: apps/employees/views.py:1594 apps/employees/views.py:1627
+#: apps/employees/views.py:1729 apps/employees/views.py:1932
+#: apps/employees/views.py:2213 apps/employees/views.py:2238
+#: apps/employees/views.py:2271 apps/employees/views.py:2569
+#: apps/employees/views.py:2794 apps/employees/views.py:3160
+#: apps/employees/views.py:3185 templates/layouts/dashboard_layout.html:19
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: apps/dashboard/templates/dashboard/home.html:11
+#, python-format
+msgid "Welcome back, %(name)s!"
+msgstr "Willkommen zurück, %(name)s!"
+
+#: apps/dashboard/templates/dashboard/home.html:13
+msgid "Here's what's happening with your workforce today"
+msgstr "Das passiert heute mit Ihrem Team"
+
+#: apps/dashboard/templates/dashboard/home.html:24 apps/employees/views.py:77
+#: apps/employees/views.py:1305 apps/employees/views.py:1976
+#: apps/employees/views.py:2838
+msgid "Total Employees"
+msgstr "Gesamte Mitarbeiter"
+
+#: apps/dashboard/templates/dashboard/home.html:40
+msgid "Today's Shifts"
+msgstr "Heutige Schichten"
+
+#: apps/dashboard/templates/dashboard/home.html:56
+msgid "Active Now"
+msgstr "Jetzt aktiv"
+
+#: apps/dashboard/templates/dashboard/home.html:90
+msgid "Welcome to Aida!"
+msgstr "Willkommen bei Aida!"
+
+#: apps/dashboard/templates/dashboard/home.html:92
+msgid ""
+"Your employee scheduling and workforce management system is being set up."
+msgstr ""
+"Ihr System zur Mitarbeiterplanung und Personalverwaltung wird eingerichtet."
+
+#: apps/dashboard/templates/dashboard/home.html:93
+msgid "We're building the following modules:"
+msgstr "Wir erstellen folgende Module:"
+
+#: apps/dashboard/templates/dashboard/home.html:101
+msgid "Authentication"
+msgstr "Authentifizierung"
+
+#: apps/dashboard/templates/dashboard/home.html:102
+msgid "Login, Signup, Password Reset ✓"
+msgstr "Anmeldung, Registrierung, Passwort zurücksetzen ✓"
+
+#: apps/dashboard/templates/dashboard/home.html:110
+msgid "Employee Management"
+msgstr "Mitarbeiterverwaltung"
+
+#: apps/dashboard/templates/dashboard/home.html:111
+msgid "CRUD, Departments, Positions ✓"
+msgstr "CRUD, Abteilungen, Positionen ✓"
+
+#: apps/dashboard/templates/dashboard/home.html:119
+msgid "Schedule Management"
+msgstr "Dienstplanverwaltung"
+
+#: apps/dashboard/templates/dashboard/home.html:120
+msgid "Coming soon..."
+msgstr "Demnächst verfügbar..."
+
+#: apps/dashboard/templates/dashboard/home.html:143
+msgid "System Info"
+msgstr "Systeminformationen"
+
+#: apps/dashboard/templates/dashboard/home.html:147
+msgid "Version:"
+msgstr "Version:"
+
+#: apps/dashboard/templates/dashboard/home.html:151
+msgid "Phase:"
+msgstr "Phase:"
+
+#: apps/dashboard/templates/dashboard/home.html:152
+msgid "Phase 1"
+msgstr "Phase 1"
+
+#: apps/dashboard/templates/dashboard/home.html:155
+msgid "Environment:"
+msgstr "Umgebung:"
+
+#: apps/dashboard/templates/dashboard/home.html:156
+msgid "Development"
+msgstr "Entwicklung"
+
+#: apps/dashboard/templates/dashboard/home.html:159
+msgid "Database:"
+msgstr "Datenbank:"
+
+#: apps/dashboard/templates/dashboard/home.html:170
+msgid "Quick Links"
+msgstr "Schnellzugriff"
+
+#: apps/dashboard/templates/dashboard/home.html:175
+msgid "Admin Panel"
+msgstr "Admin-Panel"
+
+#: apps/dashboard/templates/dashboard/home.html:179
+msgid "Manage Employees"
+msgstr "Mitarbeiter verwalten"
+
+#: apps/employees/admin.py:33 apps/employees/admin.py:333
+#: apps/employees/views.py:1379 apps/employees/views.py:2973
+#: apps/employees/views.py:3089
+msgid "Management"
+msgstr "Verwaltung"
+
+#: apps/employees/admin.py:36 apps/employees/admin.py:91
+#: apps/employees/admin.py:183 apps/employees/admin.py:255
+#: apps/schedules/admin.py:49 apps/schedules/admin.py:169
+msgid "Metadata"
+msgstr ""
+
+#: apps/employees/admin.py:50 apps/employees/filters.py:118
+#: apps/employees/filters.py:188 apps/employees/views.py:1216
+#: apps/employees/views.py:1384 apps/employees/views.py:2755
+#: apps/employees/views.py:2978
+msgid "Manager"
+msgstr "Manager"
+
+#: apps/employees/admin.py:58 apps/employees/admin.py:112
+#: apps/employees/admin.py:352
+#: apps/employees/templates/employees/employee_list.html:5
+#: apps/employees/views.py:49 apps/employees/views.py:132
+#: apps/employees/views.py:321 apps/employees/views.py:369
+#: apps/employees/views.py:408 apps/employees/views.py:843
+#: apps/employees/views.py:1058 apps/employees/views.py:1262
+#: apps/employees/views.py:1570 apps/employees/views.py:1595
+#: apps/employees/views.py:1628 apps/employees/views.py:1730
+#: apps/employees/views.py:1891 apps/employees/views.py:1933
+#: apps/employees/views.py:2214 apps/employees/views.py:2239
+#: apps/employees/views.py:2272 apps/employees/views.py:2570
+#: apps/employees/views.py:2795 apps/employees/views.py:3161
+#: apps/employees/views.py:3186 templates/layouts/dashboard_layout.html:23
+msgid "Employees"
+msgstr "Mitarbeiter"
+
+#: apps/employees/admin.py:82 apps/employees/views.py:2078
+#: apps/employees/views.py:2150
+msgid "Requirements"
+msgstr "Anforderungen"
+
+#: apps/employees/admin.py:85 apps/employees/admin.py:168
+#: apps/employees/views.py:2050
+msgid "Compensation"
+msgstr "Vergütung"
+
+#: apps/employees/admin.py:104 apps/employees/views.py:2055
+msgid "Rate Range"
+msgstr "Satzbereich"
+
+#: apps/employees/admin.py:154
+msgid "User Account"
+msgstr ""
+
+#: apps/employees/admin.py:157 apps/employees/views.py:185
+#: apps/employees/views.py:580 apps/employees/views.py:781
+msgid "Employment Information"
+msgstr "Beschäftigungsinformationen"
+
+#: apps/employees/admin.py:171 apps/employees/views.py:211
+#: apps/employees/views.py:501 apps/employees/views.py:763
+msgid "Emergency Contact"
+msgstr "Notfallkontakt"
+
+#: apps/employees/admin.py:179 apps/employees/views.py:223
+#: apps/employees/views.py:2996 apps/employees/views.py:3105
+msgid "Additional Information"
+msgstr "Zusätzliche Informationen"
+
+#: apps/employees/admin.py:196 apps/employees/mixins.py:41
+#: apps/employees/views.py:1215 apps/employees/views.py:2753
+msgid "Name"
+msgstr "Name"
+
+#: apps/employees/admin.py:202 apps/employees/views.py:565
+#: apps/employees/views.py:790
+msgid "Hourly Rate"
+msgstr "Stundenlohn"
+
+#: apps/employees/admin.py:249
+#: apps/employees/templates/employees/document_form.html:25
+#: venv/lib/python3.12/site-packages/django/db/models/fields/files.py:239
+msgid "File"
+msgstr "Datei"
+
+#: apps/employees/admin.py:252
+msgid "Dates"
+msgstr ""
+
+#: apps/employees/admin.py:267 apps/schedules/admin.py:61
+#: apps/schedules/admin.py:118 apps/schedules/models.py:32
+#: apps/schedules/models.py:177
+msgid "Employee"
+msgstr ""
+
+#: apps/employees/admin.py:324 apps/employees/views.py:1361
+#: apps/employees/views.py:1490 apps/employees/views.py:2032
+#: apps/employees/views.py:2136 apps/employees/views.py:3056
+msgid "Basic Information"
+msgstr "Grundinformationen"
+
+#: apps/employees/admin.py:327 apps/employees/views.py:2754
+#: apps/employees/views.py:2926 apps/employees/views.py:3069
+msgid "Address"
+msgstr "Adresse"
+
+#: apps/employees/admin.py:330 apps/employees/views.py:2947
+msgid "Contact"
+msgstr ""
+
+#: apps/employees/admin.py:336 apps/employees/views.py:3097
+msgid "Geolocation (Optional)"
+msgstr "Geolokalisierung (Optional)"
+
+#: apps/employees/admin.py:339
+msgid "GPS coordinates for geolocation tracking (optional)"
+msgstr ""
+
+#: apps/employees/admin.py:341
+msgid "Additional"
+msgstr ""
+
+#: apps/employees/filters.py:19 apps/employees/filters.py:61
+#: apps/employees/filters.py:82 apps/employees/filters.py:111
+#: apps/employees/filters.py:168 apps/employees/forms.py:311
+#: templates/core/components/search_bar.html:12
+msgid "Search"
+msgstr "Suchen"
+
+#: apps/employees/filters.py:20
+msgid "Search by name..."
+msgstr "Nach Name suchen..."
+
+#: apps/employees/filters.py:31 apps/employees/forms.py:331
+#: apps/employees/templates/employees/location_detail.html:5
+#: apps/employees/views.py:549 apps/employees/views.py:787
+#: apps/employees/views.py:2894 apps/schedules/models.py:40
+#: apps/schedules/models.py:269
+msgid "Location"
+msgstr "Standort"
+
+#: apps/employees/filters.py:33
+msgid "All locations"
+msgstr "Alle Standorte"
+
+#: apps/employees/filters.py:38 apps/employees/forms.py:341
+#: apps/employees/mixins.py:43
+#: apps/employees/templates/employees/position_detail.html:5
+#: apps/employees/views.py:543 apps/schedules/models.py:47
+#: apps/schedules/models.py:276
+msgid "Position"
+msgstr "Position"
+
+#: apps/employees/filters.py:40
+msgid "All positions"
+msgstr "Alle Positionen"
+
+#: apps/employees/filters.py:45 apps/employees/forms.py:321
+#: apps/employees/mixins.py:42
+#: apps/employees/templates/employees/department_detail.html:5
+#: apps/employees/views.py:537
+msgid "Department"
+msgstr "Abteilung"
+
+#: apps/employees/filters.py:47
+msgid "All departments"
+msgstr "Alle Abteilungen"
+
+#: apps/employees/filters.py:62
+msgid "Search by title or code..."
+msgstr "Nach Titel oder Code suchen..."
+
+#: apps/employees/filters.py:68 apps/employees/models.py:500
+msgid "Certification"
+msgstr "Zertifizierung"
+
+#: apps/employees/filters.py:70 apps/employees/views.py:1824
+msgid "Required"
+msgstr "Erforderlich"
+
+#: apps/employees/filters.py:71 apps/employees/views.py:1824
+msgid "Not Required"
+msgstr "Nicht erforderlich"
+
+#: apps/employees/filters.py:83
+msgid "Search locations..."
+msgstr "Standorte suchen..."
+
+#: apps/employees/filters.py:88
+msgid "City"
+msgstr "Stadt"
+
+#: apps/employees/filters.py:89
+msgid "Filter by city..."
+msgstr "Nach Stadt filtern..."
+
+#: apps/employees/filters.py:94
+msgid "Active only"
+msgstr "Nur aktive"
+
+#: apps/employees/filters.py:112
+msgid "Search by name or code..."
+msgstr "Nach Name oder Code suchen..."
+
+#: apps/employees/filters.py:120 apps/employees/filters.py:190
+msgid "All"
+msgstr ""
+
+#: apps/employees/filters.py:121 apps/employees/filters.py:191
+msgid "Has Manager"
+msgstr ""
+
+#: apps/employees/filters.py:122 apps/employees/filters.py:192
+msgid "No Manager"
+msgstr ""
+
+#: apps/employees/filters.py:169 apps/employees/forms.py:652
+msgid "Search by name, city, or address..."
+msgstr "Nach Name, Stadt oder Adresse suchen..."
+
+#: apps/employees/filters.py:175 apps/employees/views.py:495
+#: apps/employees/views.py:753
+msgid "Country"
+msgstr "Land"
+
+#: apps/employees/filters.py:177 apps/employees/forms.py:658
+msgid "All Countries"
+msgstr "Alle Länder"
+
+#: apps/employees/forms.py:32
+msgid "Enter department name"
+msgstr "Abteilungsname eingeben"
+
+#: apps/employees/forms.py:36
+msgid "e.g., ADM, RAD, CARD"
+msgstr "z.B. ADM, RAD, CARD"
+
+#: apps/employees/forms.py:41
+msgid "Brief description of the department"
+msgstr "Kurze Beschreibung der Abteilung"
+
+#: apps/employees/forms.py:48
+msgid "e.g., 1234"
+msgstr "z.B. 1234"
+
+#: apps/employees/forms.py:53
+msgid "Building, floor, room details"
+msgstr "Gebäude, Etage, Raumdetails"
+
+#: apps/employees/forms.py:77
+msgid "Department Name"
+msgstr "Abteilungsname"
+
+#: apps/employees/forms.py:78
+msgid "Department Code"
+msgstr "Abteilungscode"
+
+#: apps/employees/forms.py:79 apps/employees/views.py:1369
+#: apps/employees/views.py:2040 apps/employees/views.py:3001
+msgid "Description"
+msgstr "Beschreibung"
+
+#: apps/employees/forms.py:80
+msgid "Department Manager"
+msgstr "Abteilungsleiter"
+
+#: apps/employees/forms.py:81 apps/employees/views.py:1390
+msgid "Phone Extension"
+msgstr "Durchwahl"
+
+#: apps/employees/forms.py:82 apps/employees/views.py:1465
+msgid "Location Notes"
+msgstr "Standortnotizen"
+
+#: apps/employees/forms.py:84 apps/employees/views.py:1439
+msgid "Effective From"
+msgstr "Gültig ab"
+
+#: apps/employees/forms.py:85 apps/employees/views.py:1444
+msgid "Effective To"
+msgstr "Gültig bis"
+
+#: apps/employees/forms.py:88
+msgid "Short code for department (3-4 characters)"
+msgstr "Kurzcode für Abteilung (3-4 Zeichen)"
+
+#: apps/employees/forms.py:89
+msgid "Select the manager for this department"
+msgstr "Manager für diese Abteilung auswählen"
+
+#: apps/employees/forms.py:90
+msgid "— No manager assigned —"
+msgstr ""
+
+#: apps/employees/forms.py:91
+msgid "Leave empty if ongoing"
+msgstr "Leer lassen, wenn laufend"
+
+#: apps/employees/forms.py:103
+msgid "A department with this code already exists."
+msgstr ""
+
+#: apps/employees/forms.py:115
+msgid "End date must be after start date."
+msgstr ""
+
+#: apps/employees/forms.py:134
+msgid "Position title"
+msgstr "Positionstitel"
+
+#: apps/employees/forms.py:138
+msgid "Position code (e.g., RN, MD)"
+msgstr "Positionscode (z.B. KS, ARZT)"
+
+#: apps/employees/forms.py:143
+msgid "Position description"
+msgstr "Positionsbeschreibung"
+
+#: apps/employees/forms.py:150
+msgid "Minimum hourly rate (CHF)"
+msgstr "Mindeststundensatz (CHF)"
+
+#: apps/employees/forms.py:155
+msgid "Maximum hourly rate (CHF)"
+msgstr "Maximalstundensatz (CHF)"
+
+#: apps/employees/forms.py:170
+msgid "Maximum rate must be greater than minimum rate"
+msgstr "Maximalsatz muss größer sein als Mindestsatz"
+
+#: apps/employees/forms.py:203 apps/employees/forms.py:269
+msgid "+41 XX XXX XX XX"
+msgstr ""
+
+#: apps/employees/forms.py:231
+msgid "Employee ID (e.g., EMP1001)"
+msgstr ""
+
+#: apps/employees/forms.py:255
+msgid "Hourly rate (CHF)"
+msgstr "Stundenlohn (CHF)"
+
+#: apps/employees/forms.py:260
+msgid "Weekly hours"
+msgstr "Wochenstunden"
+
+#: apps/employees/forms.py:265
+msgid "Emergency contact name"
+msgstr "Name des Notfallkontakts"
+
+#: apps/employees/forms.py:273
+msgid "Relationship (spouse, parent, etc.)"
+msgstr "Beziehung (Ehepartner, Elternteil, etc.)"
+
+#: apps/employees/forms.py:278
+#, fuzzy
+#| msgid "Additional Notes"
+msgid "Additional information and notes"
+msgstr "Zusätzliche Notizen"
+
+#: apps/employees/forms.py:292
+msgid "Termination date cannot be before hire date"
+msgstr ""
+
+#: apps/employees/forms.py:308
+msgid "Search by name, ID, or email..."
+msgstr ""
+
+#: apps/employees/forms.py:317 apps/employees/forms.py:450
+msgid "All Departments"
+msgstr "Alle Abteilungen"
+
+#: apps/employees/forms.py:327
+msgid "All Locations"
+msgstr "Alle Standorte"
+
+#: apps/employees/forms.py:337 apps/employees/forms.py:459
+msgid "All Positions"
+msgstr "Alle Positionen"
+
+#: apps/employees/forms.py:346 apps/employees/forms.py:467
+msgid "All Types"
+msgstr ""
+
+#: apps/employees/forms.py:347 apps/employees/models.py:307
+msgid "Full-time"
+msgstr "Vollzeit"
+
+#: apps/employees/forms.py:348 apps/employees/models.py:308
+msgid "Part-time"
+msgstr "Teilzeit"
+
+#: apps/employees/forms.py:349 apps/employees/models.py:309
+msgid "Contract"
+msgstr "Vertrag"
+
+#: apps/employees/forms.py:350 apps/employees/models.py:310
+msgid "Temporary"
+msgstr "Temporär"
+
+#: apps/employees/forms.py:351 apps/employees/models.py:311
+msgid "Intern"
+msgstr "Praktikant"
+
+#: apps/employees/forms.py:356 apps/employees/mixins.py:44
+#: apps/employees/views.py:605
+msgid "Type"
+msgstr "Typ"
+
+#: apps/employees/forms.py:362 apps/employees/forms.py:477
+msgid "All Statuses"
+msgstr "Alle Status"
+
+#: apps/employees/forms.py:396
+msgid "Document title"
+msgstr "Dokumenttitel"
+
+#: apps/employees/forms.py:401
+msgid "Document description"
+msgstr "Dokumentbeschreibung"
+
+#: apps/employees/forms.py:429
+msgid "Expiry date cannot be before issue date"
+msgstr "Ablaufdatum kann nicht vor Ausstellungsdatum liegen"
+
+#: apps/employees/forms.py:442
+msgid "Search by name, email, or employee ID..."
+msgstr ""
+
+#: apps/employees/forms.py:513
+msgid "e.g., Toronto Clinic #1"
+msgstr "z.B. Klinik Zürich #1"
+
+#: apps/employees/forms.py:517
+msgid "e.g., TOR1, GVA, LAU"
+msgstr "z.B. TOR1, GVA, LAU"
+
+#: apps/employees/forms.py:521
+msgid "Street address"
+msgstr "Straßenadresse"
+
+#: apps/employees/forms.py:525
+msgid "Apartment, suite, unit, floor (optional)"
+msgstr "Wohnung, Suite, Einheit, Etage (optional)"
+
+#: apps/employees/forms.py:529
+msgid "City name"
+msgstr "Stadtname"
+
+#: apps/employees/forms.py:533
+msgid "Postal/ZIP code"
+msgstr "Postleitzahl"
+
+#: apps/employees/forms.py:537
+msgid "State/Province/Canton code (e.g., VD, QC, NY)"
+msgstr "Bundesland/Kanton-Code (z.B. VD, QC, NY)"
+
+#: apps/employees/forms.py:544
+msgid "Phone number"
+msgstr "Telefonnummer"
+
+#: apps/employees/forms.py:548
+msgid "contact@clinic.com"
+msgstr "kontakt@klinik.com"
+
+#: apps/employees/forms.py:574
+#, fuzzy
+#| msgid "Internal notes about this location..."
+msgid "Additional information and notes about this location..."
+msgstr "Interne Notizen über diesen Standort..."
+
+#: apps/employees/forms.py:585
+msgid "-- No manager assigned --"
+msgstr "-- Kein Manager zugewiesen --"
+
+#: apps/employees/forms.py:668
+msgid "All Status"
+msgstr ""
+
+#: apps/employees/mixins.py:40 apps/employees/views.py:1214
+msgid "ID"
+msgstr "ID"
+
+#: apps/employees/mixins.py:45
+msgid "Rate"
+msgstr "Tarif"
+
+#: apps/employees/mixins.py:46 apps/employees/views.py:607
+#: apps/employees/views.py:1220 apps/employees/views.py:1892
+#: apps/employees/views.py:2758
+msgid "Actions"
+msgstr "Aktionen"
+
+#: apps/employees/mixins.py:126
+msgid "hrs/week"
+msgstr "Std/Woche"
+
+#: apps/employees/mixins.py:137 apps/employees/views.py:1168
+#: apps/employees/views.py:1841 apps/employees/views.py:2706
+#: templates/core/components/info_card.html:47
+msgid "View"
+msgstr "Ansehen"
+
+#: apps/employees/mixins.py:144 apps/employees/views.py:373
+#: apps/employees/views.py:429 apps/employees/views.py:635
+#: apps/employees/views.py:1175 apps/employees/views.py:1271
+#: apps/employees/views.py:1598 apps/employees/views.py:1848
+#: apps/employees/views.py:1942 apps/employees/views.py:2242
+#: apps/employees/views.py:2713 apps/employees/views.py:2804
+#: apps/employees/views.py:3189 templates/core/components/info_card.html:53
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: apps/employees/models.py:26
+msgid "department name"
+msgstr ""
+
+#: apps/employees/models.py:29
+msgid "Full department name"
+msgstr "Vollständiger Abteilungsname"
+
+#: apps/employees/models.py:33
+msgid "department code"
+msgstr ""
+
+#: apps/employees/models.py:36
+msgid "Short code for the department (e.g., ER, ICU, CARD)"
+msgstr "Kurzcode für die Abteilung (z.B. ER, ICU, CARD)"
+
+#: apps/employees/models.py:40 apps/employees/models.py:213
+#: apps/employees/models.py:426 apps/employees/models.py:532
+#: apps/employees/models.py:701
+msgid "description"
+msgstr "Beschreibung"
+
+#: apps/employees/models.py:42
+msgid "Detailed department description"
+msgstr "Detaillierte Abteilungsbeschreibung"
+
+#: apps/employees/models.py:52
+msgid "department manager"
+msgstr ""
+
+#: apps/employees/models.py:53
+msgid "User responsible for this department"
+msgstr "Verantwortlicher Benutzer für diese Abteilung"
+
+#: apps/employees/models.py:58 apps/employees/models.py:244
+#: apps/employees/models.py:377 apps/employees/models.py:694
+msgid "is active"
+msgstr "ist aktiv"
+
+#: apps/employees/models.py:60
+msgid "Whether this department is currently operational"
+msgstr "Ob diese Abteilung derzeit in Betrieb ist"
+
+#: apps/employees/models.py:64
+msgid "effective from"
+msgstr ""
+
+#: apps/employees/models.py:67
+msgid "Date when department became operational"
+msgstr "Datum der Inbetriebnahme der Abteilung"
+
+#: apps/employees/models.py:71
+msgid "effective to"
+msgstr ""
+
+#: apps/employees/models.py:74
+msgid "Date when department ceased operations"
+msgstr ""
+
+#: apps/employees/models.py:79
+msgid "phone extension"
+msgstr ""
+
+#: apps/employees/models.py:82
+msgid "Internal phone extension"
+msgstr "Interne Durchwahl"
+
+#: apps/employees/models.py:86
+msgid "location notes"
+msgstr ""
+
+#: apps/employees/models.py:88
+msgid "Physical location details within facility"
+msgstr "Physische Standortdetails innerhalb der Einrichtung"
+
+#: apps/employees/models.py:92 apps/employees/models.py:339
+msgid "department"
+msgstr "Abteilung"
+
+#: apps/employees/models.py:93
+msgid "departments"
+msgstr ""
+
+#: apps/employees/models.py:159 apps/employees/views.py:1311
+#: apps/employees/views.py:1982 apps/employees/views.py:2844
+msgid "Active Employees"
+msgstr "Aktive Mitarbeiter"
+
+#: apps/employees/models.py:167 apps/employees/views.py:1317
+#: apps/employees/views.py:1988 apps/employees/views.py:2850
+msgid "Inactive Employees"
+msgstr "Inaktive Mitarbeiter"
+
+#: apps/employees/models.py:173
+#, python-format
+msgid "Manager: %(name)s"
+msgstr ""
+
+#: apps/employees/models.py:199
+msgid "position title"
+msgstr "positionsbezeichnung"
+
+#: apps/employees/models.py:202
+msgid "Full position title"
+msgstr "Vollständiger Positionstitel"
+
+#: apps/employees/models.py:206
+msgid "position code"
+msgstr "positionscode"
+
+#: apps/employees/models.py:209
+msgid "Short code for the position (e.g., RN, MD, PA)"
+msgstr "Kurzcode für Position (z.B. KS, ARZT, PA)"
+
+#: apps/employees/models.py:215
+msgid "Detailed position description"
+msgstr "Detaillierte Positionsbeschreibung"
+
+#: apps/employees/models.py:220
+msgid "requires certification"
+msgstr "erfordert zertifizierung"
+
+#: apps/employees/models.py:222
+msgid "Does this position require medical certification?"
+msgstr "Erfordert diese Position eine medizinische Zertifizierung?"
+
+#: apps/employees/models.py:227
+msgid "minimum hourly rate (CHF)"
+msgstr "mindeststundensatz (CHF)"
+
+#: apps/employees/models.py:231
+msgid "Minimum hourly rate in Swiss Francs"
+msgstr "Mindeststundensatz in Schweizer Franken"
+
+#: apps/employees/models.py:235
+msgid "maximum hourly rate (CHF)"
+msgstr "höchststundensatz (CHF)"
+
+#: apps/employees/models.py:239
+msgid "Maximum hourly rate in Swiss Francs"
+msgstr "Maximalstundensatz in Schweizer Franken"
+
+#: apps/employees/models.py:246
+msgid "Whether this position is currently in use"
+msgstr ""
+
+#: apps/employees/models.py:250 apps/employees/models.py:346
+msgid "position"
+msgstr "Position"
+
+#: apps/employees/models.py:251
+msgid "positions"
+msgstr ""
+
+#: apps/employees/models.py:324
+msgid "user account"
+msgstr ""
+
+#: apps/employees/models.py:329
+msgid "employee ID"
+msgstr "Mitarbeiter-ID"
+
+#: apps/employees/models.py:332
+msgid "Unique employee identification number"
+msgstr "Eindeutige Mitarbeiteridentifikationsnummer"
+
+#: apps/employees/models.py:353 apps/employees/models.py:734
+msgid "location"
+msgstr "Standort"
+
+#: apps/employees/models.py:354
+msgid "Primary work location for this employee"
+msgstr "Hauptarbeitsort für diesen Mitarbeiter"
+
+#: apps/employees/models.py:358
+msgid "employment type"
+msgstr "Beschäftigungsart"
+
+#: apps/employees/models.py:365
+msgid "hire date"
+msgstr "Einstellungsdatum"
+
+#: apps/employees/models.py:366
+msgid "Date when employee was hired"
+msgstr "Datum der Einstellung"
+
+#: apps/employees/models.py:370
+msgid "termination date"
+msgstr "Enddatum"
+
+#: apps/employees/models.py:373
+msgid "Date when employment ended"
+msgstr "Datum des Beschäftigungsendes"
+
+#: apps/employees/models.py:379
+msgid "Is this employee currently active?"
+msgstr "Ist dieser Mitarbeiter derzeit aktiv?"
+
+#: apps/employees/models.py:384
+msgid "hourly rate (CHF)"
+msgstr "Stundenlohn (CHF)"
+
+#: apps/employees/models.py:388
+msgid "Hourly wage rate in Swiss Francs"
+msgstr "Stundenlohn in Schweizer Franken"
+
+#: apps/employees/models.py:393
+msgid "weekly hours"
+msgstr "Wochenstunden"
+
+#: apps/employees/models.py:401
+msgid "Expected weekly working hours"
+msgstr "Erwartete wöchentliche Arbeitsstunden"
+
+#: apps/employees/models.py:406
+msgid "emergency contact name"
+msgstr "Name des Notfallkontakts"
+
+#: apps/employees/models.py:412
+msgid "emergency contact phone"
+msgstr "Telefon des Notfallkontakts"
+
+#: apps/employees/models.py:418
+msgid "relationship"
+msgstr "Beziehung"
+
+#: apps/employees/models.py:421
+msgid "Relationship to employee (spouse, parent, etc.)"
+msgstr "Beziehung zum Mitarbeiter (Ehepartner, Elternteil, etc.)"
+
+#: apps/employees/models.py:428
+#, fuzzy
+#| msgid "Internal notes about the employee"
+msgid "Additional information and notes about the employee"
+msgstr "Interne Notizen über den Mitarbeiter"
+
+#: apps/employees/models.py:432 apps/employees/models.py:511
+msgid "employee"
+msgstr ""
+
+#: apps/employees/models.py:433
+msgid "employees"
+msgstr ""
+
+#: apps/employees/models.py:475
+msgid "Terminated"
+msgstr ""
+
+#: apps/employees/models.py:499
+msgid "Employment Contract"
+msgstr "Arbeitsvertrag"
+
+#: apps/employees/models.py:501
+msgid "License"
+msgstr "Lizenz"
+
+#: apps/employees/models.py:502
+msgid "Resume/CV"
+msgstr "Lebenslauf"
+
+#: apps/employees/models.py:503
+msgid "Reference Letter"
+msgstr "Empfehlungsschreiben"
+
+#: apps/employees/models.py:504 apps/schedules/models.py:170
+msgid "Other"
+msgstr "Andere"
+
+#: apps/employees/models.py:515
+msgid "document type"
+msgstr "Dokumenttyp"
+
+#: apps/employees/models.py:521
+msgid "title"
+msgstr "Titel"
+
+#: apps/employees/models.py:526
+#: venv/lib/python3.12/site-packages/click/types.py:937
+msgid "file"
+msgstr "Datei"
+
+#: apps/employees/models.py:528
+msgid "Upload document (PDF, DOCX, JPG, PNG)"
+msgstr "Dokument hochladen (PDF, DOCX, JPG, PNG)"
+
+#: apps/employees/models.py:537
+msgid "issue date"
+msgstr "Ausstellungsdatum"
+
+#: apps/employees/models.py:540
+#, fuzzy
+#| msgid "When does this document expire?"
+msgid "When was this document issued?"
+msgstr "Wann läuft dieses Dokument ab?"
+
+#: apps/employees/models.py:544
+msgid "expiry date"
+msgstr "Ablaufdatum"
+
+#: apps/employees/models.py:547
+msgid "When does this document expire?"
+msgstr "Wann läuft dieses Dokument ab?"
+
+#: apps/employees/models.py:555
+msgid "uploaded by"
+msgstr ""
+
+#: apps/employees/models.py:559
+msgid "employee document"
+msgstr ""
+
+#: apps/employees/models.py:560
+msgid "employee documents"
+msgstr ""
+
+#: apps/employees/models.py:593
+msgid "location name"
+msgstr "Standortname"
+
+#: apps/employees/models.py:596
+msgid "Full location name"
+msgstr "Vollständiger Standortname"
+
+#: apps/employees/models.py:600
+msgid "location code"
+msgstr "Standortcode"
+
+#: apps/employees/models.py:603
+msgid "Short code for location (e.g., GVA, LAU, BRN)"
+msgstr "Kurzcode für Standort (z.B. GVA, LAU, BRN)"
+
+#: apps/employees/models.py:614
+msgid "Location address details"
+msgstr "Details zur Standortadresse"
+
+#: apps/employees/models.py:622
+msgid "Street address (deprecated - use address_detail)"
+msgstr "Straßenadresse (veraltet - verwenden Sie address_detail)"
+
+#: apps/employees/models.py:629
+msgid "Apartment, suite, unit, building, floor, etc. (deprecated)"
+msgstr "Wohnung, Suite, Einheit, Gebäude, Etage, etc. (veraltet)"
+
+#: apps/employees/models.py:636
+msgid "City name (deprecated - use address_detail)"
+msgstr "Stadtname (veraltet - verwenden Sie address_detail)"
+
+#: apps/employees/models.py:643
+msgid "Postal/ZIP code (deprecated - use address_detail)"
+msgstr "Postleitzahl (veraltet - verwenden Sie address_detail)"
+
+#: apps/employees/models.py:650
+msgid "Administrative level 1 (deprecated - use address_detail)"
+msgstr "Verwaltungsebene 1 (veraltet - verwenden Sie address_detail)"
+
+#: apps/employees/models.py:664
+msgid "Country code (deprecated - use address_detail)"
+msgstr "Ländercode (veraltet - verwenden Sie address_detail)"
+
+#: apps/employees/models.py:672
+msgid "Main phone number for this location"
+msgstr "Haupttelefonnummer für diesen Standort"
+
+#: apps/employees/models.py:676
+msgid "email"
+msgstr "E-Mail"
+
+#: apps/employees/models.py:678
+msgid "Main email address for this location"
+msgstr "Haupt-E-Mail-Adresse für diesen Standort"
+
+#: apps/employees/models.py:688
+msgid "location manager"
+msgstr "Standortleiter"
+
+#: apps/employees/models.py:689
+msgid "User responsible for this location"
+msgstr "Verantwortlicher Benutzer für diesen Standort"
+
+#: apps/employees/models.py:696
+msgid "Whether this location is currently operational"
+msgstr "Ob dieser Standort derzeit in Betrieb ist"
+
+#: apps/employees/models.py:703
+#, fuzzy
+#| msgid "Internal notes about this location"
+msgid "Additional information and notes about this location"
+msgstr "Interne Notizen über diesen Standort"
+
+#: apps/employees/models.py:707
+msgid "monthly labor budget (CHF)"
+msgstr "monatliches Personalbudget (CHF)"
+
+#: apps/employees/models.py:711
+msgid "Budget for labor costs per month in Swiss Francs"
+msgstr "Budget für Personalkosten pro Monat in Schweizer Franken"
+
+#: apps/employees/models.py:721
+msgid "GPS latitude coordinate (optional)"
+msgstr "GPS-Breitengradkoordinate (optional)"
+
+#: apps/employees/models.py:730
+msgid "GPS longitude coordinate (optional)"
+msgstr "GPS-Längengradkoordinate (optional)"
+
+#: apps/employees/models.py:735
+msgid "locations"
+msgstr ""
+
+#: apps/employees/templates/employees/department_confirm_delete.html:5
+#: apps/employees/templates/employees/department_confirm_delete.html:9
+msgid "Delete Department"
+msgstr ""
+
+#: apps/employees/templates/employees/department_confirm_delete.html:9
+msgid "Cannot Delete Department"
+msgstr ""
+
+#: apps/employees/templates/employees/department_confirm_delete.html:9
+msgid "Back to Department"
+msgstr ""
+
+#: apps/employees/templates/employees/department_list.html:5
+#: apps/employees/views.py:83 apps/employees/views.py:1060
+#: apps/employees/views.py:1194 apps/employees/views.py:1263
+#: apps/employees/views.py:1571 apps/employees/views.py:1596
+#: apps/employees/views.py:1629 templates/layouts/dashboard_layout.html:27
+msgid "Departments"
+msgstr "Abteilungen"
+
+#: apps/employees/templates/employees/document_confirm_delete.html:5
+#: apps/employees/views.py:2468 apps/employees/views.py:2470
+msgid "Delete Document"
+msgstr "Dokument löschen?"
+
+#: apps/employees/templates/employees/document_form.html:32
+#: apps/employees/views.py:606
+msgid "Uploaded"
+msgstr "Hochgeladen"
+
+#: apps/employees/templates/employees/document_form.html:34
+#: templates/core/components/custom_file_input.html:264
+#: venv/lib/python3.12/site-packages/django/forms/widgets.py:463
+msgid "Change"
+msgstr "Ändern"
+
+#: apps/employees/templates/employees/document_form.html:36
+#, fuzzy
+#| msgid "Uploaded"
+msgid "Upload"
+msgstr "Hochgeladen"
+
+#: apps/employees/templates/employees/document_upload.html:5
+#: apps/employees/views.py:423 apps/employees/views.py:2388
+#: templates/core/components/documents_tab_content.html:19
+msgid "Upload Document"
+msgstr "Dokument hochladen"
+
+#: apps/employees/templates/employees/employee_confirm_delete.html:5
+#: apps/employees/templates/employees/location_confirm_delete.html:13
+#: apps/employees/templates/employees/location_confirm_delete.html:64
+msgid "Delete Employee"
+msgstr ""
+
+#: apps/employees/templates/employees/location_confirm_delete.html:34
+msgid "Back to Employee"
+msgstr ""
+
+#: apps/employees/templates/employees/location_confirm_delete.html:42
+msgid "Employee:"
+msgstr ""
+
+#: apps/employees/templates/employees/location_confirm_delete.html:48
+msgid "This will permanently delete:"
+msgstr ""
+
+#: apps/employees/templates/employees/location_confirm_delete.html:60
+#: templates/core/components/action_buttons.html:16
+#: templates/core/components/confirm_delete.html:111
+#: templates/core/layouts/delete_confirm.html:62
+#: templates/core/layouts/form_page.html:44
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: apps/employees/templates/employees/location_list.html:5
+#: apps/employees/views.py:2571 apps/employees/views.py:2732
+#: apps/employees/views.py:2796 apps/employees/views.py:3162
+#: apps/employees/views.py:3187 templates/layouts/dashboard_layout.html:35
+msgid "Locations"
+msgstr "Standorte"
+
+#: apps/employees/templates/employees/position_confirm_delete.html:5
+#: apps/employees/templates/employees/position_confirm_delete.html:9
+msgid "Delete Position"
+msgstr ""
+
+#: apps/employees/templates/employees/position_confirm_delete.html:9
+msgid "Cannot Delete Position"
+msgstr ""
+
+#: apps/employees/templates/employees/position_confirm_delete.html:9
+msgid "Back to Position"
+msgstr ""
+
+#: apps/employees/templates/employees/position_list.html:5
+#: apps/employees/views.py:1731 apps/employees/views.py:1867
+#: apps/employees/views.py:1934 apps/employees/views.py:2215
+#: apps/employees/views.py:2240 apps/employees/views.py:2273
+#: templates/layouts/dashboard_layout.html:31
+msgid "Positions"
+msgstr "Positionen"
+
+#: apps/employees/views.py:114
+msgid "No employees match your filters"
+msgstr ""
+
+#: apps/employees/views.py:115 apps/employees/views.py:1232
+#: apps/employees/views.py:1904 apps/employees/views.py:2767
+msgid "Try adjusting or clearing your filters to see more results"
+msgstr ""
+
+#: apps/employees/views.py:116 apps/employees/views.py:1233
+#: apps/employees/views.py:1905 apps/employees/views.py:2768
+msgid "Clear Filters"
+msgstr "Filter löschen"
+
+#: apps/employees/views.py:123
+msgid "No employees found"
+msgstr ""
+
+#: apps/employees/views.py:124
+msgid "Start by adding your first employee"
+msgstr ""
+
+#: apps/employees/views.py:125
+msgid "Add First Employee"
+msgstr ""
+
+#: apps/employees/views.py:133
+msgid "Manage employee records and information"
+msgstr "Mitarbeiterdaten und Informationen verwalten"
+
+#: apps/employees/views.py:140 apps/employees/views.py:329
+msgid "Add Employee"
+msgstr "Mitarbeiter hinzufügen"
+
+#: apps/employees/views.py:171 apps/employees/views.py:485
+#: apps/employees/views.py:745
+msgid "Personal Information"
+msgstr "Persönliche Informationen"
+
+#: apps/employees/views.py:300 apps/employees/views.py:1548
+#: apps/employees/views.py:2192 apps/employees/views.py:3139
+#: templates/core/components/form_errors_alert.html:21
+msgid "Please correct the errors below."
+msgstr ""
+
+#: apps/employees/views.py:323 apps/employees/views.py:1572
+#: apps/employees/views.py:2216 apps/employees/views.py:3163
+msgid "Create"
+msgstr "Erstellen"
+
+#: apps/employees/views.py:330
+msgid "Fill in the employee information below"
+msgstr ""
+
+#: apps/employees/views.py:332
+msgid "Create Employee"
+msgstr ""
+
+#: apps/employees/views.py:383
+msgid "Edit Employee"
+msgstr "Mitarbeiter bearbeiten"
+
+#: apps/employees/views.py:384
+msgid "Update employee information"
+msgstr "Mitarbeiterinformationen aktualisieren"
+
+#: apps/employees/views.py:386 apps/employees/views.py:1607
+#: apps/employees/views.py:2251 apps/employees/views.py:2436
+#: apps/employees/views.py:3198
+msgid "Save Changes"
+msgstr "Änderungen speichern"
+
+#: apps/employees/views.py:393
+msgid "Employee updated successfully."
+msgstr ""
+
+#: apps/employees/views.py:435 apps/employees/views.py:647
+#: apps/employees/views.py:847 apps/employees/views.py:1277
+#: apps/employees/views.py:1631 apps/employees/views.py:1948
+#: apps/employees/views.py:2275 apps/employees/views.py:2810
+#: templates/core/components/info_card.html:59
+#: venv/lib/python3.12/site-packages/django/forms/formsets.py:499
+msgid "Delete"
+msgstr "Löschen"
+
+#: apps/employees/views.py:459
+msgid "Work Info"
+msgstr "Arbeitsinfo"
+
+#: apps/employees/views.py:465
+#: templates/core/components/documents_tab_content.html:12
+msgid "Documents"
+msgstr "Dokumente"
+
+#: apps/employees/views.py:492
+msgid "Phone Number"
+msgstr ""
+
+#: apps/employees/views.py:493 apps/employees/views.py:752
+msgid "Date of Birth"
+msgstr "Geburtsdatum"
+
+#: apps/employees/views.py:506 apps/employees/views.py:770
+msgid "Contact Name"
+msgstr "Kontaktname"
+
+#: apps/employees/views.py:510 apps/employees/views.py:771
+msgid "Contact Phone"
+msgstr "Kontakttelefon"
+
+#: apps/employees/views.py:514 apps/employees/views.py:772
+msgid "Relationship"
+msgstr "Beziehung"
+
+#: apps/employees/views.py:533
+msgid "Employee ID"
+msgstr "Mitarbeiter-ID"
+
+#: apps/employees/views.py:534 apps/employees/views.py:786
+msgid "Employment Type"
+msgstr "Beschäftigungsart"
+
+#: apps/employees/views.py:553 apps/employees/views.py:788
+msgid "Hire Date"
+msgstr "Einstellungsdatum"
+
+#: apps/employees/views.py:557 apps/employees/views.py:789
+msgid "Years of Service"
+msgstr ""
+
+#: apps/employees/views.py:561 apps/employees/views.py:791
+msgid "Weekly Hours"
+msgstr "Wochenstunden"
+
+#: apps/employees/views.py:574 apps/employees/views.py:796
+msgid "Termination Date"
+msgstr "Enddatum"
+
+#: apps/employees/views.py:604
+msgid "Title"
+msgstr "Titel"
+
+#: apps/employees/views.py:622
+#: templates/core/components/blocks/avatar_with_edit.html:58
+#: templates/core/components/custom_image_input.html:84
+msgid "Preview"
+msgstr "Vorschau"
+
+#: apps/employees/views.py:689
+msgid "Active Employee"
+msgstr "Aktiver Mitarbeiter"
+
+#: apps/employees/views.py:816
+msgid "No documents uploaded"
+msgstr ""
+
+#: apps/employees/views.py:822
+msgid "No documents uploaded yet"
+msgstr "Noch keine Dokumente hochgeladen"
+
+#: apps/employees/views.py:877
+#, python-format
+msgid "%(count)d future shift(s) scheduled"
+msgstr ""
+
+#: apps/employees/views.py:897
+#, python-format
+msgid "%(count)d open timeclock entry(ies)"
+msgstr ""
+
+#: apps/employees/views.py:909
+#, python-format
+msgid "%(count)d uploaded document(s)"
+msgstr ""
+
+#: apps/employees/views.py:923
+msgid "Employee profile and employment history"
+msgstr ""
+
+#: apps/employees/views.py:924
+msgid "Associated user account"
+msgstr ""
+
+#: apps/employees/views.py:925
+msgid "All uploaded documents"
+msgstr ""
+
+#: apps/employees/views.py:926
+msgid "Time clock records (if any)"
+msgstr ""
+
+#: apps/employees/views.py:927
+msgid "Schedule history"
+msgstr ""
+
+#: apps/employees/views.py:944
+msgid "Are you sure you want to delete this employee?"
+msgstr ""
+
+#: apps/employees/views.py:945 apps/employees/views.py:1673
+#: apps/employees/views.py:2317
+msgid "This action cannot be undone."
+msgstr ""
+
+#: apps/employees/views.py:958
+msgid "Cannot delete this employee. Please resolve the following issues first:"
+msgstr ""
+
+#: apps/employees/views.py:973
+msgid "Cannot delete employee: "
+msgstr ""
+
+#: apps/employees/views.py:990
+#, python-format
+msgid "Employee \"%(name)s\" has been deleted successfully."
+msgstr ""
+
+#: apps/employees/views.py:1094
+msgid "Total Departments"
+msgstr "Gesamte Abteilungen"
+
+#: apps/employees/views.py:1112 apps/employees/views.py:2621
+msgid "With Manager"
+msgstr "Mit Manager"
+
+#: apps/employees/views.py:1195
+msgid "Manage organizational departments"
+msgstr "Organisationsabteilungen verwalten"
+
+#: apps/employees/views.py:1202
+msgid "Add Department"
+msgstr "Abteilung hinzufügen"
+
+#: apps/employees/views.py:1217 apps/employees/views.py:2756
+msgid "Active employees"
+msgstr "Aktive Mitarbeiter"
+
+#: apps/employees/views.py:1219 apps/employees/views.py:2757
+msgid "Total employees"
+msgstr "Gesamte Mitarbeiter"
+
+#: apps/employees/views.py:1231
+msgid "No departments match your filters"
+msgstr ""
+
+#: apps/employees/views.py:1240
+msgid "No departments found"
+msgstr ""
+
+#: apps/employees/views.py:1241
+msgid "Start by adding your first department"
+msgstr ""
+
+#: apps/employees/views.py:1242
+msgid "Add First Department"
+msgstr ""
+
+#: apps/employees/views.py:1298
+#, python-format
+msgid "Department Code: %(code)s"
+msgstr ""
+
+#: apps/employees/views.py:1341 apps/employees/views.py:2012
+#: apps/employees/views.py:2874
+msgid "Code"
+msgstr "Code"
+
+#: apps/employees/views.py:1401
+msgid "Department Employees"
+msgstr "Abteilungsmitarbeiter"
+
+#: apps/employees/views.py:1421
+msgid "No employees assigned to this department"
+msgstr ""
+
+#: apps/employees/views.py:1430
+msgid "Validity Period"
+msgstr ""
+
+#: apps/employees/views.py:1445
+msgid "Ongoing"
+msgstr ""
+
+#: apps/employees/views.py:1456
+msgid "Additional Details"
+msgstr ""
+
+#: apps/employees/views.py:1504
+msgid "Management & Contact"
+msgstr "Verwaltung & Kontakt"
+
+#: apps/employees/views.py:1513
+msgid "Status & Validity"
+msgstr "Status & Gültigkeit"
+
+#: apps/employees/views.py:1544
+msgid "Department saved successfully."
+msgstr ""
+
+#: apps/employees/views.py:1578 apps/employees/views.py:1581
+msgid "Create Department"
+msgstr ""
+
+#: apps/employees/views.py:1579
+msgid "Add a new department to the organization"
+msgstr ""
+
+#: apps/employees/views.py:1604
+msgid "Edit Department"
+msgstr "Abteilung bearbeiten"
+
+#: apps/employees/views.py:1605
+msgid "Update department information"
+msgstr "Abteilungsinformationen aktualisieren"
+
+#: apps/employees/views.py:1648 apps/employees/views.py:2292
+#, python-format
+msgid "%(count)d active employee(s) assigned"
+msgstr ""
+
+#: apps/employees/views.py:1657 apps/employees/views.py:2301
+#, python-format
+msgid "%(count)d employee(s) in history"
+msgstr ""
+
+#: apps/employees/views.py:1672
+msgid "Are you sure you want to delete this department?"
+msgstr ""
+
+#: apps/employees/views.py:1682
+msgid ""
+"Cannot delete this department. Please resolve the following issues first:"
+msgstr ""
+
+#: apps/employees/views.py:1696
+msgid "Cannot delete department: "
+msgstr ""
+
+#: apps/employees/views.py:1708
+#, python-format
+msgid "Department \"%(name)s\" has been deleted successfully."
+msgstr ""
+
+#: apps/employees/views.py:1760
+msgid "Total Positions"
+msgstr "Gesamte Positionen"
+
+#: apps/employees/views.py:1778
+msgid "Requires Certification"
+msgstr "Erfordert Zertifizierung"
+
+#: apps/employees/views.py:1868
+msgid "Manage job positions and roles"
+msgstr "Berufspositionen und Rollen verwalten"
+
+#: apps/employees/views.py:1875
+msgid "Add Position"
+msgstr "Position hinzufügen"
+
+#: apps/employees/views.py:1888
+msgid "Position Title"
+msgstr "Positionstitel"
+
+#: apps/employees/views.py:1889
+msgid "Hourly Rate Range"
+msgstr "Stundensatzbereich"
+
+#: apps/employees/views.py:1890 apps/employees/views.py:2083
+msgid "Certification Required"
+msgstr "Zertifizierung erforderlich"
+
+#: apps/employees/views.py:1903
+msgid "No positions match your filters"
+msgstr ""
+
+#: apps/employees/views.py:1912
+msgid "No positions found"
+msgstr ""
+
+#: apps/employees/views.py:1913
+msgid "Start by adding your first position"
+msgstr ""
+
+#: apps/employees/views.py:1914
+msgid "Add First Position"
+msgstr ""
+
+#: apps/employees/views.py:1969
+#, python-format
+msgid "Position Code: %(code)s"
+msgstr ""
+
+#: apps/employees/views.py:2061
+msgid "Min Rate"
+msgstr "Min. Satz"
+
+#: apps/employees/views.py:2067
+msgid "Max Rate"
+msgstr "Max. Satz"
+
+#: apps/employees/views.py:2084
+#: venv/lib/python3.12/site-packages/django/forms/widgets.py:801
+msgid "Yes"
+msgstr ""
+
+#: apps/employees/views.py:2084
+#: venv/lib/python3.12/site-packages/django/forms/widgets.py:802
+msgid "No"
+msgstr ""
+
+#: apps/employees/views.py:2094
+msgid "Employees in this Position"
+msgstr "Mitarbeiter in dieser Position"
+
+#: apps/employees/views.py:2114
+msgid "No employees assigned to this position"
+msgstr ""
+
+#: apps/employees/views.py:2157
+msgid "Compensation Range"
+msgstr "Vergütungsbereich"
+
+#: apps/employees/views.py:2188
+msgid "Position saved successfully."
+msgstr ""
+
+#: apps/employees/views.py:2222 apps/employees/views.py:2225
+msgid "Create Position"
+msgstr ""
+
+#: apps/employees/views.py:2223
+msgid "Add a new position to the organization"
+msgstr ""
+
+#: apps/employees/views.py:2248
+msgid "Edit Position"
+msgstr "Position bearbeiten"
+
+#: apps/employees/views.py:2249
+msgid "Update position information"
+msgstr "Positionsinformationen aktualisieren"
+
+#: apps/employees/views.py:2316
+msgid "Are you sure you want to delete this position?"
+msgstr ""
+
+#: apps/employees/views.py:2326
+msgid "Cannot delete this position. Please resolve the following issues first:"
+msgstr ""
+
+#: apps/employees/views.py:2340
+msgid "Cannot delete position: "
+msgstr ""
+
+#: apps/employees/views.py:2352
+#, python-format
+msgid "Position \"%(title)s\" has been deleted successfully."
+msgstr ""
+
+#: apps/employees/views.py:2374
+msgid "Document uploaded successfully."
+msgstr "Dokument erfolgreich hochgeladen."
+
+#: apps/employees/views.py:2385
+#, fuzzy, python-format
+#| msgid "Upload Document for %(name)s"
+msgid "Upload Document for %(name)s"
+msgstr "Dokument hochladen"
+
+#: apps/employees/views.py:2387 apps/employees/views.py:2435
+msgid "Accepted formats: PDF, DOCX, JPG, PNG (max 10MB)"
+msgstr "Akzeptierte Formate: PDF, DOCX, JPG, PNG (max 10MB)"
+
+#: apps/employees/views.py:2421
+#, fuzzy
+#| msgid "Document uploaded successfully."
+msgid "Document updated successfully."
+msgstr "Dokument erfolgreich hochgeladen."
+
+#: apps/employees/views.py:2433
+#, fuzzy
+#| msgid "Documents"
+msgid "Edit Document"
+msgstr "Dokumente"
+
+#: apps/employees/views.py:2452
+msgid "This document has already been deleted."
+msgstr "Dieses Dokument wurde bereits gelöscht."
+
+#: apps/employees/views.py:2460
+msgid "Document deleted successfully."
+msgstr "Dokument erfolgreich gelöscht."
+
+#: apps/employees/views.py:2469
+msgid "Delete Document?"
+msgstr "Dokument löschen?"
+
+#: apps/employees/views.py:2487
+#, fuzzy
+#| msgid "No file chosen"
+msgid "No file provided"
+msgstr "Keine Datei ausgewählt"
+
+#: apps/employees/views.py:2512
+#, fuzzy
+#| msgid "Document uploaded successfully."
+msgid "Profile picture updated successfully"
+msgstr "Dokument erfolgreich hochgeladen."
+
+#: apps/employees/views.py:2514
+#: templates/core/components/custom_file_input.html:64
+#: templates/core/components/custom_file_input.html:65
+#: templates/core/components/custom_image_input.html:29
+#: templates/core/components/profile_picture_field.html:29
+#: templates/core/components/profile_picture_field.html:30
+msgid "Current photo"
+msgstr "Aktuelles Foto"
+
+#: apps/employees/views.py:2538
+#, fuzzy
+#| msgid "Document deleted successfully."
+msgid "Profile picture deleted successfully"
+msgstr "Dokument erfolgreich gelöscht."
+
+#: apps/employees/views.py:2543
+#, fuzzy
+#| msgid "profile picture"
+msgid "No profile picture to delete"
+msgstr "Profilbild"
+
+#: apps/employees/views.py:2603
+msgid "Total Locations"
+msgstr "Gesamte Standorte"
+
+#: apps/employees/views.py:2733
+msgid "Manage clinic and office locations"
+msgstr "Klinik- und Bürostandorte verwalten"
+
+#: apps/employees/views.py:2740
+msgid "Add Location"
+msgstr "Standort hinzufügen"
+
+#: apps/employees/views.py:2766
+msgid "No locations match your filters"
+msgstr ""
+
+#: apps/employees/views.py:2774
+msgid "No locations found"
+msgstr ""
+
+#: apps/employees/views.py:2775
+msgid "Start by adding your first clinic location"
+msgstr ""
+
+#: apps/employees/views.py:2776
+msgid "Add First Location"
+msgstr ""
+
+#: apps/employees/views.py:2831
+#, python-format
+msgid "Location Code: %(code)s"
+msgstr "Standortcode: %(code)s"
+
+#: apps/employees/views.py:2936
+msgid "Geo"
+msgstr "Geo"
+
+#: apps/employees/views.py:2955
+msgid "Phone"
+msgstr "Telefon"
+
+#: apps/employees/views.py:2984
+msgid "Labor Budget"
+msgstr "Personalbudget"
+
+#: apps/employees/views.py:3012
+msgid "Location Employees"
+msgstr "Standortmitarbeiter"
+
+#: apps/employees/views.py:3032
+msgid "No employees assigned to this location"
+msgstr ""
+
+#: apps/employees/views.py:3135
+msgid "Location saved successfully."
+msgstr ""
+
+#: apps/employees/views.py:3169 apps/employees/views.py:3172
+msgid "Create Location"
+msgstr ""
+
+#: apps/employees/views.py:3170
+msgid "Add a new location to the organization"
+msgstr "Neuen Standort zur Organisation hinzufügen"
+
+#: apps/employees/views.py:3195
+msgid "Edit Location"
+msgstr "Standort bearbeiten"
+
+#: apps/employees/views.py:3196
+msgid "Update location information"
+msgstr "Standortinformationen aktualisieren"
+
+#: apps/employees/views.py:3231
+msgid "Location \"{}\" has been deactivated."
+msgstr ""
+
+#: apps/schedules/admin.py:40
+msgid "Assignment"
+msgstr ""
+
+#: apps/schedules/admin.py:43 templates/layouts/dashboard_layout.html:43
+msgid "Schedule"
+msgstr "Zeitplan"
+
+#: apps/schedules/admin.py:46
+msgid "Status & Notes"
+msgstr ""
+
+#: apps/schedules/admin.py:65 apps/schedules/admin.py:183
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1853
+msgid "Duration"
+msgstr ""
+
+#: apps/schedules/admin.py:121
+msgid "Period"
+msgstr ""
+
+#: apps/schedules/admin.py:124 apps/schedules/admin.py:166
+msgid "Recurrence"
+msgstr ""
+
+#: apps/schedules/admin.py:128 apps/schedules/models.py:73
+#: apps/schedules/models.py:210
+msgid "Notes"
+msgstr "Notizen"
+
+#: apps/schedules/admin.py:160
+msgid "Template Info"
+msgstr ""
+
+#: apps/schedules/admin.py:163
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2516
+msgid "Time"
+msgstr ""
+
+#: apps/schedules/admin.py:179
+msgid "Time Range"
+msgstr ""
+
+#: apps/schedules/admin.py:190
+msgid "Weekdays"
+msgstr ""
+
+#: apps/schedules/admin.py:224
+msgid "Swap Details"
+msgstr ""
+
+#: apps/schedules/admin.py:227
+#: venv/lib/python3.12/site-packages/django/contrib/messages/apps.py:16
+msgid "Messages"
+msgstr ""
+
+#: apps/schedules/admin.py:240 apps/schedules/models.py:354
+msgid "Original Shift"
+msgstr ""
+
+#: apps/schedules/models.py:19
+msgid "Draft"
+msgstr ""
+
+#: apps/schedules/models.py:20
+msgid "Published"
+msgstr ""
+
+#: apps/schedules/models.py:21
+msgid "Approved"
+msgstr ""
+
+#: apps/schedules/models.py:22 apps/schedules/models.py:347
+msgid "Completed"
+msgstr ""
+
+#: apps/schedules/models.py:23
+msgid "Cancelled"
+msgstr ""
+
+#: apps/schedules/models.py:33
+msgid "Leave empty for open shifts"
+msgstr ""
+
+#: apps/schedules/models.py:51 apps/schedules/models.py:181
+msgid "Start Date & Time"
+msgstr ""
+
+#: apps/schedules/models.py:55 apps/schedules/models.py:185
+msgid "End Date & Time"
+msgstr ""
+
+#: apps/schedules/models.py:60 apps/schedules/models.py:291
+msgid "Break Duration (minutes)"
+msgstr ""
+
+#: apps/schedules/models.py:61
+msgid "Duration of unpaid break in minutes"
+msgstr ""
+
+#: apps/schedules/models.py:74
+msgid "Internal notes for this shift"
+msgstr ""
+
+#: apps/schedules/models.py:82 apps/schedules/models.py:310
+msgid "Created By"
+msgstr ""
+
+#: apps/schedules/models.py:86
+msgid "Shift"
+msgstr ""
+
+#: apps/schedules/models.py:87
+msgid "Shifts"
+msgstr ""
+
+#: apps/schedules/models.py:97
+msgid "Open Shift"
+msgstr ""
+
+#: apps/schedules/models.py:106 apps/schedules/models.py:230
+msgid "End time must be after start time"
+msgstr ""
+
+#: apps/schedules/models.py:110
+msgid "Shift cannot be longer than 24 hours"
+msgstr ""
+
+#: apps/schedules/models.py:115
+msgid "Break duration cannot be longer than shift duration"
+msgstr ""
+
+#: apps/schedules/models.py:126
+msgid "This employee already has a shift during this time period"
+msgstr ""
+
+#: apps/schedules/models.py:166
+msgid "Vacation"
+msgstr ""
+
+#: apps/schedules/models.py:167
+msgid "Sick Leave"
+msgstr ""
+
+#: apps/schedules/models.py:168
+msgid "Personal"
+msgstr ""
+
+#: apps/schedules/models.py:169
+msgid "Training"
+msgstr ""
+
+#: apps/schedules/models.py:192
+msgid "Reason"
+msgstr ""
+
+#: apps/schedules/models.py:197
+msgid "Recurring"
+msgstr ""
+
+#: apps/schedules/models.py:198
+msgid "Is this a recurring unavailability?"
+msgstr ""
+
+#: apps/schedules/models.py:204
+msgid "Recurrence Pattern"
+msgstr ""
+
+#: apps/schedules/models.py:205
+msgid "JSON pattern for recurring unavailability (e.g., every Monday)"
+msgstr ""
+
+#: apps/schedules/models.py:214
+msgid "Unavailability"
+msgstr ""
+
+#: apps/schedules/models.py:215
+msgid "Unavailabilities"
+msgstr ""
+
+#: apps/schedules/models.py:240
+msgid "This employee already has unavailability during this period"
+msgstr ""
+
+#: apps/schedules/models.py:262
+msgid "Template Name"
+msgstr ""
+
+#: apps/schedules/models.py:280 templates/core/components/time_picker.html:13
+msgid "Start Time"
+msgstr ""
+
+#: apps/schedules/models.py:281 apps/schedules/models.py:286
+msgid "Time only, without date"
+msgstr ""
+
+#: apps/schedules/models.py:285 templates/core/components/time_picker.html:32
+msgid "End Time"
+msgstr ""
+
+#: apps/schedules/models.py:296
+msgid "Days of Week"
+msgstr ""
+
+#: apps/schedules/models.py:297
+msgid "List of weekday numbers: 0=Monday, 6=Sunday"
+msgstr ""
+
+#: apps/schedules/models.py:314
+msgid "Shift Template"
+msgstr ""
+
+#: apps/schedules/models.py:315
+msgid "Shift Templates"
+msgstr ""
+
+#: apps/schedules/models.py:342 templates/core/components/status_badge.html:10
+msgid "Pending"
+msgstr ""
+
+#: apps/schedules/models.py:343
+msgid "Accepted by Employee"
+msgstr ""
+
+#: apps/schedules/models.py:344
+msgid "Rejected by Employee"
+msgstr ""
+
+#: apps/schedules/models.py:345
+msgid "Approved by Manager"
+msgstr ""
+
+#: apps/schedules/models.py:346
+msgid "Rejected by Manager"
+msgstr ""
+
+#: apps/schedules/models.py:361
+msgid "Requesting Employee"
+msgstr ""
+
+#: apps/schedules/models.py:362
+msgid "Employee who wants to swap their shift"
+msgstr ""
+
+#: apps/schedules/models.py:369
+msgid "Target Employee"
+msgstr ""
+
+#: apps/schedules/models.py:370
+msgid "Employee who is asked to take the shift"
+msgstr ""
+
+#: apps/schedules/models.py:382
+msgid "Request Message"
+msgstr ""
+
+#: apps/schedules/models.py:383
+msgid "Message from requesting employee"
+msgstr ""
+
+#: apps/schedules/models.py:388
+msgid "Response Message"
+msgstr ""
+
+#: apps/schedules/models.py:389
+msgid "Response from target employee or manager"
+msgstr ""
+
+#: apps/schedules/models.py:398
+msgid "Approved By"
+msgstr ""
+
+#: apps/schedules/models.py:404
+msgid "Approved At"
+msgstr ""
+
+#: apps/schedules/models.py:408
+msgid "Shift Swap Request"
+msgstr ""
+
+#: apps/schedules/models.py:409
+msgid "Shift Swap Requests"
+msgstr ""
+
+#: apps/schedules/models.py:421
+msgid "Requesting employee must be assigned to the original shift"
+msgstr ""
+
+#: apps/schedules/models.py:425
+msgid "Cannot swap shift with yourself"
+msgstr ""
+
+#: templates/core/components/action_buttons.html:21
+#: templates/core/components/form_container.html:43
+#: templates/core/layouts/form_page.html:47
+msgid "Save"
+msgstr "Speichern"
+
+#: templates/core/components/blocks/avatar_with_edit.html:54
+#: templates/core/components/custom_image_input.html:61
+msgid "Change Image"
+msgstr "Bild ändern"
+
+#: templates/core/components/blocks/avatar_with_edit.html:63
+#, fuzzy
+#| msgid "Delete file"
+msgid "Remove image"
+msgstr "Datei löschen"
+
+#: templates/core/components/blocks/avatar_with_edit.html:68
+#: templates/core/components/custom_image_input.html:63
+#, fuzzy
+#| msgid "Uploaded"
+msgid "Upload Image"
+msgstr "Hochgeladen"
+
+#: templates/core/components/blocks/avatar_with_edit.html:149
+#: templates/core/components/custom_image_input.html:186
+#, fuzzy
+#| msgid "Are you sure you want to delete this file?"
+msgid "Are you sure you want to delete this image?"
+msgstr "Sind Sie sicher, dass Sie diese Datei löschen möchten?"
+
+#: templates/core/components/blocks/avatar_with_edit.html:166
+#: templates/core/components/blocks/avatar_with_edit.html:171
+#: templates/core/components/custom_file_input.html:305
+#: templates/core/components/custom_image_input.html:223
+#: templates/core/components/custom_image_input.html:231
+#, fuzzy
+#| msgid "Delete file"
+msgid "Error deleting file"
+msgstr "Datei löschen"
+
+#: templates/core/components/blocks/avatar_with_edit.html:166
+#: templates/core/components/blocks/avatar_with_edit.html:205
+#: templates/core/components/custom_image_input.html:171
+#: templates/core/components/custom_image_input.html:223
+msgid "Unknown error"
+msgstr "Unbekannter Fehler"
+
+#: templates/core/components/blocks/avatar_with_edit.html:183
+#: templates/core/components/custom_image_input.html:130
+msgid "Please select an image file"
+msgstr "Bitte wählen Sie eine Bilddatei aus"
+
+#: templates/core/components/blocks/avatar_with_edit.html:205
+#: templates/core/components/blocks/avatar_with_edit.html:210
+#: templates/core/components/custom_file_input.html:236
+#: templates/core/components/custom_image_input.html:171
+#: templates/core/components/custom_image_input.html:178
+msgid "Error uploading file"
+msgstr "Fehler beim Hochladen der Datei"
+
+#: templates/core/components/certification_status.html:5
+msgid "All Certifications Valid"
+msgstr ""
+
+#: templates/core/components/certification_status.html:9
+#: templates/core/components/status_badge.html:13
+msgid "Expired"
+msgstr ""
+
+#: templates/core/components/certification_status.html:14
+#: templates/core/components/status_badge.html:16
+msgid "Expiring Soon"
+msgstr ""
+
+#: templates/core/components/certification_status.html:18
+msgid "No Certifications"
+msgstr ""
+
+#: templates/core/components/confirm_delete.html:31
+msgid "Cannot Delete"
+msgstr "Kann nicht gelöscht werden"
+
+#: templates/core/components/confirm_delete.html:42
+msgid "Blocking Issues"
+msgstr "Blockierende Probleme"
+
+#: templates/core/components/confirm_delete.html:53
+msgid "Please reassign or remove the blocking items first."
+msgstr "Bitte weisen Sie zuerst die blockierenden Elemente neu zu oder entfernen Sie sie."
+"Bitte weisen Sie zuerst die blockierenden Elemente neu zu oder entfernen Sie "
+"sie.Bitte weisen Sie zuerst die blockierenden Elemente neu zu oder entfernen "
+"Sie sie.Bitte weisen Sie zuerst die blockierenden Elemente neu zu oder "
+"entfernen Sie sie.Bitte weisen Sie zuerst die blockierenden Elemente neu zu "
+"oder entfernen Sie sie.Bitte weisen Sie zuerst die blockierenden Elemente "
+"neu zu oder entfernen Sie sie.Bitte weisen Sie zuerst die blockierenden "
+"Elemente neu zu oder entfernen Sie sie.Bitte weisen Sie zuerst die "
+"blockierenden Elemente neu zu oder entfernen Sie sie.Bitte weisen Sie zuerst "
+"die blockierenden Elemente neu zu oder entfernen Sie sie.Bitte weisen Sie "
+"zuerst die blockierenden Elemente neu zu oder entfernen Sie sie.Bitte weisen "
+"Sie zuerst die blockierenden Elemente neu zu oder entfernen Sie sie.Bitte "
+"weisen Sie zuerst die blockierenden Elemente neu zu oder entfernen Sie "
+"sie.Bitte weisen Sie zuerst die blockierenden Elemente neu zu oder entfernen "
+"Sie sie.Bitte weisen Sie zuerst die blockierenden Elemente neu zu oder "
+"entfernen Sie sie.Bitte weisen Sie zuerst die blockierenden Elemente neu zu "
+"oder entfernen Sie sie.Bitte weisen Sie zuerst die blockierenden Elemente "
+"neu zu oder entfernen Sie sie.Bitte weisen Sie zuerst die blockierenden "
+"Elemente neu zu oder entfernen Sie sie.Bitte weisen Sie zuerst die "
+"blockierenden Elemente neu zu oder entfernen Sie sie."
+
+#: templates/core/components/confirm_delete.html:59
+msgid "Back"
+msgstr "Zurück"
+
+#: templates/core/components/confirm_delete.html:70
+#: templates/core/layouts/delete_confirm.html:20
+msgid "Confirm Delete"
+msgstr "Löschen bestätigen"
+
+#: templates/core/components/confirm_delete.html:80
+#: templates/core/layouts/delete_confirm.html:29
+msgid "You are about to delete:"
+msgstr "Sie sind dabei zu löschen:"
+
+#: templates/core/components/confirm_delete.html:90
+#: templates/core/layouts/delete_confirm.html:44
+msgid "What happens when you delete?"
+msgstr "Was passiert beim Löschen?"
+
+#: templates/core/components/confirm_delete.html:93
+msgid "This item will be permanently removed from the database"
+msgstr "Dieses Element wird dauerhaft aus der Datenbank entfernt"
+
+#: templates/core/components/confirm_delete.html:94
+msgid "All associated data will be deleted"
+msgstr "Alle zugehörigen Daten werden gelöscht"
+
+#: templates/core/components/confirm_delete.html:95
+msgid "This action cannot be undone"
+msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
+
+#: templates/core/components/confirm_delete.html:101
+msgid "Warning"
+msgstr "Warnung"
+
+#: templates/core/components/confirm_delete.html:115
+#: templates/core/layouts/delete_confirm.html:66
+msgid "Yes, Delete"
+msgstr "Ja, löschen"
+
+#: templates/core/components/confirm_delete.html:126
+msgid "This action is permanent and cannot be undone."
+msgstr "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden."
+
+#: templates/core/components/custom_file_input.html:85
+msgid "Current file"
+msgstr "Aktuelle Datei"
+
+#: templates/core/components/custom_file_input.html:92
+msgid "No file chosen"
+msgstr "Keine Datei ausgewählt"
+
+#: templates/core/components/custom_file_input.html:113
+#: templates/core/components/custom_file_input.html:219
+msgid "Choose another file"
+msgstr "Andere Datei auswählen"
+
+#: templates/core/components/custom_file_input.html:115
+msgid "Choose file"
+msgstr "Datei auswählen"
+
+#: templates/core/components/custom_file_input.html:128
+msgid "Delete file"
+msgstr "Datei löschen"
+
+#: templates/core/components/custom_file_input.html:139
+#: templates/core/components/custom_image_input.html:93
+msgid "Loading..."
+msgstr "Wird geladen..."
+
+#: templates/core/components/custom_file_input.html:258
+msgid "new file selected"
+msgstr "neue Datei ausgewählt"
+
+#: templates/core/components/custom_file_input.html:273
+msgid "Are you sure you want to delete this file?"
+msgstr "Sind Sie sicher, dass Sie diese Datei löschen möchten?"
+
+#: templates/core/components/custom_image_input.html:37
+msgid "Image preview"
+msgstr "Bildvorschau"
+
+#: templates/core/components/custom_image_input.html:73
+#, fuzzy
+#| msgid "Delete file"
+msgid "Delete image"
+msgstr "Datei löschen"
+
+#: templates/core/components/data_table.html:29
+msgid "No data available"
+msgstr ""
+
+#: templates/core/components/department_card.html:16
+msgid "Active Department"
+msgstr ""
+
+#: templates/core/components/department_card.html:26
+msgid "Employees:"
+msgstr ""
+
+#: templates/core/components/department_card.html:32
+msgid "Manager:"
+msgstr ""
+
+#: templates/core/components/department_card.html:39
+msgid "Ext:"
+msgstr ""
+
+#: templates/core/components/documents_tab_content.html:19
+msgid "No documents yet"
+msgstr ""
+
+#: templates/core/components/documents_tab_content.html:19
+msgid "Upload documents for this employee"
+msgstr ""
+
+#: templates/core/components/filter_bar.html:22
+#: templates/core/components/filter_bar.html:87
+#: venv/lib/python3.12/site-packages/django/forms/widgets.py:461
+msgid "Clear"
+msgstr ""
+
+#: templates/core/components/filter_bar.html:107
+msgid "Clear all"
+msgstr ""
+
+#: templates/core/components/form_errors_alert.html:21
+msgid "Error!"
+msgstr ""
+
+#: templates/core/components/metric_card.html:20
+msgid "increase"
+msgstr ""
+
+#: templates/core/components/metric_card.html:23
+msgid "decrease"
+msgstr ""
+
+#: templates/core/components/metric_card.html:26
+msgid "No change"
+msgstr ""
+
+#: templates/core/components/pagination.html:58
+#, python-format
+msgid ""
+"\n"
+"            Page %(current)s of %(total)s\n"
+"        "
+msgstr ""
+
+#: templates/core/components/profile_picture_field.html:39
+msgid "Upload JPG, PNG or GIF (max 5MB)"
+msgstr "JPG, PNG oder GIF hochladen (max 5MB)"
+
+#: templates/core/components/shift_card.html:25
+msgid "Unassigned"
+msgstr ""
+
+#: templates/core/components/staffing_indicator.html:4
+msgid "Doctors"
+msgstr ""
+
+#: templates/core/layouts/delete_confirm.html:48
+msgid "This item will be marked as inactive"
+msgstr ""
+
+#: templates/core/layouts/delete_confirm.html:49
+msgid "It will not appear in active lists"
+msgstr ""
+
+#: templates/core/layouts/delete_confirm.html:50
+msgid "Historical data will be preserved"
+msgstr ""
+
+#: templates/core/layouts/delete_confirm.html:51
+msgid "You can reactivate it later if needed"
+msgstr ""
+
+#: templates/core/layouts/delete_confirm.html:79
+msgid "This is a soft delete. Data can be recovered by reactivating."
+msgstr ""
+
+#: templates/layouts/auth_layout.html:17
+msgid "Next-generation platform for medical practice management"
+msgstr "Plattform der nächsten Generation für Praxismanagement"
+
+#: templates/layouts/dashboard_layout.html:39
+msgid "Help & Docs"
+msgstr "Hilfe & Dokumentation"
+
+#: templates/layouts/dashboard_layout.html:44
+#: templates/layouts/dashboard_layout.html:49
+#: templates/layouts/dashboard_layout.html:54
+msgid "Soon"
+msgstr "Bald"
+
+#: templates/layouts/dashboard_layout.html:48
+msgid "Time Clock"
+msgstr "Zeiterfassung"
+
+#: templates/layouts/dashboard_layout.html:53
+#, fuzzy
+#| msgid "Certification"
+msgid "Certifications"
+msgstr "Zertifizierung"
+
+#: templates/layouts/dashboard_layout.html:138
+msgid "No notifications"
+msgstr "Keine Benachrichtigungen"
+
+#: templates/layouts/dashboard_layout.html:163
+msgid "Profile"
+msgstr "Profil"
+
+#: templates/layouts/dashboard_layout.html:169
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: templates/layouts/dashboard_layout.html:175
+#, fuzzy
+#| msgid "Delete Document"
+msgid "Help & Documentation"
+msgstr "Dokument löschen?"
+
+#: templates/layouts/dashboard_layout.html:182
+msgid "Logout"
+msgstr "Abmelden"
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:445
+msgid "open('foo"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:449
+msgid "open(\"foo"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:453
+#, python-format
+msgid "%ls foo"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:617
+msgid "a[0]."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:624
+msgid "a[0].r"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:631
+msgid "a[0].from_"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:638
+msgid "assert str.star"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:645
+msgid "d['a b'].str"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:652
+msgid "a.app"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:659
+msgid "x.upper() == y."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:666
+msgid "(x.upper() == y."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:673
+msgid "(x.upper() == y)."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:680
+msgid "{'==', 'abc'}."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:687
+msgid "b + c."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1687
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1709
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1712
+msgid "do not suppress"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1688
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1700
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1703
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1706
+msgid "suppress all"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1689
+msgid "suppress all but a"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1690
+msgid "suppress all but c"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1738
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1741
+msgid "---"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/IPython/core/tests/test_completer.py:1744
+msgid "--"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/_pytest/config/argparsing.py:474
+#, python-format
+msgid "ambiguous option: %(option)s could match %(matches)s"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/_termui_impl.py:608
+#, python-brace-format
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/_termui_impl.py:612
+#, python-brace-format
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1104
+#: venv/lib/python3.12/site-packages/click/core.py:1141
+#, python-brace-format
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1160
+msgid "Options"
+msgstr "Aktionen"
+
+#: venv/lib/python3.12/site-packages/click/core.py:1222
+#, python-brace-format
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1241
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1425
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1799
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1830
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1908
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2332
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2355
+#, python-brace-format
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2505
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2956
+#, python-brace-format
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2959
+#, python-brace-format
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:3023
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:50
+#: venv/lib/python3.12/site-packages/click/exceptions.py:89
+#, python-brace-format
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:81
+#, python-brace-format
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:130
+#, python-brace-format
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:132
+#, python-brace-format
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:196
+#, python-brace-format
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:203
+#, python-brace-format
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:223
+#, python-brace-format
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:235
+#, python-brace-format
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/parser.py:199
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/parser.py:381
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/parser.py:444
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/click/shell_completion.py:332
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/shell_completion.py:339
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr "Mitarbeiterinformationen aktualisieren"
+
+#: venv/lib/python3.12/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:180
+#, python-brace-format
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:332
+#, python-brace-format
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:369
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:460
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:538
+#, python-brace-format
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:719
+msgid "{value!r} is not a valid boolean. Recognized values: {states}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:747
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:939
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:941
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:988
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:997
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:1005
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:1014
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:1023
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:1032
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:1099
+#, python-brace-format
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/contrib/sitemaps/apps.py:8
+msgid "Site Maps"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/contrib/staticfiles/apps.py:9
+msgid "Static Files"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/contrib/syndication/apps.py:7
+msgid "Syndication"
+msgstr "Standort"
+
+#. Translators: String used to replace omitted page numbers in elided page
+#. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
+#: venv/lib/python3.12/site-packages/django/core/paginator.py:30
+msgid "…"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/paginator.py:32
+msgid "That page number is not an integer"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/paginator.py:33
+msgid "That page number is less than 1"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/paginator.py:34
+msgid "That page contains no results"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:22
+msgid "Enter a valid value."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:104
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:760
+msgid "Enter a valid URL."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:165
+msgid "Enter a valid integer."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:176
+msgid "Enter a valid email address."
+msgstr "E-Mail-Adresse"
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+#: venv/lib/python3.12/site-packages/django/core/validators.py:259
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:267
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:279
+#: venv/lib/python3.12/site-packages/django/core/validators.py:306
+msgid "Enter a valid IPv4 address."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:286
+#: venv/lib/python3.12/site-packages/django/core/validators.py:307
+msgid "Enter a valid IPv6 address."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:298
+#: venv/lib/python3.12/site-packages/django/core/validators.py:305
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:341
+msgid "Enter only digits separated by commas."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:347
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:382
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:391
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:400
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:407
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:439
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:457
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:480
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:355
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:394
+msgid "Enter a number."
+msgstr "Telefonnummer"
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:482
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:487
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:492
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:563
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/core/validators.py:624
+msgid "Null characters are not allowed."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/base.py:1482
+#: venv/lib/python3.12/site-packages/django/forms/models.py:906
+msgid "and"
+msgstr "Kanada"
+
+#: venv/lib/python3.12/site-packages/django/db/models/base.py:1484
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/constraints.py:20
+#, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:133
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:134
+msgid "This field cannot be null."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:135
+msgid "This field cannot be blank."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:136
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr ""
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:140
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:179
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1151
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1152
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1154
+msgid "Boolean (Either True or False)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1204
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1206
+msgid "String (unlimited)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1310
+msgid "Comma-separated integers"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1411
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1415
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1550
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1419
+msgid "Date (without time)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1546
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1554
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1559
+msgid "Date (with time)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1686
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1688
+msgid "Decimal number"
+msgstr "Telefonnummer"
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1849
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1930
+msgid "File path"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2008
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2010
+msgid "Floating point number"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2050
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2052
+msgid "Integer"
+msgstr "Praktikant"
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2148
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2165
+msgid "Small integer"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2173
+msgid "IPv4 address"
+msgstr "E-Mail-Adresse"
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2204
+msgid "IP address"
+msgstr "Adresse"
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2297
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2298
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2300
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2351
+msgid "Positive big integer"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2366
+msgid "Positive integer"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2381
+msgid "Positive small integer"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2397
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2433
+msgid "Text"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2508
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2512
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2624
+msgid "URL"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2648
+msgid "Raw binary data"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2713
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/__init__.py:2715
+msgid "Universally unique identifier"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/files.py:400
+msgid "Image"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/json.py:26
+msgid "A JSON object"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/json.py:28
+msgid "Value must be valid JSON."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/related.py:939
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/related.py:941
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/related.py:1235
+msgid "One-to-one relationship"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/related.py:1292
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/related.py:1294
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/db/models/fields/related.py:1342
+msgid "Many-to-many relationship"
+msgstr ""
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the label
+#: venv/lib/python3.12/site-packages/django/forms/boundfield.py:185
+msgid ":?.!"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:95
+msgid "This field is required."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:304
+msgid "Enter a whole number."
+msgstr "Telefonnummer"
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:475
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:1252
+msgid "Enter a valid date."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:498
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:1253
+msgid "Enter a valid time."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:525
+msgid "Enter a valid date/time."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:559
+msgid "Enter a valid duration."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:560
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:629
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:630
+msgid "No file was submitted."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:631
+msgid "The submitted file is empty."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:633
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:638
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:702
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:874
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:960
+#: venv/lib/python3.12/site-packages/django/forms/models.py:1585
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:962
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:1081
+#: venv/lib/python3.12/site-packages/django/forms/models.py:1583
+msgid "Enter a list of values."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:1082
+msgid "Enter a complete value."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:1321
+msgid "Enter a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/fields.py:1351
+msgid "Enter a valid JSON."
+msgstr ""
+
+#. Translators: This is the default suffix added to form field labels
+#: venv/lib/python3.12/site-packages/django/forms/forms.py:94
+msgid ":"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/forms.py:231
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/formsets.py:61
+#, python-format
+msgid ""
+"ManagementForm data is missing or has been tampered with. Missing fields: "
+"%(field_names)s. You may need to file a bug report if the issue persists."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/formsets.py:65
+#, python-format
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/forms/formsets.py:70
+#, python-format
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/forms/formsets.py:484
+#: venv/lib/python3.12/site-packages/django/forms/formsets.py:491
+msgid "Order"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/models.py:899
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/models.py:904
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/models.py:911
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/models.py:920
+msgid "Please correct the duplicate values below."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/models.py:1357
+msgid "The inline value did not match the parent instance."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/models.py:1448
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/models.py:1587
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/utils.py:227
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/widgets.py:462
+msgid "Currently"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/forms/widgets.py:800
+msgid "Unknown"
+msgstr ""
+
+#. Translators: Please do not add spaces around commas.
+#: venv/lib/python3.12/site-packages/django/template/defaultfilters.py:889
+msgid "yes,no,maybe"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/template/defaultfilters.py:919
+#: venv/lib/python3.12/site-packages/django/template/defaultfilters.py:936
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/template/defaultfilters.py:938
+#, python-format
+msgid "%s KB"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/template/defaultfilters.py:940
+#, python-format
+msgid "%s MB"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/template/defaultfilters.py:942
+#, python-format
+msgid "%s GB"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/template/defaultfilters.py:944
+#, python-format
+msgid "%s TB"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/template/defaultfilters.py:946
+#, python-format
+msgid "%s PB"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dateformat.py:74
+msgid "p.m."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dateformat.py:75
+msgid "a.m."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dateformat.py:80
+msgid "PM"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dateformat.py:81
+msgid "AM"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dateformat.py:153
+msgid "midnight"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dateformat.py:155
+msgid "noon"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:7
+msgid "Monday"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:8
+msgid "Tuesday"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:9
+msgid "Wednesday"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:10
+msgid "Thursday"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:11
+msgid "Friday"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:12
+msgid "Saturday"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:13
+msgid "Sunday"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:16
+msgid "Mon"
+msgstr "Monaco"
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:17
+msgid "Tue"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:18
+msgid "Wed"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:19
+msgid "Thu"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:20
+msgid "Fri"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:21
+msgid "Sat"
+msgstr "Status"
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:22
+msgid "Sun"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:25
+msgid "January"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:26
+msgid "February"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:27
+msgid "March"
+msgstr "Suchen"
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:28
+msgid "April"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:29
+msgid "May"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:30
+msgid "June"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:31
+msgid "July"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:32
+msgid "August"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:33
+msgid "September"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:34
+msgid "October"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:35
+msgid "November"
+msgstr "Telefonnummer"
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:36
+msgid "December"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:39
+msgid "jan"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:40
+msgid "feb"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:41
+msgid "mar"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:42
+msgid "apr"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:43
+msgid "may"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:44
+msgid "jun"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:45
+msgid "jul"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:46
+msgid "aug"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:47
+msgid "sep"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:48
+msgid "oct"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:49
+msgid "nov"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:50
+msgid "dec"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:53
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:54
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:55
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "Suchen"
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:56
+msgctxt "abbrev. month"
+msgid "April"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:57
+msgctxt "abbrev. month"
+msgid "May"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:58
+msgctxt "abbrev. month"
+msgid "June"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:59
+msgctxt "abbrev. month"
+msgid "July"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:60
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:61
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:62
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:63
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:64
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:67
+msgctxt "alt. month"
+msgid "January"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:68
+msgctxt "alt. month"
+msgid "February"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:69
+msgctxt "alt. month"
+msgid "March"
+msgstr "Suchen"
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:70
+msgctxt "alt. month"
+msgid "April"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:71
+msgctxt "alt. month"
+msgid "May"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:72
+msgctxt "alt. month"
+msgid "June"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:73
+msgctxt "alt. month"
+msgid "July"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:74
+msgctxt "alt. month"
+msgid "August"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:75
+msgctxt "alt. month"
+msgid "September"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:76
+msgctxt "alt. month"
+msgid "October"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:77
+msgctxt "alt. month"
+msgid "November"
+msgstr "Telefonnummer"
+
+#: venv/lib/python3.12/site-packages/django/utils/dates.py:78
+msgctxt "alt. month"
+msgid "December"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/ipv6.py:8
+msgid "This is not a valid IPv6 address."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/text.py:123
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/text.py:323
+msgid "or"
+msgstr ""
+
+#. Translators: This string is used as a separator between list elements
+#: venv/lib/python3.12/site-packages/django/utils/text.py:342
+#: venv/lib/python3.12/site-packages/django/utils/timesince.py:135
+msgid ", "
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/utils/timesince.py:8
+#, python-format
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/utils/timesince.py:9
+#, python-format
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/utils/timesince.py:10
+#, python-format
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/utils/timesince.py:11
+#, python-format
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/utils/timesince.py:12
+#, python-format
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/utils/timesince.py:13
+#, python-format
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.12/site-packages/django/views/csrf.py:29
+msgid "Forbidden"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/csrf.py:30
+msgid "CSRF verification failed. Request aborted."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/csrf.py:34
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/csrf.py:40
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/csrf.py:45
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/csrf.py:54
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/csrf.py:60
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/csrf.py:66
+msgid "More information is available with DEBUG=True."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:44
+msgid "No year specified"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:64
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:115
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:214
+msgid "Date out of range"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:94
+msgid "No month specified"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:147
+msgid "No day specified"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:194
+msgid "No week specified"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:349
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:380
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:652
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/dates.py:692
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/detail.py:56
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/list.py:70
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/list.py:77
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/generic/list.py:169
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/static.py:49
+msgid "Directory indexes are not allowed here."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/static.py:51
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/static.py:68
+#: venv/lib/python3.12/site-packages/django/views/templates/directory_index.html:8
+#: venv/lib/python3.12/site-packages/django/views/templates/directory_index.html:11
+#, python-format
+msgid "Index of %(directory)s"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:7
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:220
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:206
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:221
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:229
+msgid "Django Documentation"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:230
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:238
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:239
+msgid "Get started with Django"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:247
+msgid "Django Community"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:248
+msgid "Connect, get help, or contribute"
+msgstr ""
+
+#~ msgid "Internal notes"
+#~ msgstr "Interne Notizen"
+
+#~ msgid "notes"
+#~ msgstr "Notizen"
+
+#~ msgid "for healthcare facilities"
+#~ msgstr "für Gesundheitseinrichtungen"
+
+#~ msgid "your.email@example.com"
+#~ msgstr "ihre.email@beispiel.com"
+
+#~ msgid "Enter your password"
+#~ msgstr "Geben Sie Ihr Passwort ein"
+
+#, fuzzy
+#~| msgid "Current file"
+#~ msgid "Current File"
+#~ msgstr "Aktuelle Datei"
+
+#~ msgid "Replace File"
+#~ msgstr "Datei ersetzen"
+
+#, fuzzy
+#~| msgid "Options"
+#~ msgid "optional"
+#~ msgstr "Aktionen"
+
+#~ msgid "Download"
+#~ msgstr "Herunterladen"
+
+#, fuzzy
+#~| msgid "Delete Document"
+#~ msgid "Delete permanently"
+#~ msgstr "Dauerhaft löschen"

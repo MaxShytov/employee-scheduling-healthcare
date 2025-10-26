@@ -177,7 +177,7 @@ class EmployeeAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         (_('Additional Information'), {
-            'fields': ('notes',),
+            'fields': ('description',),
             'classes': ('collapse',)
         }),
         (_('Metadata'), {
@@ -339,7 +339,7 @@ class LocationAdmin(admin.ModelAdmin):
             'description': _('GPS coordinates for geolocation tracking (optional)')
         }),
         (_('Additional'), {
-            'fields': ('notes',)
+            'fields': ('description',)
         }),
     )
     

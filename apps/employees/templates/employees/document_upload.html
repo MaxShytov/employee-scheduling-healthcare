@@ -20,14 +20,14 @@
 
                         {% include "core/components/form_field.html" with field=form.description col_class="col-12" %}
 
-                        {% include "core/components/form_field.html" with field=form.file col_class="col-12" help_text="Accepted formats: PDF, DOCX, JPG, PNG (max 10MB)" %}
+                        {% include "core/components/custom_file_input.html" with field=form.file col_class="col-12" help_text=file_help_text accept=".pdf,.docx,.jpg,.jpeg,.png" %}
 
                         {% include "core/components/form_field.html" with field=form.issue_date col_class="col-md-6" %}
 
                         {% include "core/components/form_field.html" with field=form.expiry_date col_class="col-md-6" %}
                     </div>
 
-                    {% include "core/components/action_buttons.html" with cancel_url=cancel_url submit_text="Upload Document" submit_icon="upload" %}
+                    {% include "core/components/action_buttons.html" with cancel_url=cancel_url submit_text=submit_text submit_icon="upload" %}
                 </form>
             </div>
         </div>

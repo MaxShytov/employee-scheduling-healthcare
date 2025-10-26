@@ -2,6 +2,8 @@
 Views for employee management.
 """
 import json
+import logging
+import os
 from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,7 +15,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from apps.core.views.base import BaseListView
@@ -159,19 +161,16 @@ class EmployeeFormMixin:
     # Form Structure (sections)
     # ========================================
 
-    def get_form_sections(self, employee_form, user_form, current_image_url=None):
-        """Prepare structured form sections data for Employee."""
+    def get_form_sections(self, employee_form, user_form):
+        """
+        Prepare structured form sections data for Employee.
+        Note: Profile picture editing is now on detail page, not in edit form.
+        """
         return [
             {
                 'title': _('Personal Information'),
                 'icon': 'person',
                 'fields': [
-                    {
-                        'field': user_form['profile_picture'],
-                        'col_class': 'col-12',
-                        'is_image': True,
-                        'current_image_url': current_image_url
-                    },
                     {'field': user_form['first_name'],
                         'col_class': 'col-md-6'},
                     {'field': user_form['last_name'], 'col_class': 'col-md-6'},
@@ -221,10 +220,10 @@ class EmployeeFormMixin:
                 ]
             },
             {
-                'title': _('Additional Notes'),
+                'title': _('Additional Information'),
                 'icon': 'notes',
                 'fields': [
-                    {'field': employee_form['notes'], 'col_class': 'col-12'},
+                    {'field': employee_form['description'], 'col_class': 'col-12'},
                 ]
             }
         ]
@@ -256,10 +255,6 @@ class EmployeeFormMixin:
         raise NotImplementedError(
             "Subclasses must implement get_page_metadata()")
 
-    def get_current_image_url(self):
-        """Get current profile picture URL for update forms."""
-        return None
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -275,8 +270,7 @@ class EmployeeFormMixin:
         context['forms'] = [context['user_form'], context['form']]
         context['form_sections'] = self.get_form_sections(
             context['form'],
-            context['user_form'],
-            current_image_url=self.get_current_image_url()
+            context['user_form']
         )
 
         return context
@@ -382,12 +376,6 @@ class EmployeeUpdateView(EmployeeFormMixin, BreadcrumbMixin, LoginRequiredMixin,
     def get_user_form_instance(self):
         """Return existing user instance for update."""
         return self.object.user
-
-    def get_current_image_url(self):
-        """Return current profile picture URL."""
-        if self.object.user.profile_picture:
-            return self.object.user.profile_picture.url
-        return None
 
     def get_page_metadata(self):
         """Page metadata for update view."""
@@ -621,6 +609,44 @@ class EmployeeDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
 
         rows = []
         for doc in documents:
+            # Build actions list - only include preview if file exists
+            actions = []
+
+            # Add preview action only if file exists
+            if doc.file:
+                actions.append({
+                    'type': 'link',
+                    'url': doc.file.url,
+                    'icon': 'visibility',
+                    'color': 'primary',
+                    'title': _('Preview'),
+                    'target': '_blank'
+                })
+
+            # Always include edit action
+            actions.append({
+                'type': 'link',
+                'url': reverse(
+                    'employees:document_edit',
+                    kwargs={'pk': employee.pk, 'doc_pk': doc.pk}
+                ),
+                'icon': 'edit',
+                'color': 'secondary',
+                'title': _('Edit')
+            })
+
+            # Always include delete action
+            actions.append({
+                'type': 'link',
+                'url': reverse(
+                    'employees:document_delete',
+                    kwargs={'pk': employee.pk, 'doc_pk': doc.pk}
+                ),
+                'icon': 'delete',
+                'color': 'danger',
+                'title': _('Delete')
+            })
+
             rows.append({
                 'id': doc.pk,
                 'cells': [
@@ -630,31 +656,8 @@ class EmployeeDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
                         'text': doc.get_document_type_display(),
                         'color': 'info'
                     },
-                    {'type': 'text', 'value': doc.created_at.strftime(
-                        '%Y-%m-%d')},
-                    {
-                        'type': 'actions',
-                        'actions': [
-                            {
-                                'type': 'link',
-                                'url': doc.file.url,
-                                'icon': 'download',
-                                'color': 'primary',
-                                'title': _('Download')
-                            },
-                            {
-                                'type': 'link',
-                                'url': reverse(
-                                    'employees:document_delete',
-                                    kwargs={'pk': employee.pk,
-                                            'doc_pk': doc.pk}
-                                ),
-                                'icon': 'delete',
-                                'color': 'danger',
-                                'title': _('Delete')
-                            }
-                        ]
-                    }
+                    {'type': 'text', 'value': doc.created_at.strftime('%Y-%m-%d')},
+                    {'type': 'actions', 'actions': actions}
                 ]
             })
 
@@ -688,14 +691,16 @@ class EmployeeDetailView(BreadcrumbMixin, LoginRequiredMixin, DetailView):
         }
 
         sidebar_blocks = [
-            # Avatar header
+            # Avatar header with edit functionality
             {
                 'type': 'avatar_header',
-                'avatar_url': employee.user.profile_picture.url if employee.user.profile_picture else None,
+                'avatar_url': employee.user.profile_picture_url,
                 'avatar_initials': employee.user.initials,
                 'name': employee.full_name,
                 'subtitle': employee.position.title,
-                'badge': status_badge
+                'badge': status_badge,
+                'upload_url': reverse('employees:profile_picture_upload', kwargs={'pk': employee.pk}),
+                'delete_url': reverse('employees:profile_picture_delete', kwargs={'pk': employee.pk}),
             },
             {'type': 'divider'},
             # Quick info fields
@@ -2373,10 +2378,62 @@ def employee_document_upload(request, pk):
     else:
         form = EmployeeDocumentForm()
 
-    return render(request, 'employees/document_upload.html', {
+    return render(request, 'employees/document_form.html', {
         'form': form,
         'employee': employee,
-        'page_title': _(f'Upload Document for {employee.full_name}')
+        'is_edit': False,
+        'page_title': _('Upload Document for %(name)s') % {'name': employee.full_name},
+        'cancel_url': reverse('employees:employee_detail', kwargs={'pk': employee.pk}) + '?tab=documents',
+        'file_help_text': _('Accepted formats: PDF, DOCX, JPG, PNG (max 10MB)'),
+        'submit_text': _('Upload Document'),
+    })
+
+
+@login_required
+def employee_document_edit(request, pk, doc_pk):
+    """Edit employee document."""
+    employee = get_object_or_404(Employee, pk=pk)
+    document = get_object_or_404(EmployeeDocument, pk=doc_pk, employee=employee)
+
+    if request.method == 'POST':
+        # Save old file reference BEFORE creating form
+        # Form will bind new file to the instance in memory!
+        old_file_name = document.file.name if document.file else None
+
+        form = EmployeeDocumentForm(request.POST, request.FILES, instance=document)
+        if form.is_valid():
+            # Save the form with new file
+            form.save()
+
+            # Delete old file from disk if new file was uploaded
+            if old_file_name and 'file' in request.FILES:
+                from django.conf import settings
+                old_file_path = os.path.join(settings.MEDIA_ROOT, old_file_name)
+                try:
+                    if os.path.exists(old_file_path):
+                        os.remove(old_file_path)
+                except Exception as e:
+                    # Log the error but don't fail the request
+                    # The new file has been saved successfully
+                    logger = logging.getLogger(__name__)
+                    logger.warning(f"Failed to delete old file {old_file_path}: {e}")
+
+            messages.success(request, _('Document updated successfully.'))
+            url = reverse('employees:employee_detail', kwargs={
+                          'pk': employee.pk}) + '?tab=documents'
+            return HttpResponseRedirect(url)
+    else:
+        form = EmployeeDocumentForm(instance=document)
+
+    return render(request, 'employees/document_form.html', {
+        'form': form,
+        'employee': employee,
+        'document': document,
+        'is_edit': True,
+        'page_title': _('Edit Document'),
+        'cancel_url': reverse('employees:employee_detail', kwargs={'pk': employee.pk}) + '?tab=documents',
+        'file_help_text': _('Accepted formats: PDF, DOCX, JPG, PNG (max 10MB)'),
+        'submit_text': _('Save Changes'),
     })
 
 
@@ -2408,8 +2465,88 @@ def employee_document_delete(request, pk, doc_pk):
     return render(request, 'employees/document_confirm_delete.html', {
         'document': document,
         'employee': employee,
-        'page_title': _('Delete Document')
+        'page_title': _('Delete Document'),
+        'delete_title': _('Delete Document?'),
+        'confirm_text': _('Delete Document'),
+        'cancel_url': reverse('employees:employee_detail', kwargs={'pk': employee.pk}) + '?tab=documents',
     })
+
+
+@login_required
+@require_http_methods(["POST"])
+def employee_profile_picture_upload(request, pk):
+    """
+    AJAX endpoint to upload/update employee profile picture.
+    Returns JSON response with new image URL or error.
+    """
+    employee = get_object_or_404(Employee, pk=pk)
+
+    if 'profile_picture' not in request.FILES:
+        return JsonResponse({
+            'success': False,
+            'error': _('No file provided')
+        }, status=400)
+
+    try:
+        # Save old profile picture reference before updating
+        user = employee.user
+        old_picture_name = user.profile_picture.name if user.profile_picture else None
+
+        # Update user's profile picture
+        user.profile_picture = request.FILES['profile_picture']
+        user.save()
+
+        # Delete old profile picture from disk
+        if old_picture_name:
+            from django.conf import settings
+            old_picture_path = os.path.join(settings.MEDIA_ROOT, old_picture_name)
+            try:
+                if os.path.exists(old_picture_path):
+                    os.remove(old_picture_path)
+            except Exception as e:
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Failed to delete old profile picture {old_picture_path}: {e}")
+
+        return JsonResponse({
+            'success': True,
+            'message': _('Profile picture updated successfully'),
+            'image_url': user.profile_picture_url,
+            'file_name': _('Current photo')
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def employee_profile_picture_delete(request, pk):
+    """
+    AJAX endpoint to delete employee profile picture.
+    Returns JSON response confirming deletion.
+    """
+    employee = get_object_or_404(Employee, pk=pk)
+
+    try:
+        user = employee.user
+        if user.profile_picture:
+            user.profile_picture.delete(save=True)
+            return JsonResponse({
+                'success': True,
+                'message': _('Profile picture deleted successfully')
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': _('No profile picture to delete')
+            }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
 
 
 # ============================================
@@ -2849,20 +2986,20 @@ class LocationDetailView(EmployeeTableMixin, BreadcrumbMixin, LoginRequiredMixin
             }
         ])
 
-        # English: Add notes if present
-        if loc.notes:
+        # Add description if present
+        if loc.description:
             sidebar_blocks.extend([
                 {'type': 'divider'},
                 {
                     'type': 'section_header',
                     'icon': 'notes',
-                    'title': _('Additional Notes')
+                    'title': _('Additional Information')
                 },
                 {
                     'type': 'field',
                     'icon': 'notes',
-                    'label': _('Notes'),
-                    'value': loc.notes
+                    'label': _('Description'),
+                    'value': loc.description
                 }
             ])
 
@@ -2965,10 +3102,10 @@ class LocationFormMixin:
                 ]
             },
             {
-                'title': _('Additional Notes'),
+                'title': _('Additional Information'),
                 'icon': 'notes',
                 'fields': [
-                    {'field': form['notes'], 'col_class': 'col-12'},
+                    {'field': form['description'], 'col_class': 'col-12'},
                 ]
             }
         ]

@@ -20,8 +20,13 @@ urlpatterns = [
     
     # Document URLs
     path('<int:pk>/documents/upload/', views.employee_document_upload, name='document_upload'),
+    path('<int:pk>/documents/<int:doc_pk>/edit/', views.employee_document_edit, name='document_edit'),
     path('<int:pk>/documents/<int:doc_pk>/delete/', views.employee_document_delete, name='document_delete'),
-    
+
+    # Profile Picture AJAX URLs
+    path('<int:pk>/profile-picture/upload/', views.employee_profile_picture_upload, name='profile_picture_upload'),
+    path('<int:pk>/profile-picture/delete/', views.employee_profile_picture_delete, name='profile_picture_delete'),
+
     # Department URLs
     path('departments/', views.DepartmentListView.as_view(), name='department_list'),
     path('departments/<int:pk>/', views.DepartmentDetailView.as_view(), name='department_detail'),

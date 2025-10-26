@@ -73,7 +73,7 @@ Supported cell types:
                     <div class="btn-group btn-group-sm">
                         {% for action in cell.actions %}
                             {% if action.type == "link" %}
-                                <a href="{{ action.url }}" class="btn btn-outline-{{ action.color|default:'primary' }}" title="{{ action.title }}">
+                                <a href="{{ action.url }}" class="btn btn-outline-{{ action.color|default:'primary' }}" title="{{ action.title }}"{% if action.target %} target="{{ action.target }}"{% endif %}>
                                     <span class="material-icons" style="font-size: 16px;">{{ action.icon }}</span>
                                 </a>
                             {% elif action.type == "button" %}

@@ -111,7 +111,7 @@ class Command(BaseCommand):
                 'labor_budget': Decimal('250000.00'),
                 'latitude': Decimal('46.204391'),
                 'longitude': Decimal('6.143158'),
-                'notes': 'Main clinic location in Geneva city center'
+                'description': 'Main clinic location in Geneva city center'
             },
             {
                 'name': 'Clinique des Alpes - Lausanne',
@@ -126,7 +126,7 @@ class Command(BaseCommand):
                 'labor_budget': Decimal('180000.00'),
                 'latitude': Decimal('46.516968'),
                 'longitude': Decimal('6.629117'),
-                'notes': 'Secondary location in Lausanne'
+                'description': 'Secondary location in Lausanne'
             },
             {
                 'name': 'Clinique des Alpes - Bern',
@@ -141,7 +141,7 @@ class Command(BaseCommand):
                 'labor_budget': Decimal('150000.00'),
                 'latitude': Decimal('46.947456'),
                 'longitude': Decimal('7.447396'),
-                'notes': 'Branch office in Bern'
+                'description': 'Branch office in Bern'
             },
             # Canada locations - Toronto Dental Clinics
             {
@@ -157,7 +157,7 @@ class Command(BaseCommand):
                 'labor_budget': Decimal('120000.00'),
                 'latitude': Decimal('43.651070'),
                 'longitude': Decimal('-79.381786'),
-                'notes': 'Downtown Toronto dental clinic specializing in cosmetic dentistry'
+                'description': 'Downtown Toronto dental clinic specializing in cosmetic dentistry'
             },
             {
                 'name': 'North York Dental Care',
@@ -172,7 +172,7 @@ class Command(BaseCommand):
                 'labor_budget': Decimal('95000.00'),
                 'latitude': Decimal('43.777111'),
                 'longitude': Decimal('-79.417297'),
-                'notes': 'Family dental practice in North York area'
+                'description': 'Family dental practice in North York area'
             },
             # Luxembourg - Family Doctor
             {
@@ -188,7 +188,7 @@ class Command(BaseCommand):
                 'labor_budget': Decimal('80000.00'),
                 'latitude': Decimal('49.611622'),
                 'longitude': Decimal('6.131935'),
-                'notes': 'Family medicine practice in Luxembourg City center'
+                'description': 'Family medicine practice in Luxembourg City center'
             },
             # Monaco - ENT Specialist
             {
@@ -204,7 +204,7 @@ class Command(BaseCommand):
                 'labor_budget': Decimal('150000.00'),
                 'latitude': Decimal('43.738418'),
                 'longitude': Decimal('7.424616'),
-                'notes': 'ENT (Ear, Nose, Throat) specialist clinic in Monte-Carlo'
+                'description': 'ENT (Ear, Nose, Throat) specialist clinic in Monte-Carlo'
             },
         ]
 
